@@ -29,7 +29,8 @@ const NavBar = () => {
             <button
               onClick={() => setIsOpen(!isOpen)}
               type="button"
-              className="text-gray-500 hover:text-whatsapp-green focus:outline-none focus:text-whatsapp-green transition duration-150 ease-in-out"
+              // CAMBIO AQUÍ: Color base más claro y armónico
+              className="text-gray-700 hover:text-whatsapp-green focus:outline-none focus:text-whatsapp-green transition duration-150 ease-in-out" 
               aria-label="Toggle menu"
             >
               {isOpen ? (
@@ -45,7 +46,6 @@ const NavBar = () => {
             <li>
               <a 
                 href="#inicio" 
-                // TAMAÑO DE FUENTE ESCRITORIO
                 className="text-base text-whatsapp-green font-semibold border-b-2 border-whatsapp-green pb-1 transition duration-200"
               >
                 Inicio
@@ -54,7 +54,6 @@ const NavBar = () => {
             <li>
               <a 
                 href="#conoceme" 
-                // TAMAÑO DE FUENTE ESCRITORIO
                 className="text-base text-gray-600 font-regular hover:text-whatsapp-green transition duration-200"
               >
                 Conóceme
@@ -63,7 +62,6 @@ const NavBar = () => {
             <li>
               <a 
                 href="#contacto" 
-                // TAMAÑO DE FUENTE ESCRITORIO
                 className="text-base text-gray-600 font-regular hover:text-whatsapp-green transition duration-200"
               >
                 Contáctame
@@ -79,13 +77,11 @@ const NavBar = () => {
           isOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
         } overflow-hidden`}
       >
-        {/* Aquí la lista del menú móvil aplica las clases de tamaño de fuente */}
         <ul className="px-2 pt-2 pb-3 space-y-1 sm:px-3 text-center bg-gray-50 border-t border-gray-200">
           <li>
             <a 
               href="#inicio" 
               onClick={handleNavLinkClick}
-              // TAMAÑO DE FUENTE MÓVIL: text-sm
               className="block py-2 text-sm text-whatsapp-green font-semibold border-b-2 border-whatsapp-green transition duration-200"
             >
               Inicio
@@ -95,7 +91,6 @@ const NavBar = () => {
             <a 
               href="#conoceme" 
               onClick={handleNavLinkClick}
-              // TAMAÑO DE FUENTE MÓVIL: text-sm
               className="block py-2 text-sm text-text-dark font-regular hover:text-whatsapp-green transition duration-200"
             >
               Conóceme
@@ -105,7 +100,6 @@ const NavBar = () => {
             <a 
               href="#contacto" 
               onClick={handleNavLinkClick}
-              // TAMAÑO DE FUENTE MÓVIL: text-sm
               className="block py-2 text-sm text-text-dark font-regular hover:text-whatsapp-green transition duration-200"
             >
               Contáctame
