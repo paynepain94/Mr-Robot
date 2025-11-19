@@ -30,7 +30,7 @@ const NavBar = () => {
               onClick={() => setIsOpen(!isOpen)}
               type="button"
               // CAMBIO AQUÍ: Color base más claro (text-gray-400) y hover más oscuro para contraste
-              className="text-gray-400 hover:text-whatsapp-dark focus:outline-none focus:text-whatsapp-dark transition duration-150 ease-in-out"
+              className="text-gray-400 hover:text-whatsapp-white focus:outline-none focus:text-whatsapp-white transition duration-150 ease-in-out"
               aria-label="Toggle menu"
             >
               {isOpen ? (
