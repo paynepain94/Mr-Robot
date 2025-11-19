@@ -1,0 +1,6 @@
+# Permitir el acceso a todos los archivos a todos los bots
+User-agent: *
+Allow: /
+
+# Especifica la ubicación del sitemap
+Sitemap: [www.mr-robot.mx/sitemap.xml
