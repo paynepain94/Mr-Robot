@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'; // Iconos de Heroicons
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import MrRobotNavLogo from '../assets/mr-robot-logo-circle.svg'; 
 
 const NavBar = () => {
-  // Estado para controlar si el menú está abierto o cerrado
   const [isOpen, setIsOpen] = useState(false);
 
-  // Función para manejar la navegación (cierra el menú al hacer clic)
   const handleNavLinkClick = () => {
-    setIsOpen(false); // Cierra el menú
-    // Nota: La navegación al ancla (#) se maneja automáticamente por el 'href'
+    setIsOpen(false);
   };
 
   return (
-    // El 'nav' se mantiene sticky
     <nav className="sticky top-0 z-30 bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
@@ -37,9 +33,9 @@ const NavBar = () => {
               aria-label="Toggle menu"
             >
               {isOpen ? (
-                <XMarkIcon className="h-8 w-8" /> // Icono de 'X' cuando está abierto
+                <XMarkIcon className="h-8 w-8" />
               ) : (
-                <Bars3Icon className="h-8 w-8" /> // Icono de hamburguesa cuando está cerrado
+                <Bars3Icon className="h-8 w-8" />
               )}
             </button>
           </div>
@@ -49,6 +45,7 @@ const NavBar = () => {
             <li>
               <a 
                 href="#inicio" 
+                // TAMAÑO DE FUENTE ESCRITORIO
                 className="text-base text-whatsapp-green font-semibold border-b-2 border-whatsapp-green pb-1 transition duration-200"
               >
                 Inicio
@@ -57,6 +54,7 @@ const NavBar = () => {
             <li>
               <a 
                 href="#conoceme" 
+                // TAMAÑO DE FUENTE ESCRITORIO
                 className="text-base text-gray-600 font-regular hover:text-whatsapp-green transition duration-200"
               >
                 Conóceme
@@ -65,6 +63,7 @@ const NavBar = () => {
             <li>
               <a 
                 href="#contacto" 
+                // TAMAÑO DE FUENTE ESCRITORIO
                 className="text-base text-gray-600 font-regular hover:text-whatsapp-green transition duration-200"
               >
                 Contáctame
@@ -75,18 +74,19 @@ const NavBar = () => {
       </div>
 
       {/* --- MENÚ MÓVIL (se muestra/oculta con el estado) --- */}
-      {/* Usamos el ternario para aplicar las clases de visibilidad y animación */}
       <div 
         className={`md:hidden transition-all duration-300 ease-in-out ${
           isOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
         } overflow-hidden`}
       >
+        {/* Aquí la lista del menú móvil aplica las clases de tamaño de fuente */}
         <ul className="px-2 pt-2 pb-3 space-y-1 sm:px-3 text-center bg-gray-50 border-t border-gray-200">
           <li>
             <a 
               href="#inicio" 
               onClick={handleNavLinkClick}
-              className="block py-2 text-whatsapp-green font-semibold border-b-2 border-whatsapp-green transition duration-200"
+              // TAMAÑO DE FUENTE MÓVIL: text-sm
+              className="block py-2 text-sm text-whatsapp-green font-semibold border-b-2 border-whatsapp-green transition duration-200"
             >
               Inicio
             </a>
@@ -95,7 +95,8 @@ const NavBar = () => {
             <a 
               href="#conoceme" 
               onClick={handleNavLinkClick}
-              className="block py-2 text-text-dark font-regular hover:text-whatsapp-green transition duration-200"
+              // TAMAÑO DE FUENTE MÓVIL: text-sm
+              className="block py-2 text-sm text-text-dark font-regular hover:text-whatsapp-green transition duration-200"
             >
               Conóceme
             </a>
@@ -104,7 +105,8 @@ const NavBar = () => {
             <a 
               href="#contacto" 
               onClick={handleNavLinkClick}
-              className="block py-2 text-text-dark font-regular hover:text-whatsapp-green transition duration-200"
+              // TAMAÑO DE FUENTE MÓVIL: text-sm
+              className="block py-2 text-sm text-text-dark font-regular hover:text-whatsapp-green transition duration-200"
             >
               Contáctame
             </a>
