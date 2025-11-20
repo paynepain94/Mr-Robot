@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react'; // Importamos useEffect
 import NavBar from './components/NavBar';
 import Header from './components/Header';
 import Benefits from './components/Benefits';
@@ -7,9 +7,32 @@ import Conoceme from './components/Conoceme';
 import Testimonials from './components/Testimonials';
 import ContactForm from './components/ContactForm';
 import Footer from './components/Footer';
-import WhatsappButton from './components/WhatsappButton'; // <-- 1. IMPORTAR
+import WhatsappButton from './components/WhatsappButton';
+import Lenis from 'lenis'; // Importamos Lenis
 
 function App() {
+  
+  // Configuración de Lenis (Scroll Suave)
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2, // Ajusta la suavidad (1.2 es un buen estándar)
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Efecto inercia
+      smoothWheel: true,
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    // Limpieza para evitar errores al recargar
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
+
   return (
     <div className="font-sans antialiased text-text-dark">
       <NavBar /> 
@@ -22,7 +45,7 @@ function App() {
         <ContactForm />
       </main>
       <Footer />
-      <WhatsappButton /> {/* <-- 2. AÑADIR AL FINAL */}
+      <WhatsappButton />
     </div>
   );
 }

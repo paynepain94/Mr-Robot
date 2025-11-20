@@ -38,7 +38,7 @@ const Benefits = () => {
   return (
     <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gray-soft text-center">
       <div className="max-w-7xl mx-auto">
-        {/* CAMBIO DE PESO: Titular de sección en Bold (ya estaba) */}
+        {/* Titular de sección en Bold */}
         <h2 className="text-3xl sm:text-4xl font-bold text-text-dark mb-12">
           ¿Por qué elegir Mr-Robot?
         </h2>
@@ -47,23 +47,24 @@ const Benefits = () => {
           {benefitsData.map((benefit, index) => (
             <div 
               key={index} 
+              // --- CAMBIOS AQUÍ: Animación y Efecto de Levantamiento ---
               className="relative bg-white p-6 sm:p-8 rounded-xl shadow-md overflow-hidden 
-                         flex flex-col items-center justify-center text-center h-72 sm:h-80" 
+                         flex flex-col items-center justify-center text-center h-72 sm:h-80
+                         transform transition duration-300 ease-in-out 
+                         hover:scale-[1.02] hover:shadow-xl focus-within:scale-[1.02] cursor-pointer"
               style={{ 
                 background: 'linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(240,255,240,1) 100%)',
                 border: '1px solid #e6ffe6'
               }}
             >
               <img 
-                 src={benefit.illustration} 
-                 alt={benefit.title} 
-                 className={`${benefit.sizeClass} object-contain mx-auto mb-4`} 
+                src={benefit.illustration} 
+                alt={benefit.title} 
+                className={`${benefit.sizeClass} object-contain mx-auto mb-4`} 
               />
 
               <div className="w-full text-center"> 
-                {/* CAMBIO DE PESO: Titular de tarjeta en Bold */}
                 <h3 className="text-xl font-bold text-text-dark mb-2">{benefit.title}</h3>
-                {/* CAMBIO DE PESO: Descripción en Light */}
                 <p className="text-gray-600 text-sm font-light">{benefit.description}</p>
               </div>
             </div>
