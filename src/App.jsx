@@ -1,5 +1,5 @@
 import React from 'react';
-import NavBar from './components/NavBar'; // <-- 1. IMPORTA EL NUEVO COMPONENTE
+import NavBar from './components/NavBar';
 import Header from './components/Header';
 import Benefits from './components/Benefits';
 import HowItWorks from './components/HowItWorks';
@@ -7,11 +7,12 @@ import Conoceme from './components/Conoceme';
 import Testimonials from './components/Testimonials';
 import ContactForm from './components/ContactForm';
 import Footer from './components/Footer';
+import WhatsappButton from './components/WhatsappButton'; // <-- 1. IMPORTAR
 
 function App() {
   return (
     <div className="font-sans antialiased text-text-dark">
-      <NavBar /> {/* <-- 2. AÑÁDELO AQUÍ, ANTES DEL HEADER */}
+      <NavBar /> 
       <Header />
       <main>
         <Benefits />
@@ -21,6 +22,7 @@ function App() {
         <ContactForm />
       </main>
       <Footer />
+      <WhatsappButton /> {/* <-- 2. AÑADIR AL FINAL */}
     </div>
   );
 }
