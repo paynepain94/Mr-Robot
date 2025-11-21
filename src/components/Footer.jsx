@@ -1,14 +1,15 @@
 import React from 'react';
 
-
- import instagramIcon from '../assets/instagram.svg';
- import linkedinIcon from '../assets/linkedin.svg';
- import tiktokIcon from '../assets/tiktok.svg';
-
-
+import instagramIcon from '../assets/instagram.svg';
+import linkedinIcon from '../assets/linkedin.svg';
+import tiktokIcon from '../assets/tiktok.svg';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+
+  // Enlaces proporcionados
+  const privacidadLink = "https://drive.google.com/file/d/1AsZ5PTK4Iy311tuIk-RN3I_SZdoR7XJ6/view?usp=drive_link";
+  const terminosLink = "https://drive.google.com/file/d/1iR9m2gGuxWHrPzEwktlCo7v5pxPoLLLq/view?usp=sharing";
 
   return (
     <footer className="bg-text-dark text-white py-12 px-4 sm:px-6 lg:px-8">
@@ -33,11 +34,32 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Columna 3: Redes sociales */}
+        {/* Columna 3: Legal y Redes sociales */}
         <div>
           <h4 className="text-xl font-bold mb-4">Legal</h4>
           <ul className="space-y-2 mb-6 font-light">
-            <li><a href="#" className="text-gray-400 hover:text-white transition duration-200">Términos y Condiciones</a></li>
+            {/* ENLACE TÉRMINOS Y CONDICIONES ACTUALIZADO */}
+            <li>
+              <a 
+                href={terminosLink} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-400 hover:text-white transition duration-200"
+              >
+                Términos y Condiciones
+              </a>
+            </li>
+            {/* ENLACE AVISO DE PRIVACIDAD ACTUALIZADO Y REUBICADO */}
+            <li>
+               <a
+                href={privacidadLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition duration-200"
+              >
+                Aviso de Privacidad
+              </a>
+            </li>
           </ul>
           
           <h4 className="text-xl font-bold mb-4">Síguenos</h4>
@@ -45,30 +67,30 @@ const Footer = () => {
           <div className="flex space-x-4 justify-center md:justify-start items-center">
             
             {/* Instagram */}
-            <a 
-              href="https://www.instagram.com/mr.robot.mx/" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              href="https://www.instagram.com/mr.robot.mx/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="transition duration-200 opacity-60 hover:opacity-100"
             >
               <img src={instagramIcon} alt="Instagram" className="h-6 w-6 object-contain invert" />
             </a>
             
             {/* LinkedIn */}
-            <a 
-              href="https://www.linkedin.com/in/joabromero94/" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              href="https://www.linkedin.com/in/joabromero94/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="transition duration-200 opacity-60 hover:opacity-100"
             >
               <img src={linkedinIcon} alt="LinkedIn" className="h-6 w-6 object-contain invert" />
             </a>
             
             {/* TikTok */}
-            <a 
-              href="https://www.tiktok.com/@mr_robot_mx" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              href="https://www.tiktok.com/@mr_robot_mx"
+              target="_blank"
+              rel="noopener noreferrer"
               className="transition duration-200 opacity-60 hover:opacity-100"
             >
               <img src={tiktokIcon} alt="TikTok" className="h-6 w-6 object-contain invert" />
@@ -79,15 +101,6 @@ const Footer = () => {
       
       {/* Copyright */}
       <div className="text-center text-gray-500 text-sm mt-12 border-t border-gray-700 pt-8 font-light">
-        <a 
-          // IMPORTANTE: Este archivo debe estar en la carpeta 'public'
-          href="/Aviso_de_Privacidad_Integral_Mr-Robot.pdf" 
-          download="Aviso_de_Privacidad_Integral_Mr-Robot.pdf"
-          className="text-gray-400 hover:text-white transition duration-200 cursor-pointer"
-        >
-          Aviso de Privacidad
-        </a>
-        <span className="mx-2">|</span>
         <span className="text-gray-500">
           © {currentYear} Mr-Robot. Todos los derechos reservados.
         </span>
