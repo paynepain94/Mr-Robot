@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import Matter from 'matter-js';
+import WhatsAppIcon from '../assets/whatsapp-dynamic.svg';
+import CheckIcon from '../assets/check-dynamic.svg';
 
 const GravityHero = () => {
     const sceneRef = useRef(null);
@@ -8,7 +10,6 @@ const GravityHero = () => {
     const runnerRef = useRef(null);
 
     useEffect(() => {
-        // Module aliases
         const Engine = Matter.Engine,
             Render = Matter.Render,
             Runner = Matter.Runner,
@@ -19,100 +20,106 @@ const GravityHero = () => {
             Events = Matter.Events,
             Body = Matter.Body;
 
-        // Create engine
         const engine = Engine.create();
-        engine.gravity.y = 0; // Zero gravity
+        engine.gravity.y = 0;
         engineRef.current = engine;
 
-        // Create renderer
         const render = Render.create({
             element: sceneRef.current,
             engine: engine,
             options: {
                 width: window.innerWidth,
                 height: window.innerHeight,
-                background: '#0a0a0a', // Deep dark background
+                background: '#0a0a0a',
                 wireframes: false,
                 pixelRatio: window.devicePixelRatio
             }
         });
         renderRef.current = render;
 
-        // Create bodies
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        const bodies = [];
+        // --- CREATE BODIES WITH ICONS ---
+        const createBodies = (width, height) => {
+            const bodies = [];
+            const iconSize = 60; // Base size for icons
 
-        // Add some random "tech" shapes
-        const colors = ['#25D366', '#128C7E', '#075E54', '#34B7F1', '#ECE5DD']; // WhatsApp & Tech colors
+            for (let i = 0; i < 25; i++) {
+                const x = Math.random() * width;
+                const y = Math.random() * height;
+                const scale = 0.5 + Math.random() * 0.5; // Random scale between 0.5 and 1.0
 
-        for (let i = 0; i < 40; i++) {
-            const x = Math.random() * width;
-            const y = Math.random() * height;
-            const size = Math.random() * 30 + 10;
-            const color = colors[Math.floor(Math.random() * colors.length)];
-
-            let body;
-            if (Math.random() > 0.5) {
-                body = Bodies.circle(x, y, size, {
-                    render: { fillStyle: color, opacity: 0.8 },
-                    restitution: 0.9,
-                    frictionAir: 0.02
-                });
-            } else {
-                body = Bodies.rectangle(x, y, size * 1.5, size * 1.5, {
-                    render: { fillStyle: color, opacity: 0.8 },
-                    restitution: 0.9,
-                    frictionAir: 0.02,
-                    chamfer: { radius: 5 }
-                });
+                let body;
+                if (Math.random() > 0.4) {
+                    // WhatsApp Icon
+                    body = Bodies.circle(x, y, (iconSize * scale) / 2, {
+                        restitution: 0.9,
+                        frictionAir: 0.02,
+                        render: {
+                            sprite: {
+                                texture: WhatsAppIcon,
+                                xScale: scale * 0.6, // Adjust scale to match body size
+                                yScale: scale * 0.6
+                            }
+                        }
+                    });
+                } else {
+                    // Check Icon (Palomita)
+                    body = Bodies.circle(x, y, (iconSize * scale) / 2, {
+                        restitution: 0.9,
+                        frictionAir: 0.02,
+                        render: {
+                            sprite: {
+                                texture: CheckIcon,
+                                xScale: scale * 0.8,
+                                yScale: scale * 0.8
+                            }
+                        }
+                    });
+                }
+                bodies.push(body);
             }
-            bodies.push(body);
-        }
+            return bodies;
+        };
 
-        // Add walls to keep things on screen (optional, but good for containment)
-        const wallOptions = { isStatic: true, render: { visible: false } };
-        const walls = [
-            Bodies.rectangle(width / 2, -50, width, 100, wallOptions),
-            Bodies.rectangle(width / 2, height + 50, width, 100, wallOptions),
-            Bodies.rectangle(width + 50, height / 2, 100, height, wallOptions),
-            Bodies.rectangle(-50, height / 2, 100, height, wallOptions)
-        ];
+        const initialBodies = createBodies(window.innerWidth, window.innerHeight);
 
-        Composite.add(engine.world, [...bodies, ...walls]);
+        // --- WALLS ---
+        const createWalls = (width, height) => {
+            const wallOptions = { isStatic: true, render: { visible: false } };
+            const wallThickness = 200; // Thick walls to prevent tunneling
+            return [
+                Bodies.rectangle(width / 2, -wallThickness / 2, width * 2, wallThickness, wallOptions), // Top
+                Bodies.rectangle(width / 2, height + wallThickness / 2, width * 2, wallThickness, wallOptions), // Bottom
+                Bodies.rectangle(width + wallThickness / 2, height / 2, wallThickness, height * 2, wallOptions), // Right
+                Bodies.rectangle(-wallThickness / 2, height / 2, wallThickness, height * 2, wallOptions) // Left
+            ];
+        };
 
-        // Add mouse control
+        let walls = createWalls(window.innerWidth, window.innerHeight);
+        Composite.add(engine.world, [...initialBodies, ...walls]);
+
+        // --- MOUSE CONTROL ---
         const mouse = Mouse.create(render.canvas);
         const mouseConstraint = MouseConstraint.create(engine, {
             mouse: mouse,
             constraint: {
                 stiffness: 0.2,
-                render: {
-                    visible: false
-                }
+                render: { visible: false }
             }
         });
-
         Composite.add(engine.world, mouseConstraint);
-
-        // Keep the mouse in sync with rendering
         render.mouse = mouse;
 
-        // Add "Anti-Gravity" effect on mouse move
+        // --- INTERACTION ---
         Events.on(engine, 'beforeUpdate', function () {
             const mousePosition = mouse.position;
             const bodies = Composite.allBodies(engine.world);
-
             bodies.forEach(body => {
                 if (body.isStatic) return;
-
                 const dx = body.position.x - mousePosition.x;
                 const dy = body.position.y - mousePosition.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
-
-                // Repel if close
-                if (distance < 200) {
-                    const forceMagnitude = (200 - distance) / 200 * 0.00005;
+                if (distance < 250) {
+                    const forceMagnitude = (250 - distance) / 250 * 0.00005;
                     Body.applyForce(body, body.position, {
                         x: dx * forceMagnitude,
                         y: dy * forceMagnitude
@@ -121,17 +128,26 @@ const GravityHero = () => {
             });
         });
 
-
-        // Run the engine
         Render.run(render);
         const runner = Runner.create();
         runnerRef.current = runner;
         Runner.run(runner, engine);
 
-        // Handle resize
+        // --- RESPONSIVE HANDLER ---
         const handleResize = () => {
-            render.canvas.width = window.innerWidth;
-            render.canvas.height = window.innerHeight;
+            const newWidth = window.innerWidth;
+            const newHeight = window.innerHeight;
+
+            // Update canvas and renderer
+            render.canvas.width = newWidth;
+            render.canvas.height = newHeight;
+            render.options.width = newWidth;
+            render.options.height = newHeight;
+
+            // Remove old walls and add new ones
+            Composite.remove(engine.world, walls);
+            walls = createWalls(newWidth, newHeight);
+            Composite.add(engine.world, walls);
         };
 
         window.addEventListener('resize', handleResize);
@@ -140,14 +156,9 @@ const GravityHero = () => {
             window.removeEventListener('resize', handleResize);
             Render.stop(render);
             Runner.stop(runner);
-            if (render.canvas) {
-                render.canvas.remove();
-            }
+            if (render.canvas) render.canvas.remove();
             Composite.clear(engine.world);
             Engine.clear(engine);
-            render.canvas = null;
-            render.context = null;
-            render.textures = {};
         };
     }, []);
 
