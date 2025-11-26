@@ -22,8 +22,8 @@ const DynamicBackground = () => {
         const colors = ['#10B981', '#34D399', '#059669', '#6EE7B7']; // Emerald shades
 
         class Comet {
-            constructor(direction) {
-                this.direction = direction; // 'left-to-right' or 'right-to-left'
+            constructor() {
+                this.direction = 'left-to-right'; // Uniform direction
                 this.init();
             }
 
@@ -34,53 +34,42 @@ const DynamicBackground = () => {
                 this.headSize = this.thickness + Math.random() * 3;
                 this.color = colors[Math.floor(Math.random() * colors.length)];
 
-                if (this.direction === 'left-to-right') {
-                    this.x = Math.random() * canvas.width - canvas.width;
-                    this.y = Math.random() * (canvas.height * 0.35); // Top 35%
+                // Start off-screen left
+                this.x = Math.random() * canvas.width - canvas.width;
+
+                // RESTRICTED AREAS: Top 15% or Bottom 15%
+                const isTop = Math.random() > 0.5;
+                if (isTop) {
+                    // Top 15%
+                    this.y = Math.random() * (canvas.height * 0.15);
                 } else {
-                    this.x = Math.random() * canvas.width + canvas.width;
-                    this.y = canvas.height - Math.random() * (canvas.height * 0.35); // Bottom 35%
+                    // Bottom 15% (Start at 85% height)
+                    this.y = (canvas.height * 0.85) + Math.random() * (canvas.height * 0.15);
                 }
             }
 
             update() {
-                if (this.direction === 'left-to-right') {
-                    this.x += this.speed;
-                    if (this.x > canvas.width + this.length) {
-                        this.init();
-                        this.x = -this.length;
-                    }
-                } else {
-                    this.x -= this.speed;
-                    if (this.x < -this.length) {
-                        this.init();
-                        this.x = canvas.width + this.length;
-                    }
+                // Move Left to Right
+                this.x += this.speed;
+
+                // Reset if off-screen right
+                if (this.x > canvas.width + this.length) {
+                    this.init();
+                    this.x = -this.length;
                 }
             }
 
             draw() {
-                // Determine Head and Tail positions based on direction
-                let xHead, xTail;
+                // Head is at x + length (Right), Tail is at x (Left)
+                const xHead = this.x + this.length;
+                const xTail = this.x;
 
-                if (this.direction === 'left-to-right') {
-                    // Moving Right: Head is at the rightmost point (x + length), Tail is at x
-                    xHead = this.x + this.length;
-                    xTail = this.x;
-                } else {
-                    // Moving Left: Head is at the leftmost point (x), Tail is at x + length
-                    xHead = this.x;
-                    xTail = this.x + this.length;
-                }
-
-                // Create Gradient from Head to Tail
-                // We always define the gradient starting from the Head (Solid) to the Tail (Transparent)
+                // Gradient: Head (Solid) -> Tail (Transparent)
                 const gradient = ctx.createLinearGradient(xHead, this.y, xTail, this.y);
+                gradient.addColorStop(0, this.color);
+                gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
 
-                gradient.addColorStop(0, this.color);           // Head: Solid Color
-                gradient.addColorStop(1, 'rgba(16, 185, 129, 0)'); // Tail: Transparent
-
-                // Draw the Trail
+                // Draw Trail
                 ctx.beginPath();
                 ctx.strokeStyle = gradient;
                 ctx.lineWidth = this.thickness;
@@ -89,10 +78,10 @@ const DynamicBackground = () => {
                 ctx.lineTo(xHead, this.y);
                 ctx.stroke();
 
-                // Draw the Nucleus at the Head position
+                // Draw Nucleus
                 ctx.beginPath();
-                ctx.fillStyle = '#ffffff'; // White hot center
-                ctx.shadowBlur = 20; // Glow
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowBlur = 20;
                 ctx.shadowColor = this.color;
                 ctx.arc(xHead, this.y, this.headSize, 0, Math.PI * 2);
                 ctx.fill();
@@ -103,21 +92,7 @@ const DynamicBackground = () => {
 
         // Initialize comets
         for (let i = 0; i < cometCount; i++) {
-            // User requested "flip" and complained about "reverse" look.
-            // Switching all to 'left-to-right' to ensure consistent forward flow.
-            // We still distribute them top/bottom.
-            const direction = 'left-to-right';
-
-            // We need to manually handle the y-position distribution since we removed the direction check
-            const comet = new Comet(direction);
-
-            // Override y position to distribute across top and bottom
-            if (i >= cometCount / 2) {
-                // Bottom half
-                comet.y = canvas.height - Math.random() * (canvas.height * 0.35);
-            }
-
-            comets.push(comet);
+            comets.push(new Comet());
         }
 
         const animate = () => {
