@@ -25,17 +25,17 @@ const Header = () => {
             </span>
           </div>
 
-          {/* Headline */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight tracking-tight animate-fade-in-up">
+          {/* Headline (Visual only, semantically secondary) */}
+          <p className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight tracking-tight animate-fade-in-up">
             ¿Pierdes ventas mientras duermes?
-          </h1>
+          </p>
 
-          {/* Green Text H2 - Styled as requested */}
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight mt-4 animate-fade-in-up delay-100">
+          {/* Main H1 (SEO optimized) */}
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight mt-4 animate-fade-in-up delay-100">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">
               Mr-Robot vende por ti 24/7. Sin sueldos, sin descansos, solo resultados.
             </span>
-          </h2>
+          </h1>
 
           {/* Subheadline */}
           <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto lg:mx-0 animate-fade-in-up delay-200">
