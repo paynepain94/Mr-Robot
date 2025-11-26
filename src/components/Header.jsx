@@ -44,10 +44,10 @@ const Header = () => {
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 animate-fade-in-up delay-300">
-            <button className="w-full sm:w-auto px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg hover:shadow-emerald-500/30 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2">
+            <a href="https://wa.me/523317106005" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg hover:shadow-emerald-500/30 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2">
               <span className="text-xl">🚀</span>
-              Empezar a Automatizar Hoy
-            </button>
+              Empieza a automatizar hoy
+            </a>
           </div>
 
           {/* Trust Signal */}
