@@ -6,11 +6,11 @@ export default async function handler(req, res) {
         const challenge = req.query['hub.challenge'];
 
         // SECURITY: Use an environment variable for the verify token
-        const VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN;
+        const VERIFY_TOKEN = 'mr_robot_secret_8909789';
 
         console.log('--- NEW VERIFICATION REQUEST ---');
         console.log('Query Params:', JSON.stringify(req.query));
-        console.log('Expected Token (Env Var):', VERIFY_TOKEN ? `'${VERIFY_TOKEN}'` : 'UNDEFINED/NULL');
+        console.log('Expected Token (Hardcoded):', VERIFY_TOKEN);
         console.log('Received Token:', token ? `'${token}'` : 'UNDEFINED/NULL');
         console.log('Match?', token === VERIFY_TOKEN);
 
