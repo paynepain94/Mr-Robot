@@ -8,11 +8,18 @@ export default async function handler(req, res) {
         // SECURITY: Use an environment variable for the verify token
         const VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN;
 
+        console.log('--- NEW VERIFICATION REQUEST ---');
+        console.log('Query Params:', JSON.stringify(req.query));
+        console.log('Expected Token (Env Var):', VERIFY_TOKEN ? `'${VERIFY_TOKEN}'` : 'UNDEFINED/NULL');
+        console.log('Received Token:', token ? `'${token}'` : 'UNDEFINED/NULL');
+        console.log('Match?', token === VERIFY_TOKEN);
+
         if (mode && token) {
             if (mode === 'subscribe' && token === VERIFY_TOKEN) {
-                console.log('WEBHOOK_VERIFIED');
+                console.log('WEBHOOK_VERIFIED success');
                 return res.status(200).send(challenge);
             } else {
+                console.log('VERIFICATION FAILED: Token mismatch');
                 return res.status(403).json({ error: 'Verification failed' });
             }
         } else {
