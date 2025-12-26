@@ -65,7 +65,10 @@ export default async function handler(req, res) {
 
 // Helper function to send messages via WhatsApp Graph API
 async function sendMessage(phoneNumberId, to, text) {
-    const token = process.env.WHATSAPP_API_TOKEN;
+    // TEMPORARY FIX: Hardcode your token here because Vercel Env Vars are not loading
+    // PASTE YOUR LONG TOKEN INSIDE THE QUOTES BELOW:
+    const token = 'EAAL9iuGZC5pwBQaTSWIfXVoyaqIaVAQNbxJUN7oFWfahYJutzZBDx9uBfr4HG0TrZBAgHSpKXrO2DugVNIZBXEYfSt4Tt6di4QNe8E51JOSxzrQBb4ysKdskZAtAeKdOVgN8TZB66tgektFCNWOsaNRELn2qCkySxpQdzYbaRrzNkT8NqLcY3XajekSVcq2VtBSh1ZAvpIeDUHf1YUH66F6hBQwqZBIKJP9TKSB70nWtZApEkVyiGdgP5UBUqWH2lbYnwg0lnQRxp1ADRVqWxOKVk1XuP';
+    // const token = process.env.WHATSAPP_API_TOKEN; // (Commented out until Vercel is fixed)
     const response = await fetch(
         `https://graph.facebook.com/v17.0/${phoneNumberId}/messages`,
         {
