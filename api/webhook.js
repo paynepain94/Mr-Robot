@@ -38,7 +38,33 @@ export default async function handler(req, res) {
                 console.log(`Message from ${from}: ${msg_body}`);
 
                 // KEYWORD LOGIC
-                let responseText = `👋 Hola! Soy el asistente virtual de Mr. Robot.\n\nEscribe una opción:\n1️⃣ *Servicios*\n2️⃣ *Precios*\n3️⃣ *Contacto*`;
+                let responseText = '';
+                const ADMIN_NUMBER = '523317106005'; // Tu número para alertas
+
+                // Helper to check business hours (Mon-Fri, 9am-6pm Mexico City time)
+                const isBusinessHours = () => {
+                    const now = new Date();
+                    const options = { timeZone: 'America/Mexico_City', hour12: false, weekday: 'numeric', hour: 'numeric' };
+                    // formatter returns something like "1, 10" (Monday, 10am) depending on locale, but let's parse parts properly
+                    const parts = new Intl.DateTimeFormat('en-US', {
+                        timeZone: 'America/Mexico_City',
+                        weekday: 'numeric', // 1 (Mon) - 7 (Sun)
+                        hour: 'numeric',    // 0-23
+                        hour12: false
+                    }).formatToParts(now);
+
+                    const weekday = parseInt(parts.find(p => p.type === 'weekday').value); // Monday is 1? No, logic varies.
+                    // Wait, 'weekday: numeric' in en-US might return differently. Let's use standard Date objects converted to TZ.
+                    // Safer approach:
+                    const mexicoDate = new Date(now.toLocaleString("en-US", { timeZone: "America/Mexico_City" }));
+                    const day = mexicoDate.getDay(); // 0 (Sun) - 6 (Sat)
+                    const hour = mexicoDate.getHours();
+
+                    // Condition: Mon(1) to Fri(5) AND 9 <= hour < 18
+                    return (day >= 1 && day <= 5) && (hour >= 9 && hour < 18);
+                };
+
+                const menuText = `👋 Hola! Soy el asistente virtual de Mr. Robot.\n\nEscribe una opción:\n1️⃣ *Servicios*\n2️⃣ *Precios*\n3️⃣ *Contacto*\n4️⃣ *Hablar con Humano*`;
 
                 if (msg_body.includes('servicios') || msg_body.includes('1')) {
                     responseText = "🚀 *Nuestros Servicios:*\n- Desarrollo Web\n- Chatbots con IA\n- Automatización de Procesos";
@@ -46,6 +72,21 @@ export default async function handler(req, res) {
                     responseText = "💰 *Planes:*\n- Básico: $XXXX\n- Pro: $XXXX\n- Enterprise: Cotizar";
                 } else if (msg_body.includes('contacto') || msg_body.includes('3')) {
                     responseText = "📞 *Contáctanos:*\nWhatsapp: +52 33 1710 6005\nCorreo: contacto@mr-robot.mx";
+                } else if (msg_body.includes('humano') || msg_body.includes('4')) {
+                    if (isBusinessHours()) {
+                        responseText = "Un agente se pondrá en contacto contigo en breve.";
+                        // Send Alert to Admin
+                        try {
+                            await sendMessage(phone_number_id, ADMIN_NUMBER, `⚠️ ALERTA MR-ROBOT: El cliente ${from} solicita atención humana.`);
+                        } catch (e) {
+                            console.error('Failed to send admin alert', e);
+                        }
+                    } else {
+                        responseText = "Nuestro horario de atención humana es de Lunes a Viernes de 9am a 6pm. Por ahora, puedo ayudarte con las opciones automáticas.\n\n" + menuText;
+                    }
+                } else {
+                    // CATCH-ALL / ERROR CASE
+                    responseText = "❌ Opción no válida. Por favor, selecciona una de las opciones del menú.\n\n" + menuText;
                 }
 
                 try {
