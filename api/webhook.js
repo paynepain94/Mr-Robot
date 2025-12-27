@@ -44,18 +44,10 @@ export default async function handler(req, res) {
                 // Helper to check business hours (Mon-Fri, 9am-6pm Mexico City time)
                 const isBusinessHours = () => {
                     const now = new Date();
-                    const options = { timeZone: 'America/Mexico_City', hour12: false, weekday: 'numeric', hour: 'numeric' };
-                    // formatter returns something like "1, 10" (Monday, 10am) depending on locale, but let's parse parts properly
-                    const parts = new Intl.DateTimeFormat('en-US', {
-                        timeZone: 'America/Mexico_City',
-                        weekday: 'numeric', // 1 (Mon) - 7 (Sun)
-                        hour: 'numeric',    // 0-23
-                        hour12: false
-                    }).formatToParts(now);
 
-                    const weekday = parseInt(parts.find(p => p.type === 'weekday').value); // Monday is 1? No, logic varies.
-                    // Wait, 'weekday: numeric' in en-US might return differently. Let's use standard Date objects converted to TZ.
-                    // Safer approach:
+                    // Convert to Mexico City time using standard Locale capabilities
+                    // This creates a string, which we parse back to a Date object that represents 
+                    // the "local" time in Mexico City as if it were UTC/Local values we can read with getDay/getHours
                     const mexicoDate = new Date(now.toLocaleString("en-US", { timeZone: "America/Mexico_City" }));
                     const day = mexicoDate.getDay(); // 0 (Sun) - 6 (Sat)
                     const hour = mexicoDate.getHours();
