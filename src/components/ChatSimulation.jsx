@@ -5,10 +5,24 @@ const ChatSimulation = () => {
     const [messages, setMessages] = useState([]);
 
     const conversation = [
-        { id: 1, sender: 'client', text: 'Hola, info de precios.', delay: 1000 },
-        { id: 2, sender: 'robot', text: '¡Hola! 👋 Nuestros planes empiezan en $29/mes. ¿Te interesa ver una demo?', delay: 2500 },
-        { id: 3, sender: 'client', text: 'Sí, claro.', delay: 4000 },
-        { id: 4, sender: 'robot', text: '¡Genial! Agenda aquí: cal.com/mr-robot. ¡Listo! 🚀', delay: 5500 }
+        {
+            id: 1,
+            sender: 'robot',
+            text: '¡Hola! Gracias por escribirnos desde la web. ⚡',
+            delay: 500
+        },
+        {
+            id: 2,
+            sender: 'robot',
+            text: 'Para darte una propuesta de automatización a tu medida, cuéntanos ¿cuál es tu volumen aproximado de mensajes diarios?',
+            type: 'options',
+            delay: 5500, // 5 segundos después del primer mensaje
+            options: [
+                { label: '🟢 Bajo: Menos de 30 chats al día.', action: 'low' },
+                { label: '🔴 Alto: Más de 100 chats y necesito solución robusta.', action: 'high' },
+                { label: '🗓️ Agendar reunión', action: 'calendar', link: 'https://calendar.google.com' }
+            ]
+        }
     ];
 
     useEffect(() => {
@@ -27,6 +41,15 @@ const ChatSimulation = () => {
         return () => timeouts.forEach(clearTimeout);
     }, []);
 
+    const handleOptionClick = (option) => {
+        if (option.link) {
+            window.open(option.link, '_blank');
+        } else {
+            console.log("Selected option:", option.label);
+            // Simulación de interacción visual o respuesta podría ir aquí
+        }
+    };
+
     return (
         <div className="relative w-72 sm:w-80 bg-white rounded-[2rem] shadow-2xl border-8 border-gray-900 overflow-hidden transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500">
             {/* Phone Header */}
@@ -41,16 +64,33 @@ const ChatSimulation = () => {
             </div>
 
             {/* Chat Area */}
-            <div className="bg-[#ECE5DD] h-80 p-4 overflow-y-auto flex flex-col space-y-3">
+            <div className="bg-[#ECE5DD] h-96 p-4 overflow-y-auto flex flex-col space-y-3 custom-scrollbar">
                 {messages.map((msg) => (
                     <div
                         key={msg.id}
-                        className={`max-w-[80%] p-3 rounded-lg text-sm shadow-sm animate-fade-in-up ${msg.sender === 'client'
-                                ? 'bg-white self-start rounded-tl-none'
-                                : 'bg-[#DCF8C6] self-end rounded-tr-none'
+                        className={`max-w-[85%] p-3 rounded-lg text-sm shadow-sm animate-fade-in-up ${msg.sender === 'client'
+                            ? 'bg-white self-start rounded-tl-none'
+                            : 'bg-white self-start rounded-tl-none' // Bot is always white/default in this new flow for options? Or keep green? Standard whatsapp bot is usually left side (white)
                             }`}
+                        style={msg.sender === 'robot' ? { backgroundColor: 'white', borderTopLeftRadius: 0 } : {}}
                     >
-                        <p className="text-gray-800">{msg.text}</p>
+                        <p className="text-gray-800 whitespace-pre-line">{msg.text}</p>
+
+                        {/* Options Rendering */}
+                        {msg.type === 'options' && (
+                            <div className="mt-3 flex flex-col space-y-2">
+                                {msg.options.map((option, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => handleOptionClick(option)}
+                                        className="w-full text-left bg-gray-50 hover:bg-gray-100 text-gray-700 p-2 rounded border border-gray-200 text-xs transition-colors duration-200"
+                                    >
+                                        {option.label}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
                         <span className="text-[10px] text-gray-500 block text-right mt-1">
                             {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>

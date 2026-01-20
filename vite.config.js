@@ -1,16 +1,20 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import path from 'path'; // <-- 1. AÑADE ESTE IMPORT
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  
+
   // --- 2. AÑADE ESTA SECCIÓN ---
   resolve: {
     alias: {
       // Configura el alias para que "@" apunte a la carpeta "./src"
-      "@": path.resolve(__dirname, "./src"),
+      "@": resolve(__dirname, "./src"),
     },
   },
   // -------------------------------
