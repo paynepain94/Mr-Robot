@@ -62,6 +62,29 @@ const reqStart = {
 
 await handler(reqStart, res);
 
+// Test Case 1.5: Simple "Hola"
+console.log('\nTEST 1.5: Triggering "Hola"');
+const reqHola = {
+    method: 'POST',
+    body: {
+        object: 'whatsapp_business_account',
+        entry: [{
+            changes: [{
+                value: {
+                    metadata: { phone_number_id: '123456' },
+                    messages: [{
+                        from: '5213312345678',
+                        type: 'text',
+                        text: { body: 'Hola me gustaria saber mas' }
+                    }]
+                }
+            }]
+        }]
+    }
+};
+
+await handler(reqHola, res);
+
 // Test Case 2: Option Selection (Low Volume)
 console.log('\nTEST 2: Selecting "Bajo" Option');
 const reqOption = {

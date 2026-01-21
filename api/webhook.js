@@ -56,8 +56,9 @@ export default async function handler(req, res) {
                 const ADMIN_NUMBER = '523317106005';
 
                 // START PHRASE DETECTION
-                // Matches "¡Hola! Me interesa saber mas de Mr-Robot" or slight variations
-                if (msg_body.includes('interesa saber mas de mr-robot')) {
+                // Matches "¡Hola! Me interesa saber mas de Mr-Robot" or "Hi", "Hello"
+                const greetingKeywords = ['hola', 'hi', 'hello', 'interesa saber mas de mr-robot'];
+                if (greetingKeywords.some(keyword => msg_body.includes(keyword))) {
 
                     // 1. Send Greeting
                     await sendMessage(phone_number_id, from, "¡Hola! Gracias por escribirnos desde la web. ⚡");
