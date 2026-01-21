@@ -75,10 +75,10 @@ export default async function handler(req, res) {
                 // HANDLE OPTIONS (Button ID or Text)
                 if (msg_body === 'btn_low' || msg_body.includes('menos de 30')) {
                     responseText = "Perfecto. Para un volumen bajo, te recomendamos nuestro plan *Starter*. Es ideal para empezar a automatizar sin complicaciones.";
-                } else if (msg_body === 'btn_high' || msg_body.includes('más de 100')) {
-                    responseText = "¡Excelente! Para altos volúmenes necesitamos una solución robusta. Te sugerimos el plan *Enterprise* con soporte dedicado.";
+                } else if (msg_body === 'btn_high' || msg_body.includes('más de 30')) {
+                    responseText = "¡Excelente! Para altos volúmenes necesitamos una solución robusta. Te sugerimos el plan ** con soporte dedicado.";
                 } else if (msg_body === 'btn_calendar' || msg_body.includes('agendar')) {
-                    responseText = "Genial. Aquí tienes el enlace para agendar tu sesión técnica: https://calendar.google.com/calendar/u/0/r";
+                    responseText = "Genial. Aquí tienes el enlace para agendar tu sesión técnica: https://calendar.app.google/qn637ixBGpdNaCzW8";
                 } else {
                     // Fallback / Standard menu logic could go here
                     // For now, if it's not the start phrase or an option, we do nothing or generic reply
