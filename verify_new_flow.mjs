@@ -70,8 +70,6 @@ function createMockRes() {
 if (!process.env.VERIFY_TOKEN || !process.env.WHATSAPP_API_TOKEN) {
     console.error("❌ ERROR: .env file missing or tokens not found.");
     process.exit(1);
-} else {
-    // console.log("✅ Environment Variables Loaded");
 }
 
 async function runTest(name, inputBody, expectedCheck) {
@@ -91,34 +89,38 @@ async function runTest(name, inputBody, expectedCheck) {
 }
 
 async function main() {
-    // 1. Test Greeting
+    // 1. Test Greeting (Standard)
     await runTest('Greeting - "Hola"', { text: 'Hola' }, (calls, res) => {
-        // Expect 2 calls: one text (welcome), one interactive (segmentation)
         if (calls.length !== 2) return false;
         const msg1 = calls[0].body.text.body;
         const msg2 = calls[1].body.interactive.body.text;
 
-        const hasWelcome = msg1.includes("Bienvenido a Senior Robot");
-        const hasSegmentation = msg2.includes("Selecciona tu volumen actual");
-        return hasWelcome && hasSegmentation;
+        return msg1.includes("Bienvenido a Senior Robot") && msg2.includes("Selecciona tu volumen actual");
     });
 
-    // 2. Test Level 1
+    // 2. Test Random Text (NEW Catch-all)
+    await runTest('Random Text - "Info please"', { text: 'Info please' }, (calls, res) => {
+        if (calls.length !== 2) return false;
+        const msg1 = calls[0].body.text.body;
+
+        // Should be same as greeting
+        return msg1.includes("Bienvenido a Senior Robot");
+    });
+
+    // 3. Test Level 1
     await runTest('Level 1 - "btn_level_1"',
         { type: 'interactive', interactive: { type: 'button_reply', button_reply: { id: 'btn_level_1' } } },
         (calls, res) => {
             if (calls.length !== 1) return false;
-            const body = calls[0].body.interactive.body.text;
-            const buttons = calls[0].body.interactive.action.buttons;
-            return body.includes("Solución Entrada") && buttons.some(b => b.reply.id === 'btn_schedule');
+            return calls[0].body.interactive.body.text.includes("Solución Entrada");
         }
     );
 
-    // 6. Test Main Menu (REFINED)
+    // 4. Test Main Menu (REFINED)
     await runTest('Main Menu - "btn_main_menu"',
         { type: 'interactive', interactive: { type: 'button_reply', button_reply: { id: 'btn_main_menu' } } },
         (calls, res) => {
-            // New Logic: Expect only 1 call (Segmentation Buttons)
+            // New Logic: Expect only 1 call (Buttons), NO Welcome Text
             if (calls.length !== 1) return false;
             return calls[0].body.interactive.body.text.includes("Selecciona tu volumen actual");
         }

@@ -53,27 +53,7 @@ export default async function handler(req, res) {
                 console.log(`Message from ${from}: ${msg_body}`);
 
                 // KEYWORD LOGIC
-                // START PHRASE DETECTION
-                // Matches "¡Hola! Me interesa saber mas de Mr-Robot" or "Hi", "Hello"
-                const greetingKeywords = ['hola', 'hi', 'hello', 'interesa saber mas de mr-robot'];
-
-                // Check for Greeting
-                if (greetingKeywords.some(keyword => msg_body.includes(keyword))) {
-
-                    // 1. Send Detailed Welcome Message
-                    const welcomeText = "¡Hola! 👋 Bienvenido a Senior Robot, ingeniería en automatización de élite. 🤖🚀\n\nSoy tu asistente virtual y estoy aquí para ayudarte a escalar tus ventas con tecnología inteligente. 📈\n\nDiseñamos soluciones con más de 10 años de experiencia en infraestructura y ciberseguridad 🛡️, garantizando que tu bot sea una herramienta blindada y ultra eficiente.\n\nPara darte el diagnóstico correcto, ¿Cuántos chats recibe tu negocio en promedio al día? 👇";
-                    await sendMessage(phone_number_id, from, welcomeText);
-
-                    // 2. Wait a bit for natural pacing
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-
-                    // 3. Send Interactive Button Message for Segmentation
-                    await sendSegmentationButtons(phone_number_id, from);
-
-                    return res.status(200).send('EVENT_RECEIVED');
-                }
-
-                // Check for Return to Main Menu
+                // 1. Check for Return to Main Menu (First priority explicit action)
                 if (msg_body === 'btn_main_menu') {
                     // Just the segmentation question
                     await sendSegmentationButtons(phone_number_id, from);
@@ -83,7 +63,7 @@ export default async function handler(req, res) {
                 let responseText = '';
                 let nextButtons = null;
 
-                // HANDLE OPTIONS (Button ID or Text)
+                // 2. Check for Specific Flow Options
                 // LEVEL 1: 1 - 25 chats
                 if (msg_body === 'btn_level_1' || msg_body.includes('1 - 25')) {
                     responseText = "¡Perfecto! ✨ Para tu volumen actual, nuestra Solución Entrada es la llave para que dejes de perder clientes por falta de atención inmediata. 🔑\n\nLo que obtienes:\n✅ Orden Total: Registro automático de tus prospectos en Google Sheets. 📊\n✅ Puntualidad: Agendamiento directo en tu Google Calendar. 📅\n✅ Disponibilidad 24/7: Sección de Preguntas Frecuentes personalizada para que nunca dejes de responder. 💡\n\n💰 Inversión: Desde $3,000 MXN.\n\n¿Te gustaría que un especialista valide si este flujo es el ideal para ti?";
@@ -113,6 +93,7 @@ export default async function handler(req, res) {
                     responseText = "¡Excelente decisión! 🎯 El siguiente paso es una breve llamada de diagnóstico para detectar los cuellos de botella en tu proceso y ver cómo Senior Robot los va a eliminar. 🚫🍾\n\nPor favor, elige el horario que mejor te acomode en nuestro calendario oficial: 👉 https://calendar.app.google/1VzMDX3u7EunndcYA 📅\n\nNota: Atendemos de forma personalizada para asegurar la máxima calidad en cada integración. 🦾";
                 }
 
+                // 3. Send Response if matched an option
                 if (responseText) {
                     try {
                         if (nextButtons) {
@@ -123,6 +104,23 @@ export default async function handler(req, res) {
                     } catch (error) {
                         console.error('Error sending message:', error);
                     }
+                    return res.status(200).send('EVENT_RECEIVED');
+                }
+
+                // 4. FALLBACK / DEFAULT: Detailed Welcome Message
+                // If it wasn't a Main Menu click AND not a known option, assume it's a Greeting or valid input.
+                // This acts as a Catch-All for new users or random text.
+                try {
+                    const welcomeText = "¡Hola! 👋 Bienvenido a Senior Robot, ingeniería en automatización de élite. 🤖🚀\n\nSoy tu asistente virtual y estoy aquí para ayudarte a escalar tus ventas con tecnología inteligente. 📈\n\nDiseñamos soluciones con más de 10 años de experiencia en infraestructura y ciberseguridad 🛡️, garantizando que tu bot sea una herramienta blindada y ultra eficiente.\n\nPara darte el diagnóstico correcto, ¿Cuántos chats recibe tu negocio en promedio al día? 👇";
+                    await sendMessage(phone_number_id, from, welcomeText);
+
+                    // Wait a bit for natural pacing
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                    // Send Segmentation Buttons
+                    await sendSegmentationButtons(phone_number_id, from);
+                } catch (error) {
+                    console.error('Error sending welcome flow:', error);
                 }
             }
             return res.status(200).send('EVENT_RECEIVED');
