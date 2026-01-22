@@ -52,42 +52,66 @@ export default async function handler(req, res) {
                 console.log(`Message from ${from}: ${msg_body}`);
 
                 // KEYWORD LOGIC
-                let responseText = '';
-                const ADMIN_NUMBER = '523317106005';
-
                 // START PHRASE DETECTION
                 // Matches "¡Hola! Me interesa saber mas de Mr-Robot" or "Hi", "Hello"
                 const greetingKeywords = ['hola', 'hi', 'hello', 'interesa saber mas de mr-robot'];
-                if (greetingKeywords.some(keyword => msg_body.includes(keyword))) {
 
-                    // 1. Send Greeting
-                    await sendMessage(phone_number_id, from, "¡Hola! Gracias por escribirnos desde la web. ⚡");
+                // Check for Greeting OR Return to Main Menu
+                if (greetingKeywords.some(keyword => msg_body.includes(keyword)) || msg_body === 'btn_main_menu') {
 
-                    // 2. Wait 5 seconds (Serverless caution: this might time out on some platforms, but per request we do it)
-                    await new Promise(resolve => setTimeout(resolve, 5000));
+                    // 1. Send Detailed Welcome Message
+                    const welcomeText = "¡Hola! 👋 Bienvenido a Senior Robot, ingeniería en automatización de élite. 🤖🚀\n\nSoy tu asistente virtual y estoy aquí para ayudarte a escalar tus ventas con tecnología inteligente. 📈\n\nDiseñamos soluciones con más de 10 años de experiencia en infraestructura y ciberseguridad 🛡️, garantizando que tu bot sea una herramienta blindada y ultra eficiente.\n\nPara darte el diagnóstico correcto, ¿Cuántos chats recibe tu negocio en promedio al día? 👇";
+                    await sendMessage(phone_number_id, from, welcomeText);
 
-                    // 3. Send Interactive Button Message (Max 3 buttons)
-                    await sendButtonMessage(phone_number_id, from);
+                    // 2. Wait a bit for natural pacing
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                    // 3. Send Interactive Button Message for Segmentation
+                    await sendSegmentationButtons(phone_number_id, from);
 
                     return res.status(200).send('EVENT_RECEIVED');
                 }
 
+                let responseText = '';
+                let nextButtons = null;
+
                 // HANDLE OPTIONS (Button ID or Text)
-                if (msg_body === 'btn_low' || msg_body.includes('menos de 30')) {
-                    responseText = "Perfecto. Para un volumen bajo, te recomendamos nuestro plan *Starter*. Es ideal para empezar a automatizar sin complicaciones.";
-                } else if (msg_body === 'btn_high' || msg_body.includes('más de 30')) {
-                    responseText = "¡Excelente! Para altos volúmenes necesitamos una solución robusta. Te sugerimos el plan ** con soporte dedicado.";
-                } else if (msg_body === 'btn_calendar' || msg_body.includes('agendar')) {
-                    responseText = "Genial. Aquí tienes el enlace para agendar tu sesión técnica: https://calendar.app.google/qn637ixBGpdNaCzW8";
-                } else {
-                    // Fallback / Standard menu logic could go here
-                    // For now, if it's not the start phrase or an option, we do nothing or generic reply
-                    // process.env.WHATSAPP_API_TOKEN would control this
+                // LEVEL 1: 1 - 25 chats
+                if (msg_body === 'btn_level_1' || msg_body.includes('1 - 25')) {
+                    responseText = "¡Perfecto! ✨ Para tu volumen actual, nuestra Solución Entrada es la llave para que dejes de perder clientes por falta de atención inmediata. 🔑\n\nLo que obtienes:\n✅ Orden Total: Registro automático de tus prospectos en Google Sheets. 📊\n✅ Puntualidad: Agendamiento directo en tu Google Calendar. 📅\n✅ Disponibilidad 24/7: Sección de Preguntas Frecuentes personalizada para que nunca dejes de responder. 💡\n\n💰 Inversión: Desde $3,000 MXN.\n\n¿Te gustaría que un especialista valide si este flujo es el ideal para ti?";
+                    nextButtons = [
+                        { type: "reply", reply: { id: "btn_schedule", title: "Agendar Llamada 📞" } },
+                        { type: "reply", reply: { id: "btn_main_menu", title: "Menú Principal ⬅️" } }
+                    ];
+                }
+                // LEVEL 2: 25 - 50 chats
+                else if (msg_body === 'btn_level_2' || msg_body.includes('25 - 50')) {
+                    responseText = "¡Excelente! 🚀 Tu negocio está en el punto ideal para nuestro Plan Estándar, donde la automatización toma el control total de tu logística.\n\nLo que obtienes:\n✅ Control de Agenda: El bot agenda, cambia o cancela citas sin que tú muevas un dedo. ⏳\n✅ Seguridad Pro: Base de datos dedicada para el resguardo seguro de tus contactos. 🔒\n✅ Cierre de Ventas: Estructura de Preguntas Frecuentes diseñada para derribar objeciones al instante. 🎯\n\n💰 Inversión: Desde $7,000 MXN.\n\n¿Quieres ver cómo este sistema puede ahorrarte más de 15 horas de administración a la semana? 🕒";
+                    nextButtons = [
+                        { type: "reply", reply: { id: "btn_schedule", title: "Agendar Llamada 📞" } },
+                        { type: "reply", reply: { id: "btn_main_menu", title: "Menú Principal ⬅️" } }
+                    ];
+                }
+                // LEVEL 3: 51+ chats
+                else if (msg_body === 'btn_level_3' || msg_body.includes('51') || msg_body.includes('más')) {
+                    responseText = "¡Entendido! ⚡ A este volumen, la eficiencia es crítica. Nuestro Plan Premium integra un Agente de IA entrenado específicamente con el ADN de tu marca. 🧠🤖\n\nLo que obtienes:\n✅ IA Avanzada: Respuestas inteligentes y naturales a consultas complejas. 🤯\n✅ Ecosistema Conectado: Integración total con tu CRM para un seguimiento perfecto. 🔗\n✅ Máxima Resiliencia: Infraestructura diseñada bajo estándares de ciberseguridad profesional. 🛡️\n\n💰 Inversión: Desde $15,000 MXN.\n\nEste nivel requiere una consultoría técnica personalizada. ¿Agendamos tu sesión ahora? 💡";
+                    nextButtons = [
+                        { type: "reply", reply: { id: "btn_consulting", title: "Consultoría 🛠️" } },
+                        { type: "reply", reply: { id: "btn_main_menu", title: "Menú Principal ⬅️" } }
+                    ];
+                }
+                // SCHEDULING / CONSULTING
+                else if (msg_body === 'btn_schedule' || msg_body === 'btn_consulting' || msg_body.includes('agendar') || msg_body.includes('consultoría')) {
+                    responseText = "¡Excelente decisión! 🎯 El siguiente paso es una breve llamada de diagnóstico para detectar los cuellos de botella en tu proceso y ver cómo Senior Robot los va a eliminar. 🚫🍾\n\nPor favor, elige el horario que mejor te acomode en nuestro calendario oficial: 👉 https://calendar.app.google/1VzMDX3u7EunndcYA 📅\n\nNota: Atendemos de forma personalizada para asegurar la máxima calidad en cada integración. 🦾";
                 }
 
                 if (responseText) {
                     try {
-                        await sendMessage(phone_number_id, from, responseText);
+                        if (nextButtons) {
+                            await sendCustomButtonMessage(phone_number_id, from, responseText, nextButtons);
+                        } else {
+                            await sendMessage(phone_number_id, from, responseText);
+                        }
                     } catch (error) {
                         console.error('Error sending message:', error);
                     }
@@ -128,8 +152,19 @@ async function sendMessage(phoneNumberId, to, text) {
     }
 }
 
-// Helper to send Interactive Button Messages
-async function sendButtonMessage(phoneNumberId, to) {
+// Helper to send Segmentation Buttons (Fixed)
+async function sendSegmentationButtons(phoneNumberId, to) {
+    const buttons = [
+        { type: "reply", reply: { id: "btn_level_1", title: "1 - 25 chats 🐣" } },
+        { type: "reply", reply: { id: "btn_level_2", title: "25 - 50 chats 📈" } },
+        { type: "reply", reply: { id: "btn_level_3", title: "51+ chats 🏢" } }
+    ];
+    // Short body because the main text was sent before
+    await sendCustomButtonMessage(phoneNumberId, to, "Selecciona tu volumen actual:", buttons);
+}
+
+// Generic Helper to send Button Messages
+async function sendCustomButtonMessage(phoneNumberId, to, bodyText, buttons) {
     const token = 'EAAL9iuGZC5pwBQc3QrfiZCEAb0EkAT5OOJW2OkoRWfMQXk1qZCGvFeGb77yrXnQAZC1w5UkIJ8GjoCbxYGBq6DIfGMoekKcrZCeZApp84RBsdQkYt4lCWLk3ZAXMoNZCWh29ssrcazoVCNGWZBBnWBLZCJLCffnZA86rbpIENjONOnrQzBzfCUqCgNZBFGwqrChPxOwvmz7TqHFsERh3cH8M5bptZBtZBx2oRXIr5Uq1tyY6IZB';
 
     const messagePayload = {
@@ -139,32 +174,10 @@ async function sendButtonMessage(phoneNumberId, to) {
         interactive: {
             type: "button",
             body: {
-                text: "Para darte una propuesta de automatización a tu medida, cuéntanos ¿cuál es tu volumen aproximado de mensajes diarios?"
+                text: bodyText
             },
             action: {
-                buttons: [
-                    {
-                        type: "reply",
-                        reply: {
-                            id: "btn_low",
-                            title: "🟢 Bajo (<30)"
-                        }
-                    },
-                    {
-                        type: "reply",
-                        reply: {
-                            id: "btn_high",
-                            title: "🔴 Alto (>100)"
-                        }
-                    },
-                    {
-                        type: "reply",
-                        reply: {
-                            id: "btn_calendar",
-                            title: "🗓️ Agendar"
-                        }
-                    }
-                ]
+                buttons: buttons
             }
         }
     };
