@@ -6,7 +6,8 @@ export default async function handler(req, res) {
 
         // Use hardcoded token as requested/debugged
         // Load env via process.env (Standard Node/Vercel behavior)
-        const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
+        // FALLBACK: Use hardcoded token if env var is missing (Hotfix for immediate deployment)
+        const VERIFY_TOKEN = process.env.VERIFY_TOKEN || 'mr_robot_secret_8909789';
 
         if (mode && token) {
             if (mode === 'subscribe' && token === VERIFY_TOKEN) {
@@ -134,7 +135,7 @@ export default async function handler(req, res) {
 
 // Helper to send text messages
 async function sendMessage(phoneNumberId, to, text) {
-    const token = process.env.WHATSAPP_API_TOKEN;
+    const token = process.env.WHATSAPP_API_TOKEN || 'EAAL9iuGZC5pwBQc3QrfiZCEAb0EkAT5OOJW2OkoRWfMQXk1qZCGvFeGb77yrXnQAZC1w5UkIJ8GjoCbxYGBq6DIfGMoekKcrZCeZApp84RBsdQkYt4lCWLk3ZAXMoNZCWh29ssrcazoVCNGWZBBnWBLZCJLCffnZA86rbpIENjONOnrQzBzfCUqCgNZBFGwqrChPxOwvmz7TqHFsERh3cH8M5bptZBtZBx2oRXIr5Uq1tyY6IZB';
 
     const response = await fetch(
         `https://graph.facebook.com/v17.0/${phoneNumberId}/messages`,
@@ -171,7 +172,7 @@ async function sendSegmentationButtons(phoneNumberId, to) {
 
 // Generic Helper to send Button Messages
 async function sendCustomButtonMessage(phoneNumberId, to, bodyText, buttons) {
-    const token = process.env.WHATSAPP_API_TOKEN;
+    const token = process.env.WHATSAPP_API_TOKEN || 'EAAL9iuGZC5pwBQc3QrfiZCEAb0EkAT5OOJW2OkoRWfMQXk1qZCGvFeGb77yrXnQAZC1w5UkIJ8GjoCbxYGBq6DIfGMoekKcrZCeZApp84RBsdQkYt4lCWLk3ZAXMoNZCWh29ssrcazoVCNGWZBBnWBLZCJLCffnZA86rbpIENjONOnrQzBzfCUqCgNZBFGwqrChPxOwvmz7TqHFsERh3cH8M5bptZBtZBx2oRXIr5Uq1tyY6IZB';
 
     const messagePayload = {
         messaging_product: "whatsapp",
