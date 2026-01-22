@@ -5,7 +5,8 @@ export default async function handler(req, res) {
         const challenge = req.query['hub.challenge'];
 
         // Use hardcoded token as requested/debugged
-        const VERIFY_TOKEN = 'mr_robot_secret_8909789';
+        // Load env via process.env (Standard Node/Vercel behavior)
+        const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 
         if (mode && token) {
             if (mode === 'subscribe' && token === VERIFY_TOKEN) {
@@ -56,8 +57,8 @@ export default async function handler(req, res) {
                 // Matches "¡Hola! Me interesa saber mas de Mr-Robot" or "Hi", "Hello"
                 const greetingKeywords = ['hola', 'hi', 'hello', 'interesa saber mas de mr-robot'];
 
-                // Check for Greeting OR Return to Main Menu
-                if (greetingKeywords.some(keyword => msg_body.includes(keyword)) || msg_body === 'btn_main_menu') {
+                // Check for Greeting
+                if (greetingKeywords.some(keyword => msg_body.includes(keyword))) {
 
                     // 1. Send Detailed Welcome Message
                     const welcomeText = "¡Hola! 👋 Bienvenido a Senior Robot, ingeniería en automatización de élite. 🤖🚀\n\nSoy tu asistente virtual y estoy aquí para ayudarte a escalar tus ventas con tecnología inteligente. 📈\n\nDiseñamos soluciones con más de 10 años de experiencia en infraestructura y ciberseguridad 🛡️, garantizando que tu bot sea una herramienta blindada y ultra eficiente.\n\nPara darte el diagnóstico correcto, ¿Cuántos chats recibe tu negocio en promedio al día? 👇";
@@ -69,6 +70,13 @@ export default async function handler(req, res) {
                     // 3. Send Interactive Button Message for Segmentation
                     await sendSegmentationButtons(phone_number_id, from);
 
+                    return res.status(200).send('EVENT_RECEIVED');
+                }
+
+                // Check for Return to Main Menu
+                if (msg_body === 'btn_main_menu') {
+                    // Just the segmentation question
+                    await sendSegmentationButtons(phone_number_id, from);
                     return res.status(200).send('EVENT_RECEIVED');
                 }
 
@@ -94,7 +102,7 @@ export default async function handler(req, res) {
                 }
                 // LEVEL 3: 51+ chats
                 else if (msg_body === 'btn_level_3' || msg_body.includes('51') || msg_body.includes('más')) {
-                    responseText = "¡Entendido! ⚡ A este volumen, la eficiencia es crítica. Nuestro Plan Premium integra un Agente de IA entrenado específicamente con el ADN de tu marca. 🧠🤖\n\nLo que obtienes:\n✅ IA Avanzada: Respuestas inteligentes y naturales a consultas complejas. 🤯\n✅ Ecosistema Conectado: Integración total con tu CRM para un seguimiento perfecto. 🔗\n✅ Máxima Resiliencia: Infraestructura diseñada bajo estándares de ciberseguridad profesional. 🛡️\n\n💰 Inversión: Desde $15,000 MXN.\n\nEste nivel requiere una consultoría técnica personalizada. ¿Agendamos tu sesión ahora? 💡";
+                    responseText = "¡Entendido! ⚡ A este volumen, la eficiencia es crítica. Nuestro Plan Premium integra un Agente de IA entrenado específicamente con el ADN de tu marca. 🧠🤖\n\nLo que obtienes:\n✅ IA Avanzada: Respuestas inteligentes y naturales a consultas complejas. 🤯\n✅ Ecosistema Conectado: Integración total con tu CRM para un seguimiento perfecto. 🔗\n✅ Máxima Resiliencia: Infraestructura diseñada bajo estándares de ciberseguridad profesional. 🛡️\n\n💰 Inversión: Desde $15,000 MXN.\n\nEste nivel requiere una consultoría técnica personalizada Gratis. ¿Agendamos tu sesión ahora? 💡";
                     nextButtons = [
                         { type: "reply", reply: { id: "btn_consulting", title: "Consultoría 🛠️" } },
                         { type: "reply", reply: { id: "btn_main_menu", title: "Menú Principal ⬅️" } }
@@ -128,7 +136,7 @@ export default async function handler(req, res) {
 
 // Helper to send text messages
 async function sendMessage(phoneNumberId, to, text) {
-    const token = 'EAAL9iuGZC5pwBQc3QrfiZCEAb0EkAT5OOJW2OkoRWfMQXk1qZCGvFeGb77yrXnQAZC1w5UkIJ8GjoCbxYGBq6DIfGMoekKcrZCeZApp84RBsdQkYt4lCWLk3ZAXMoNZCWh29ssrcazoVCNGWZBBnWBLZCJLCffnZA86rbpIENjONOnrQzBzfCUqCgNZBFGwqrChPxOwvmz7TqHFsERh3cH8M5bptZBtZBx2oRXIr5Uq1tyY6IZB';
+    const token = process.env.WHATSAPP_API_TOKEN;
 
     const response = await fetch(
         `https://graph.facebook.com/v17.0/${phoneNumberId}/messages`,
@@ -165,7 +173,7 @@ async function sendSegmentationButtons(phoneNumberId, to) {
 
 // Generic Helper to send Button Messages
 async function sendCustomButtonMessage(phoneNumberId, to, bodyText, buttons) {
-    const token = 'EAAL9iuGZC5pwBQc3QrfiZCEAb0EkAT5OOJW2OkoRWfMQXk1qZCGvFeGb77yrXnQAZC1w5UkIJ8GjoCbxYGBq6DIfGMoekKcrZCeZApp84RBsdQkYt4lCWLk3ZAXMoNZCWh29ssrcazoVCNGWZBBnWBLZCJLCffnZA86rbpIENjONOnrQzBzfCUqCgNZBFGwqrChPxOwvmz7TqHFsERh3cH8M5bptZBtZBx2oRXIr5Uq1tyY6IZB';
+    const token = process.env.WHATSAPP_API_TOKEN;
 
     const messagePayload = {
         messaging_product: "whatsapp",

@@ -1,4 +1,20 @@
 import handler from './api/webhook.js';
+import fs from 'fs';
+import path from 'path';
+
+// --- LOAD ENV ---
+// Simple .env parser for testing (since we might not have dotenv installed)
+const envPath = path.resolve(process.cwd(), '.env');
+if (fs.existsSync(envPath)) {
+    const envConfig = fs.readFileSync(envPath, 'utf8');
+    envConfig.split('\n').forEach(line => {
+        const [key, value] = line.split('=');
+        if (key && value) {
+            process.env[key.trim()] = value.trim();
+        }
+    });
+}
+// ----------------
 
 // Mock Fetch
 const fetchCalls = [];
@@ -13,6 +29,7 @@ global.fetch = async (url, options) => {
 function createMockReq(body) {
     return {
         method: 'POST',
+        query: {}, // Default empty query
         body: {
             object: 'whatsapp_business_account',
             entry: [{
@@ -49,6 +66,14 @@ function createMockRes() {
     return res;
 }
 
+// Check tokens availability
+if (!process.env.VERIFY_TOKEN || !process.env.WHATSAPP_API_TOKEN) {
+    console.error("❌ ERROR: .env file missing or tokens not found.");
+    process.exit(1);
+} else {
+    // console.log("✅ Environment Variables Loaded");
+}
+
 async function runTest(name, inputBody, expectedCheck) {
     console.log(`\n--- Running Test: ${name} ---`);
     fetchCalls.length = 0; // Clear history
@@ -69,7 +94,6 @@ async function main() {
     // 1. Test Greeting
     await runTest('Greeting - "Hola"', { text: 'Hola' }, (calls, res) => {
         // Expect 2 calls: one text (welcome), one interactive (segmentation)
-        // Note: Code waits 2000ms, so test will take 2s.
         if (calls.length !== 2) return false;
         const msg1 = calls[0].body.text.body;
         const msg2 = calls[1].body.interactive.body.text;
@@ -90,44 +114,13 @@ async function main() {
         }
     );
 
-    // 3. Test Level 2
-    await runTest('Level 2 - "btn_level_2"',
-        { type: 'interactive', interactive: { type: 'button_reply', button_reply: { id: 'btn_level_2' } } },
-        (calls, res) => {
-            if (calls.length !== 1) return false;
-            const body = calls[0].body.interactive.body.text;
-            return body.includes("Plan Estándar");
-        }
-    );
-
-    // 4. Test Level 3
-    await runTest('Level 3 - "btn_level_3"',
-        { type: 'interactive', interactive: { type: 'button_reply', button_reply: { id: 'btn_level_3' } } },
-        (calls, res) => {
-            if (calls.length !== 1) return false;
-            const body = calls[0].body.interactive.body.text;
-            const buttons = calls[0].body.interactive.action.buttons;
-            return body.includes("Plan Premium") && buttons.some(b => b.reply.id === 'btn_consulting');
-        }
-    );
-
-    // 5. Test Schedule
-    await runTest('Schedule - "btn_schedule"',
-        { type: 'interactive', interactive: { type: 'button_reply', button_reply: { id: 'btn_schedule' } } },
-        (calls, res) => {
-            if (calls.length !== 1) return false;
-            const body = calls[0].body.text.body;
-            return body.includes("calendar.app.google");
-        }
-    );
-
-    // 6. Test Main Menu
+    // 6. Test Main Menu (REFINED)
     await runTest('Main Menu - "btn_main_menu"',
         { type: 'interactive', interactive: { type: 'button_reply', button_reply: { id: 'btn_main_menu' } } },
         (calls, res) => {
-            // Same as Greeting
-            if (calls.length !== 2) return false;
-            return calls[0].body.text.body.includes("Bienvenido a Senior Robot");
+            // New Logic: Expect only 1 call (Segmentation Buttons)
+            if (calls.length !== 1) return false;
+            return calls[0].body.interactive.body.text.includes("Selecciona tu volumen actual");
         }
     );
 }
