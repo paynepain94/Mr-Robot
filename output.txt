@@ -1,0 +1,125 @@
+
+--- Running Test: Greeting - "Hola" ---
+Incoming webhook: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "changes": [
+        {
+          "value": {
+            "metadata": {
+              "phone_number_id": "12345"
+            },
+            "messages": [
+              {
+                "from": "521234567890",
+                "type": "text",
+                "text": {
+                  "body": "Hola"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+Message from 521234567890: hola
+✅ Greeting - "Hola" Passed
+
+--- Running Test: Needs Selection - "btn_need_speed" ---
+Incoming webhook: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "changes": [
+        {
+          "value": {
+            "metadata": {
+              "phone_number_id": "12345"
+            },
+            "messages": [
+              {
+                "from": "521234567890",
+                "type": "interactive",
+                "interactive": {
+                  "type": "button_reply",
+                  "button_reply": {
+                    "id": "btn_need_speed"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+Message from 521234567890: btn_need_speed
+✅ Needs Selection - "btn_need_speed" Passed
+
+--- Running Test: Volume Selection - "btn_vol_3" ---
+Incoming webhook: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "changes": [
+        {
+          "value": {
+            "metadata": {
+              "phone_number_id": "12345"
+            },
+            "messages": [
+              {
+                "from": "521234567890",
+                "type": "interactive",
+                "interactive": {
+                  "type": "button_reply",
+                  "button_reply": {
+                    "id": "btn_vol_3"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+Message from 521234567890: btn_vol_3
+✅ Volume Selection - "btn_vol_3" Passed
+
+--- Running Test: Main Menu - "btn_main_menu" ---
+Incoming webhook: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "changes": [
+        {
+          "value": {
+            "metadata": {
+              "phone_number_id": "12345"
+            },
+            "messages": [
+              {
+                "from": "521234567890",
+                "type": "interactive",
+                "interactive": {
+                  "type": "button_reply",
+                  "button_reply": {
+                    "id": "btn_main_menu"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+Message from 521234567890: btn_main_menu
+✅ Main Menu - "btn_main_menu" Passed

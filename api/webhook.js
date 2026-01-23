@@ -53,48 +53,66 @@ export default async function handler(req, res) {
 
                 console.log(`Message from ${from}: ${msg_body}`);
 
-                // KEYWORD LOGIC
-                // 1. Check for Return to Main Menu (First priority explicit action)
+                // KEYWORD / BUTTON LOGIC
+
+                // 1. Check for Return to Main Menu (Resets to Needs Assessment)
                 if (msg_body === 'btn_main_menu') {
-                    // Just the segmentation question
-                    await sendSegmentationButtons(phone_number_id, from);
+                    // Send Needs Assessment (Step 1)
+                    await sendWelcomeAndNeeds(phone_number_id, from);
                     return res.status(200).send('EVENT_RECEIVED');
                 }
 
                 let responseText = '';
                 let nextButtons = null;
 
-                // 2. Check for Specific Flow Options
-                // LEVEL 1: 1 - 25 chats
-                if (msg_body === 'btn_level_1' || msg_body.includes('1 - 25')) {
-                    responseText = "¡Perfecto! ✨ Para tu volumen actual, nuestra Solución Entrada es la llave para que dejes de perder clientes por falta de atención inmediata. 🔑\n\nLo que obtienes:\n✅ Orden Total: Registro automático de tus prospectos en Google Sheets. 📊\n✅ Puntualidad: Agendamiento directo en tu Google Calendar. 📅\n✅ Disponibilidad 24/7: Sección de Preguntas Frecuentes personalizada para que nunca dejes de responder. 💡\n\n💰 Inversión: Desde $3,000 MXN.\n\n¿Te gustaría que un especialista valide si este flujo es el ideal para ti?";
+                // 2. STEP 2 A: Handle Needs Selection -> Send Volume Qualification
+                // Needs: Speed (A), Organization (B), AI (C)
+                if (
+                    msg_body === 'btn_need_speed' || msg_body.includes('rapidez') ||
+                    msg_body === 'btn_need_org' || msg_body.includes('organizar') ||
+                    msg_body === 'btn_need_ai' || msg_body.includes('inteligencia')
+                ) {
+                    const qualText = "¡Excelente meta! Tenemos la tecnología para lograrlo. Solo para asegurarnos de que el sistema soporte tu ritmo de trabajo sin interrupciones, ¿cuántos chats recibes, aproximadamente, por día? 📊";
+                    const qualButtons = [
+                        { type: "reply", reply: { id: "btn_vol_1", title: "Hasta 25 🐣" } },
+                        { type: "reply", reply: { id: "btn_vol_2", title: "25 a 50 📈" } },
+                        { type: "reply", reply: { id: "btn_vol_3", title: "Más de 50 🏢" } }
+                    ];
+                    await sendCustomButtonMessage(phone_number_id, from, qualText, qualButtons);
+                    return res.status(200).send('EVENT_RECEIVED');
+                }
+
+                // 3. STEP 3: Handle Volume Selection -> Send Solution
+                // LEVEL 1: Hasta 25 chats
+                else if (msg_body === 'btn_vol_1' || msg_body.includes('hasta 25')) {
+                    responseText = "¡Perfecto para dar el primer gran paso! Nuestra Solución Entrada está diseñada para que te olvides de las tareas repetitivas y te enfoques en crecer. 🌱\n\n✅ Tus contactos se guardan solos en Google Sheets. 📊\n✅ Tus citas se agendan directo en Google Calendar. 📅\n✅ Resolvemos dudas comunes al instante con FAQ. 💡\n\n💰 Inversión: Desde $3,000 MXN.\n\n¿Te gustaría agendar una breve llamada para ver cómo se vería en tu negocio? 📞";
                     nextButtons = [
                         { type: "reply", reply: { id: "btn_schedule", title: "Agendar Llamada 📞" } },
                         { type: "reply", reply: { id: "btn_main_menu", title: "Menú Principal ⬅️" } }
                     ];
                 }
                 // LEVEL 2: 25 - 50 chats
-                else if (msg_body === 'btn_level_2' || msg_body.includes('25 - 50')) {
-                    responseText = "¡Excelente! 🚀 Tu negocio está en el punto ideal para nuestro Plan Estándar, donde la automatización toma el control total de tu logística.\n\nLo que obtienes:\n✅ Control de Agenda: El bot agenda, cambia o cancela citas sin que tú muevas un dedo. ⏳\n✅ Seguridad Pro: Base de datos dedicada para el resguardo seguro de tus contactos. 🔒\n✅ Cierre de Ventas: Estructura de Preguntas Frecuentes diseñada para derribar objeciones al instante. 🎯\n\n💰 Inversión: Desde $7,000 MXN.\n\n¿Quieres ver cómo este sistema puede ahorrarte más de 15 horas de administración a la semana? 🕒";
+                else if (msg_body === 'btn_vol_2' || msg_body.includes('25 a 50')) {
+                    responseText = "¡Qué buen ritmo lleva tu negocio! El Plan Estándar es el aliado que necesitas para profesionalizar cada interacción. 🚀\n\n✅ Gestión completa de citas: tus clientes agendan, cambian o cancelan solos. ⏳\n✅ Base de datos segura para que nunca pierdas un prospecto. 🔒\n✅ Respuestas rápidas que dan confianza y cierran ventas. 🎯\n\n💰 Inversión: Desde $7,000 MXN.\n\n¿Platicamos en una llamada para explicarte cómo configurarlo? 📞";
                     nextButtons = [
                         { type: "reply", reply: { id: "btn_schedule", title: "Agendar Llamada 📞" } },
                         { type: "reply", reply: { id: "btn_main_menu", title: "Menú Principal ⬅️" } }
                     ];
                 }
-                // LEVEL 3: 51+ chats
-                else if (msg_body === 'btn_level_3' || msg_body.includes('51') || msg_body.includes('más')) {
-                    responseText = "¡Entendido! ⚡ A este volumen, la eficiencia es crítica. Nuestro Plan Premium integra un Agente de IA entrenado específicamente con el ADN de tu marca. 🧠🤖\n\nLo que obtienes:\n✅ IA Avanzada: Respuestas inteligentes y naturales a consultas complejas. 🤯\n✅ Ecosistema Conectado: Integración total con tu CRM para un seguimiento perfecto. 🔗\n✅ Máxima Resiliencia: Infraestructura diseñada bajo estándares de ciberseguridad profesional. 🛡️\n\n💰 Inversión: Desde $15,000 MXN.\n\nEste nivel requiere una consultoría técnica personalizada. ¿Agendamos tu sesión ahora? 💡";
+                // LEVEL 3: 50+ chats
+                else if (msg_body === 'btn_vol_3' || msg_body.includes('más de 50') || msg_body.includes('51')) {
+                    responseText = "¡Increíble volumen! Para un flujo así, necesitas el poder de nuestra Solución Premium con Inteligencia Artificial. 🧠⚡\n\n✅ Un agente de IA entrenado con la voz de tu marca. 🗣️\n✅ Integración total con tu CRM para que todo esté conectado. 🔗\n✅ Seguridad de nivel corporativo para proteger tu información. 🛡️\n\n💰 Inversión: Desde $15,000 MXN.\n\nEste nivel requiere un toque personal. ¿Agendamos una consultoría técnica gratuita? 📞";
                     nextButtons = [
-                        { type: "reply", reply: { id: "btn_consulting", title: "Consultoría 🛠️" } },
+                        { type: "reply", reply: { id: "btn_consulting", title: "Consultoría Gratis 🛠️" } },
                         { type: "reply", reply: { id: "btn_main_menu", title: "Menú Principal ⬅️" } }
                     ];
                 }
-                // SCHEDULING / CONSULTING
+                // SCHEDULING / CONSULTING (External Link)
                 else if (msg_body === 'btn_schedule' || msg_body === 'btn_consulting' || msg_body.includes('agendar') || msg_body.includes('consultoría')) {
                     responseText = "¡Excelente decisión! 🎯 El siguiente paso es una breve llamada de diagnóstico para detectar los cuellos de botella en tu proceso y ver cómo Senior Robot los va a eliminar. 🚫🍾\n\nPor favor, elige el horario que mejor te acomode en nuestro calendario oficial: 👉 https://calendar.app.google/1VzMDX3u7EunndcYA 📅\n\nNota: Atendemos de forma personalizada para asegurar la máxima calidad en cada integración. 🦾";
                 }
 
-                // 3. Send Response if matched an option
+                // 4. Send Response if matched an option
                 if (responseText) {
                     try {
                         if (nextButtons) {
@@ -108,18 +126,10 @@ export default async function handler(req, res) {
                     return res.status(200).send('EVENT_RECEIVED');
                 }
 
-                // 4. FALLBACK / DEFAULT: Detailed Welcome Message
-                // If it wasn't a Main Menu click AND not a known option, assume it's a Greeting or valid input.
-                // This acts as a Catch-All for new users or random text.
+                // 5. CATCH-ALL / DEFAULT: Welcome & Needs Assessment
+                // This acts as the Entry Point (Step 1)
                 try {
-                    const welcomeText = "¡Hola! 👋 Bienvenido a Senior Robot, ingeniería en automatización de élite. 🤖🚀\n\nSoy tu asistente virtual y estoy aquí para ayudarte a escalar tus ventas con tecnología inteligente. 📈\n\nDiseñamos soluciones con más de 10 años de experiencia en infraestructura y ciberseguridad 🛡️, garantizando que tu bot sea una herramienta blindada y ultra eficiente.\n\nPara darte el diagnóstico correcto, ¿cuántos chats recibe tu negocio en promedio al día? 👇\n\n1️⃣ 1 - 25 chats (Perfil Emprendedor / Micro) 🐣\n2️⃣ 25 - 50 chats (Empresa en Crecimiento) 📈\n3️⃣ 51 o más chats (Nivel Corporativo / Alto Flujo) 🏢";
-                    await sendMessage(phone_number_id, from, welcomeText);
-
-                    // Wait a bit for natural pacing
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-
-                    // Send Segmentation Buttons
-                    await sendSegmentationButtons(phone_number_id, from);
+                    await sendWelcomeAndNeeds(phone_number_id, from);
                 } catch (error) {
                     console.error('Error sending welcome flow:', error);
                 }
@@ -159,15 +169,23 @@ async function sendMessage(phoneNumberId, to, text) {
     }
 }
 
-// Helper to send Segmentation Buttons (Fixed)
-async function sendSegmentationButtons(phoneNumberId, to) {
+// Helper to send Welcome Message & Needs Assessment Buttons
+async function sendWelcomeAndNeeds(phoneNumberId, to) {
+    const welcomeText = "¡Hola! Qué gusto saludarte. Soy el asistente inteligente de Senior Robot 🤖.\n\nSabemos que detrás de cada chat hay un cliente esperando y un negocio con metas grandes. Mi objetivo es ayudarte a que tu equipo sea más productivo y tus clientes reciban atención de primer nivel, las 24 horas. 🌟\n\nPara empezar, ¿cuál es el impulso que tu negocio necesita hoy? 👇\n\nA) Dejar de perder clientes por falta de respuesta rápida ⚡\nB) Organizar mis citas y datos de forma automática 📅\nC) Implementar Inteligencia Artificial para ventas complejas 🧠";
+
+    // Send text first
+    await sendMessage(phoneNumberId, to, welcomeText);
+
+    // Short delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // Send Buttons
     const buttons = [
-        { type: "reply", reply: { id: "btn_level_1", title: "1 - 25 chats 🐣" } },
-        { type: "reply", reply: { id: "btn_level_2", title: "25 - 50 chats 📈" } },
-        { type: "reply", reply: { id: "btn_level_3", title: "51+ chats 🏢" } }
+        { type: "reply", reply: { id: "btn_need_speed", title: "Respuesta Rápida ⚡" } },
+        { type: "reply", reply: { id: "btn_need_org", title: "Organizar Citas 📅" } },
+        { type: "reply", reply: { id: "btn_need_ai", title: "Implementar IA 🧠" } }
     ];
-    // Short body because the main text was sent before
-    await sendCustomButtonMessage(phoneNumberId, to, "Selecciona tu volumen actual:", buttons);
+    await sendCustomButtonMessage(phoneNumberId, to, "Selecciona tu prioridad:", buttons);
 }
 
 // Generic Helper to send Button Messages

@@ -89,40 +89,46 @@ async function runTest(name, inputBody, expectedCheck) {
 }
 
 async function main() {
-    // 1. Test Greeting (Standard)
+    // 1. Test Greeting (Step 1)
     await runTest('Greeting - "Hola"', { text: 'Hola' }, (calls, res) => {
+        // Now expects: Welcome Text + Needs Buttons (Wait is simulated but helper calls send twice)
+        // sendWelcomeAndNeeds sends text then buttons.
         if (calls.length !== 2) return false;
         const msg1 = calls[0].body.text.body;
-        const msg2 = calls[1].body.interactive.body.text;
+        const msg2 = calls[1].body.interactive.action.buttons;
 
-        return msg1.includes("Bienvenido a Senior Robot") && msg2.includes("Selecciona tu volumen actual");
+        return msg1.includes("¿cuál es el impulso que tu negocio necesita hoy?") &&
+            msg2.some(b => b.reply.id === 'btn_need_speed');
     });
 
-    // 2. Test Random Text (NEW Catch-all)
-    await runTest('Random Text - "Info please"', { text: 'Info please' }, (calls, res) => {
-        if (calls.length !== 2) return false;
-        const msg1 = calls[0].body.text.body;
-
-        // Should be same as greeting
-        return msg1.includes("Bienvenido a Senior Robot");
-    });
-
-    // 3. Test Level 1
-    await runTest('Level 1 - "btn_level_1"',
-        { type: 'interactive', interactive: { type: 'button_reply', button_reply: { id: 'btn_level_1' } } },
+    // 2. Test Needs Selection (Step 2)
+    await runTest('Needs Selection - "btn_need_speed"',
+        { type: 'interactive', interactive: { type: 'button_reply', button_reply: { id: 'btn_need_speed' } } },
         (calls, res) => {
             if (calls.length !== 1) return false;
-            return calls[0].body.interactive.body.text.includes("Solución Entrada");
+            const text = calls[0].body.interactive.body.text;
+            const buttons = calls[0].body.interactive.action.buttons;
+            return text.includes("¿cuántos chats recibes") && buttons.some(b => b.reply.id === 'btn_vol_1');
         }
     );
 
-    // 4. Test Main Menu (REFINED)
+    // 3. Test Volume Selection (Step 3) - Level 3
+    await runTest('Volume Selection - "btn_vol_3"',
+        { type: 'interactive', interactive: { type: 'button_reply', button_reply: { id: 'btn_vol_3' } } },
+        (calls, res) => {
+            if (calls.length !== 1) return false;
+            const text = calls[0].body.interactive.body.text;
+            return text.includes("Solución Premium") && text.includes("Desde $15,000 MXN");
+        }
+    );
+
+    // 4. Test Main Menu (Reset to Step 1)
     await runTest('Main Menu - "btn_main_menu"',
         { type: 'interactive', interactive: { type: 'button_reply', button_reply: { id: 'btn_main_menu' } } },
         (calls, res) => {
-            // New Logic: Expect only 1 call (Buttons), NO Welcome Text
-            if (calls.length !== 1) return false;
-            return calls[0].body.interactive.body.text.includes("Selecciona tu volumen actual");
+            // Should call sendWelcomeAndNeeds (Text + Buttons)
+            if (calls.length !== 2) return false;
+            return calls[0].body.text.body.includes("¿cuál es el impulso que tu negocio necesita hoy?");
         }
     );
 }
