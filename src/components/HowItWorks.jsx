@@ -1,136 +1,174 @@
 import React from 'react';
-import {
-  ArrowRightIcon,
-  Cog6ToothIcon,
-  LinkIcon,
-  RocketLaunchIcon
-} from '@heroicons/react/24/outline';
-
-// --- IMPORTA TUS ÍCONOS DE FLUJO AQUÍ ---
-import IconoCliente from '../assets/icon-cliente.svg';
+import { motion } from 'framer-motion';
+import { Cog6ToothIcon, LinkIcon, RocketLaunchIcon } from '@heroicons/react/24/outline';
 import IconoMrRobotHead from '../assets/icon-mr-robot-head.svg';
-import IconoNegocio from '../assets/icon-negocio.svg';
-// ------------------------------------
 
 const HowItWorks = () => {
-
-  // --- DATOS PARA LA PRIMERA SECCIÓN (LOS 3 PASOS) ---
-  const verticalSteps = [
+  const steps = [
     {
-      icon: <Cog6ToothIcon className="h-8 w-8 text-white" />,
+      id: 1,
       title: '1. Análisis Humano',
       description: 'Entendemos a fondo tu negocio y tus clientes para diseñar conversaciones ideales.',
+      icon: <Cog6ToothIcon className="w-8 h-8 text-emerald-400" />,
+      position: 'md:-translate-x-64 md:translate-y-12', // Left
     },
     {
-      icon: <LinkIcon className="h-8 w-8 text-white" />,
+      id: 2,
       title: '2. Creación a Medida',
       description: 'Programamos tu chatbot con respuestas clave, haciéndolo sentir humano y efectivo.',
+      icon: <LinkIcon className="w-8 h-8 text-emerald-400" />,
+      position: 'md:-translate-y-12', // Center Top
     },
     {
-      icon: <RocketLaunchIcon className="h-8 w-8 text-white" />,
-      title: '3. Lanzamiento y Soporte',
-      description: 'Tu bot empieza a trabajar, y nosotros te acompañamos para asegurar su rendimiento.',
-    },
-  ];
-
-  // --- DATOS PARA LA SEGUNDA SECCIÓN (EL FLUJO) ---
-  const horizontalFlow = [
-    {
-      icon: IconoCliente,
-      title: 'Cliente',
-      description: 'Envía un mensaje a tu WhatsApp.',
-    },
-    {
-      icon: IconoMrRobotHead,
-      title: 'Senior Robot',
-      description: 'Recibe y contesta automáticamente.',
-    },
-    {
-      icon: IconoNegocio,
-      title: 'Tu Negocio',
-      description: 'Vende, informa y crece sin esfuerzo.',
+      id: 3,
+      title: '3. Lanzamiento',
+      description: 'Tu bot empieza a trabajar 24/7, y nosotros te acompañamos para asegurar su rendimiento.',
+      icon: <RocketLaunchIcon className="w-8 h-8 text-emerald-400" />,
+      position: 'md:translate-x-64 md:translate-y-12', // Right
     },
   ];
 
   return (
-    <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white text-center overflow-hidden">
-      <div className="max-w-7xl mx-auto">
-        {/* CAMBIO DE PESO: Titular de sección en Bold (ya estaba) */}
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-16 relative z-10">
-          ¿Cómo funciona Senior Robot?
-        </h2>
+    <section className="relative py-24 px-4 overflow-hidden bg-gradient-to-b from-[#0f172a] to-[#022c22] text-white">
 
-        {/* --- SECCIÓN 1: LOS 3 PASOS (Análisis, Creación, Lanzamiento) --- */}
-        <div className="relative flex flex-col md:flex-row justify-center items-start md:items-center space-y-12 md:space-y-0 md:space-x-12 mb-20 sm:mb-24">
-
-          {/* CONECTOR VISUAL (Línea de Tiempo) */}
-          <div className="hidden md:block absolute top-8 left-[15%] right-[15%] h-0.5 border-t-2 border-dashed border-emerald-200 -z-0"></div>
-
-          {verticalSteps.map((step, index) => (
-            <div key={step.title} className="group flex flex-col items-center max-w-xs relative z-10 transition-all duration-300">
-              <div className="bg-emerald-500 rounded-full p-4 mb-6 shadow-lg transform transition-transform duration-300 group-hover:scale-110 group-hover:shadow-emerald-500/30">
-                {step.icon}
-              </div>
-              {/* CAMBIO DE PESO: Titular de paso en Bold */}
-              <h3 className="text-xl font-bold text-gray-800 mb-3 transition-colors duration-300 group-hover:text-gray-900">{step.title}</h3>
-              {/* CAMBIO DE PESO: Descripción en Light */}
-              <p className="text-gray-600 font-medium transition-colors duration-300 group-hover:text-gray-700">{step.description}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* --- SECCIÓN 2: EL FLUJO VISUAL (Cliente, Robot, Negocio) --- */}
-        <div
-          className="bg-white p-8 sm:p-12 rounded-2xl shadow-xl flex flex-col items-center justify-center relative z-10"
-          style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(240,255,240,1) 100%)',
-            border: '1px solid #e6ffe6'
-          }}
-        >
-          <div className="flex flex-col md:flex-row items-center justify-center space-y-8 md:space-y-0 md:space-x-8 lg:space-x-12 w-full">
-            {horizontalFlow.map((step, index) => (
-              <React.Fragment key={step.title}>
-                <div className="group flex flex-col items-center text-center max-w-[200px] w-full">
-                  <div
-                    className="flex items-center justify-center w-24 h-24 rounded-full mb-4 shadow-md flex-shrink-0 transform transition-transform duration-300 group-hover:scale-105"
-                    style={{
-                      background: 'linear-gradient(135deg, #a8e063 0%, #56ab2f 100%)',
-                    }}
-                  >
-                    <img src={step.icon} alt={step.title} className="w-16 h-16 object-contain" />
-                  </div>
-                  {/* CAMBIO DE PESO: Titular de flujo en Bold */}
-                  <h3 className="text-lg font-bold text-gray-800 mb-1">{step.title}</h3>
-                  {/* CAMBIO DE PESO: Descripción en Light */}
-                  <p className="text-sm text-gray-600 font-medium">{step.description}</p>
-                </div>
-
-                {index < horizontalFlow.length - 1 && (
-                  <ArrowRightIcon className="h-8 w-8 text-emerald-500 flex-shrink-0 mx-4 md:mx-0 rotate-90 md:rotate-0 animate-pulse-horizontal" />
-                )}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
+      {/* Background Grid/Texture Effect */}
+      <div className="absolute inset-0 opacity-10"
+        style={{ backgroundImage: 'radial-gradient(#10b981 1px, transparent 1px)', backgroundSize: '30px 30px' }}>
       </div>
 
-      {/* Estilos para la animación de la flecha */}
+      <div className="relative z-10 max-w-6xl mx-auto flex flex-col items-center">
+
+        {/* Title */}
+        <motion.h2
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-3xl md:text-5xl font-black text-center mb-24 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-200"
+        >
+          Senior Robot Process Flow
+        </motion.h2>
+
+        {/* Central Visualization Area */}
+        <div className="relative w-full h-[600px] flex justify-center items-end pb-10">
+
+          {/* SVG Circuits */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="circuitGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stopColor="#10B981" stopOpacity="0" />
+                <stop offset="100%" stopColor="#34D399" />
+              </linearGradient>
+            </defs>
+
+            {/* Circuit Paths matching the card positions roughly */}
+            {/* Left Path */}
+            <motion.path
+              d="M50% 90% C 30% 90%, 20% 60%, 25% 35%"
+              fill="none"
+              stroke="url(#circuitGradient)"
+              strokeWidth="2"
+              initial={{ pathLength: 0 }}
+              whileInView={{ pathLength: 1 }}
+              transition={{ duration: 1.5, delay: 0.2 }}
+              className="opacity-50 md:block hidden"
+            />
+
+            {/* Center Path */}
+            <motion.path
+              d="M50% 90% L 50% 30%"
+              fill="none"
+              stroke="url(#circuitGradient)"
+              strokeWidth="2"
+              initial={{ pathLength: 0 }}
+              whileInView={{ pathLength: 1 }}
+              transition={{ duration: 1.5, delay: 0.4 }}
+              className="opacity-50 md:block hidden"
+            />
+
+            {/* Right Path */}
+            <motion.path
+              d="M50% 90% C 70% 90%, 80% 60%, 75% 35%"
+              fill="none"
+              stroke="url(#circuitGradient)"
+              strokeWidth="2"
+              initial={{ pathLength: 0 }}
+              whileInView={{ pathLength: 1 }}
+              transition={{ duration: 1.5, delay: 0.6 }}
+              className="opacity-50 md:block hidden"
+            />
+
+            {/* Animated Particles flowing on paths */}
+            <circle r="4" fill="#34D399" className="hidden md:block">
+              <animateMotion dur="3s" repeatCount="indefinite" path="M50% 90% C 30% 90%, 20% 60%, 25% 35%" />
+            </circle>
+            <circle r="4" fill="#34D399" className="hidden md:block">
+              <animateMotion dur="2.5s" repeatCount="indefinite" path="M50% 90% L 50% 30%" />
+            </circle>
+            <circle r="4" fill="#34D399" className="hidden md:block">
+              <animateMotion dur="3s" repeatCount="indefinite" path="M50% 90% C 70% 90%, 80% 60%, 75% 35%" />
+            </circle>
+          </svg>
+
+          {/* Steps - Positioned Absolute for Desktop, Stacked for Mobile */}
+          <div className="absolute inset-0 flex flex-col md:block">
+            {steps.map((step, index) => (
+              <motion.div
+                key={step.id}
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5 + (index * 0.2) }}
+                className={`
+                            relative z-10 
+                            w-full max-w-xs mx-auto md:absolute md:left-1/2 md:top-1/4 md:-ml-[160px]
+                            p-6 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md shadow-2xl
+                            transform ${step.position}
+                            transition-all duration-300 hover:bg-white/10 hover:border-emerald-500/50 hover:shadow-emerald-500/20 group
+                            cursor-pointer mb-8 md:mb-0
+                        `}
+              >
+                <div className="bg-emerald-500/10 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto group-hover:bg-emerald-500/20 transition-colors">
+                  {step.icon}
+                </div>
+                <h3 className="text-xl font-bold text-center mb-2 group-hover:text-emerald-300 transition-colors">
+                  {step.title}
+                </h3>
+                <p className="text-sm text-gray-400 text-center leading-relaxed">
+                  {step.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Central Robot Head (Source) */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="relative z-20 mt-auto"
+          >
+            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shadow-[0_0_50px_rgba(16,185,129,0.3)] animate-pulse-slow">
+              <img
+                src={IconoMrRobotHead}
+                alt="Senior Robot Brain"
+                className="w-20 h-20 md:w-24 md:h-24 object-contain drop-shadow-[0_0_15px_rgba(52,211,153,0.8)]"
+              />
+            </div>
+            {/* Connecting lines glowing base */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent -z-10"></div>
+          </motion.div>
+
+        </div>
+
+      </div>
+
       <style>{`
-        @keyframes pulse-horizontal {
-          0%, 100% { transform: translateX(0); }
-          50% { transform: translateX(5px); }
+        @keyframes pulse-slow {
+            0%, 100% { box-shadow: 0 0 50px rgba(16,185,129,0.3); }
+            50% { box-shadow: 0 0 80px rgba(16,185,129,0.6); }
         }
-        .animate-pulse-horizontal {
-          animation: pulse-horizontal 1.5s ease-in-out infinite;
-        }
-        @media (max-width: 768px) {
-           .animate-pulse-horizontal {
-             animation: pulse-vertical 1.5s ease-in-out infinite;
-           }
-           @keyframes pulse-vertical {
-            0%, 100% { transform: rotate(90deg) translateY(0); }
-            50% { transform: rotate(90deg) translateY(-5px); }
-          }
+        .animate-pulse-slow {
+            animation: pulse-slow 3s infinite;
         }
       `}</style>
     </section>
