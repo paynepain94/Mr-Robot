@@ -60,7 +60,65 @@ Incoming webhook: {
 Message from 521234567890: btn_need_speed
 ✅ Needs Selection - "btn_need_speed" Passed
 
---- Running Test: Volume Selection - "btn_vol_3" ---
+--- Running Test: Greeting - "Hola" ---
+Incoming webhook: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "changes": [
+        {
+          "value": {
+            "metadata": {
+              "phone_number_id": "12345"
+            },
+            "messages": [
+              {
+                "from": "521234567890",
+                "type": "text",
+                "text": {
+                  "body": "Hola"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+Message from 521234567890: hola
+✅ Greeting - "Hola" Passed
+
+--- Running Test: Random Text - "Precio" ---
+Incoming webhook: {
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "changes": [
+        {
+          "value": {
+            "metadata": {
+              "phone_number_id": "12345"
+            },
+            "messages": [
+              {
+                "from": "521234567890",
+                "type": "text",
+                "text": {
+                  "body": "Precio"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+Message from 521234567890: precio
+✅ Random Text - "Precio" Passed
+
+--- Running Test: Contact Human - "btn_contact_human" ---
 Incoming webhook: {
   "object": "whatsapp_business_account",
   "entry": [
@@ -78,7 +136,7 @@ Incoming webhook: {
                 "interactive": {
                   "type": "button_reply",
                   "button_reply": {
-                    "id": "btn_vol_3"
+                    "id": "btn_contact_human"
                   }
                 }
               }
@@ -89,8 +147,8 @@ Incoming webhook: {
     }
   ]
 }
-Message from 521234567890: btn_vol_3
-✅ Volume Selection - "btn_vol_3" Passed
+Message from 521234567890: btn_contact_human
+✅ Contact Human - "btn_contact_human" Passed
 
 --- Running Test: Main Menu - "btn_main_menu" ---
 Incoming webhook: {

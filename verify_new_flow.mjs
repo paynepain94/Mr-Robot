@@ -112,13 +112,28 @@ async function main() {
         }
     );
 
-    // 3. Test Volume Selection (Step 3) - Level 3
-    await runTest('Volume Selection - "btn_vol_3"',
-        { type: 'interactive', interactive: { type: 'button_reply', button_reply: { id: 'btn_vol_3' } } },
+    // 3. Test Greeting (Correct Trigger)
+    await runTest('Greeting - "Hola"', { text: 'Hola' }, (calls, res) => {
+        if (calls.length !== 2) return false;
+        return calls[0].body.text.body.includes("¿cuál es el impulso");
+    });
+
+    // 3. Test Random Text (NEW Fallback -> Human Handoff)
+    await runTest('Random Text - "Precio"', { text: 'Precio' }, (calls, res) => {
+        // Expect: Human Handoff Message + 3 Buttons
+        if (calls.length !== 1) return false;
+        const text = calls[0].body.interactive.body.text;
+        const buttons = calls[0].body.interactive.action.buttons;
+        return text.includes("Soy Senior Robot") &&
+            buttons.some(b => b.reply.id === 'btn_contact_human');
+    });
+
+    // 4. Test Contact Human Button
+    await runTest('Contact Human - "btn_contact_human"',
+        { type: 'interactive', interactive: { type: 'button_reply', button_reply: { id: 'btn_contact_human' } } },
         (calls, res) => {
             if (calls.length !== 1) return false;
-            const text = calls[0].body.interactive.body.text;
-            return text.includes("Solución Premium") && text.includes("Desde $15,000 MXN");
+            return calls[0].body.text.body.includes("+52 220 613 4842");
         }
     );
 

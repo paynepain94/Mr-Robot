@@ -6,7 +6,7 @@ import WhatsappIcon from '../assets/whatsapp_icon.png';
 
 const WhatsappButton = () => {
   const phoneNumber = '5212206134842';
-  const message = encodeURIComponent('¡Hola! Me interesa saber mas de Mr-Robot');
+  const message = encodeURIComponent('¡Hola! Me interesa saber mas de Senior Robot');
 
   const whatsappURL = `https://wa.me/${phoneNumber}?text=${message}`;
 

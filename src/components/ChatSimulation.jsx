@@ -1,118 +1,136 @@
-import React, { useState, useEffect } from 'react';
-import WhatsAppIcon from '../assets/whatsapp-dynamic.svg'; // Reusing the icon
+import React, { useState, useEffect, useRef } from 'react';
+import WhatsAppIcon from '../assets/whatsapp-dynamic.svg'; // Asegúrate de que esta ruta sea correcta
 
-const ChatSimulation = () => {
-    const [messages, setMessages] = useState([]);
+const ChatSimulation = ({
+    messages = [],
+    position = 'right',
+    botName = "Senior Robot",
+    status = "online",
+    className = ""
+}) => {
+    const [visibleMessages, setVisibleMessages] = useState([]);
+    const [isTyping, setIsTyping] = useState(false);
+    const scrollRef = useRef(null);
 
-    const conversation = [
-        {
-            id: 1,
-            sender: 'robot',
-            text: '¡Hola! Gracias por escribirnos desde la web. ⚡',
-            delay: 500
-        },
-        {
-            id: 2,
-            sender: 'robot',
-            text: 'Para darte una propuesta de automatización a tu medida, cuéntanos ¿cuál es tu volumen aproximado de mensajes diarios?',
-            type: 'options',
-            delay: 5500, // 5 segundos después del primer mensaje
-            options: [
-                { label: '🟢 Bajo: Menos de 30 chats al día.', action: 'low' },
-                { label: '🔴 Alto: Más de 100 chats y necesito solución robusta.', action: 'high' },
-                { label: '🗓️ Agendar reunión', action: 'calendar', link: 'https://calendar.google.com' }
-            ]
-        }
+    // Default messages if none provided (Fallback)
+    const defaultMessages = [
+        { type: 'user', text: 'Hi, I need to schedule a viewing.', delay: 1000 },
+        { type: 'bot', text: 'I can help with that. Slots available: Today at 4 PM.', delay: 2000 },
     ];
 
+    const currentMessages = messages.length > 0 ? messages : defaultMessages;
+
     useEffect(() => {
-        let timeouts = [];
+        let currentIndex = 0;
+        let timeoutId;
 
-        // Reset messages on mount
-        setMessages([]);
+        const processNextMessage = () => {
+            if (currentIndex >= currentMessages.length) {
+                // Loop: Reset after a pause
+                timeoutId = setTimeout(() => {
+                    setVisibleMessages([]);
+                    currentIndex = 0;
+                    processNextMessage();
+                }, 5000);
+                return;
+            }
 
-        conversation.forEach((msg) => {
-            const timeout = setTimeout(() => {
-                setMessages((prev) => [...prev, msg]);
-            }, msg.delay);
-            timeouts.push(timeout);
-        });
+            const msg = currentMessages[currentIndex];
 
-        return () => timeouts.forEach(clearTimeout);
-    }, []);
+            if (msg.type === 'bot') {
+                setIsTyping(true);
+                // Simulate typing delay
+                const typingDelay = 800;
 
-    const handleOptionClick = (option) => {
-        if (option.link) {
-            window.open(option.link, '_blank');
-        } else {
-            console.log("Selected option:", option.label);
-            // Simulación de interacción visual o respuesta podría ir aquí
+                timeoutId = setTimeout(() => {
+                    setIsTyping(false);
+                    setVisibleMessages(prev => [...prev, msg]);
+                    currentIndex++;
+                    // Wait for next message delay
+                    timeoutId = setTimeout(processNextMessage, msg.delay || 1500);
+                }, typingDelay);
+            } else {
+                // User message
+                timeoutId = setTimeout(() => {
+                    setVisibleMessages(prev => [...prev, msg]);
+                    currentIndex++;
+                    processNextMessage();
+                }, msg.delay || 1000);
+            }
+        };
+
+        // Start initial delay
+        timeoutId = setTimeout(processNextMessage, 500);
+
+        return () => clearTimeout(timeoutId);
+    }, [currentMessages]);
+
+    // Auto-scroll
+    useEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
-    };
+    }, [visibleMessages, isTyping]);
 
     return (
-        <div className="relative w-72 sm:w-80 bg-white rounded-[2rem] shadow-2xl border-8 border-gray-900 overflow-hidden transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500">
-            {/* Phone Header */}
-            <div className="bg-[#075E54] p-4 flex items-center space-x-3 text-white">
-                <div className="w-8 h-8 bg-white rounded-full p-1">
-                    <img src={WhatsAppIcon} alt="Bot" className="w-full h-full" />
+        <div className={`w-72 sm:w-80 bg-gray-900/80 backdrop-blur-md border border-gray-700 rounded-2xl overflow-hidden shadow-2xl flex flex-col font-sans ${className}`}>
+            {/* Header */}
+            <div className="bg-gray-800/90 px-4 py-3 flex items-center gap-3 border-b border-gray-700">
+                <div className="w-10 h-10 rounded-full bg-emerald-500/20 p-1.5 flex items-center justify-center">
+                    {/* Using a generic bot icon or the whatsapp icon if available, ensuring it renders nicely on dark */}
+                    <span className="text-xl">🤖</span>
                 </div>
                 <div>
-                    <h3 className="font-bold text-sm">Mr-Robot</h3>
-                    <p className="text-xs opacity-80">En línea</p>
+                    <h3 className="font-bold text-sm text-gray-100">{botName}</h3>
+                    <p className="text-xs text-emerald-400 font-medium flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        {isTyping ? 'typing...' : status}
+                    </p>
                 </div>
             </div>
 
-            {/* Chat Area */}
-            <div className="bg-[#ECE5DD] h-96 p-4 overflow-y-auto flex flex-col space-y-3 custom-scrollbar">
-                {messages.map((msg) => (
+            {/* Body */}
+            <div
+                ref={scrollRef}
+                className="flex-1 p-4 space-y-4 h-64 overflow-y-auto scrollbar-hide bg-gradient-to-b from-gray-900/50 to-black/20"
+            >
+                {visibleMessages.map((msg, idx) => (
                     <div
-                        key={msg.id}
-                        className={`max-w-[85%] p-3 rounded-lg text-sm shadow-sm animate-fade-in-up ${msg.sender === 'client'
-                            ? 'bg-white self-start rounded-tl-none'
-                            : 'bg-white self-start rounded-tl-none' // Bot is always white/default in this new flow for options? Or keep green? Standard whatsapp bot is usually left side (white)
-                            }`}
-                        style={msg.sender === 'robot' ? { backgroundColor: 'white', borderTopLeftRadius: 0 } : {}}
+                        key={idx}
+                        className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in-up`}
                     >
-                        <p className="text-gray-800 whitespace-pre-line">{msg.text}</p>
-
-                        {/* Options Rendering */}
-                        {msg.type === 'options' && (
-                            <div className="mt-3 flex flex-col space-y-2">
-                                {msg.options.map((option, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => handleOptionClick(option)}
-                                        className="w-full text-left bg-gray-50 hover:bg-gray-100 text-gray-700 p-2 rounded border border-gray-200 text-xs transition-colors duration-200"
-                                    >
-                                        {option.label}
-                                    </button>
-                                ))}
+                        <div
+                            className={`max-w-[85%] px-4 py-2 rounded-2xl text-sm leading-relaxed shadow-sm ${msg.type === 'user'
+                                    ? 'bg-emerald-600 text-white rounded-tr-none'
+                                    : 'bg-gray-700 text-gray-200 rounded-tl-none border border-gray-600'
+                                }`}
+                        >
+                            {msg.text}
+                            <div className={`text-[10px] mt-1 opacity-70 text-right ${msg.type === 'user' ? 'text-emerald-100' : 'text-gray-400'}`}>
+                                {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                {msg.type === 'user' && <span className="ml-1">✓✓</span>}
                             </div>
-                        )}
-
-                        <span className="text-[10px] text-gray-500 block text-right mt-1">
-                            {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
+                        </div>
                     </div>
                 ))}
+
+                {isTyping && (
+                    <div className="flex justify-start animate-fade-in">
+                        <div className="bg-gray-700 px-4 py-3 rounded-2xl rounded-tl-none border border-gray-600 flex gap-1">
+                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span>
+                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-100"></span>
+                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-200"></span>
+                        </div>
+                    </div>
+                )}
             </div>
 
-            {/* Input Area (Mock) */}
-            <div className="bg-white p-3 border-t border-gray-200 flex items-center space-x-2">
-                <div className="w-full h-8 bg-gray-100 rounded-full"></div>
-                <div className="w-8 h-8 bg-[#075E54] rounded-full"></div>
+            {/* Input Placeholder (Visual only) */}
+            <div className="bg-gray-800/50 px-3 py-2 border-t border-gray-700 flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-gray-400 text-xs">+</div>
+                <div className="flex-1 h-8 bg-gray-700/50 rounded-full border border-gray-600"></div>
+                <div className="w-8 h-8 rounded-full bg-emerald-600/80 flex items-center justify-center text-white text-xs">➤</div>
             </div>
-
-            <style>{`
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in-up {
-            animation: fadeInUp 0.3s ease-out forwards;
-        }
-      `}</style>
         </div>
     );
 };

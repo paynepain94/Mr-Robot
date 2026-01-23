@@ -11,62 +11,62 @@ const FAQ = () => {
 
     const faqs = [
         {
-            question: "¿Qué es Mr-Robot y para qué sirve?",
-            answer: "Mr-Robot es una plataforma integral que centraliza y organiza la atención al cliente en WhatsApp. Te ayuda a responder más rápido, automatizar tareas repetitivas y brindar un servicio profesional sin perder la cercanía con tus clientes."
+            question: "¿Qué es Senior Robot y para qué sirve?",
+            answer: "Senior Robot es una plataforma integral que centraliza y organiza la atención al cliente en WhatsApp. Te ayuda a responder más rápido, automatizar tareas repetitivas y brindar un servicio profesional sin perder la cercanía con tus clientes."
         },
         {
-            question: "¿En qué se diferencia Mr-Robot de WhatsApp Business normal?",
-            answer: "WhatsApp Business está pensado para una sola persona o equipos muy pequeños. Con Mr-Robot puedes trabajar con múltiples agentes y líneas simultáneamente, tener supervisión en tiempo real, chatbots avanzados y automatizaciones que el WhatsApp normal no ofrece."
+            question: "¿En qué se diferencia Senior Robot de WhatsApp Business normal?",
+            answer: "WhatsApp Business está pensado para una sola persona o equipos muy pequeños. Con Senior Robot puedes trabajar con múltiples agentes y líneas simultáneamente, tener supervisión en tiempo real, chatbots avanzados y automatizaciones que el WhatsApp normal no ofrece."
         },
         {
-            question: "¿Mr-Robot trabaja con la API oficial de WhatsApp?",
+            question: "¿Senior Robot trabaja con la API oficial de WhatsApp?",
             answer: "Sí. Solo utilizamos la API oficial de WhatsApp, lo que garantiza el cumplimiento con las políticas de Meta, máxima estabilidad y elimina los riesgos de bloqueo por uso indebido."
         },
         {
-            question: "¿Necesito conocimientos técnicos para usar Mr-Robot?",
+            question: "¿Necesito conocimientos técnicos para usar Senior Robot?",
             answer: "No. Nuestra plataforma está diseñada para ser intuitiva y fácil de usar desde el primer día. Tu equipo podrá aprender a utilizarla en cuestión de horas gracias a nuestras guías claras y soporte cercano."
         },
         {
-            question: "¿Puedo usar Mr-Robot si ya tengo un CRM?",
-            answer: "¡Claro! Mr-Robot se integra con miles de aplicaciones a través de Make, Webhooks y la propia API de meta, permitiendo que tu CRM actual y tu WhatsApp trabajen en perfecta sincronía."
+            question: "¿Puedo usar Senior Robot si ya tengo un CRM?",
+            answer: "¡Claro! Senior Robot se integra con miles de aplicaciones a través de Make, Webhooks y la propia API de meta, permitiendo que tu CRM actual y tu WhatsApp trabajen en perfecta sincronía."
         },
         {
             question: "¿Se pueden crear chatbots sin saber programar?",
             answer: "Sí. Puedes diseñar flujos conversacionales completos con botones, listas, condiciones y variables de forma visual, sin escribir una sola línea de código."
         },
         {
-            question: "¿Puedo enviar mensajes masivos y campañas por WhatsApp con Mr-Robot?",
-            answer: "Sí. Mr-Robot te permite enviar campañas segmentadas y personalizadas, con métricas en tiempo real para medir el impacto y la conversión de tus mensajes."
+            question: "¿Puedo enviar mensajes masivos y campañas por WhatsApp con Senior Robot?",
+            answer: "Sí. Senior Robot te permite enviar campañas segmentadas y personalizadas, con métricas en tiempo real para medir el impacto y la conversión de tus mensajes."
         },
         {
-            question: "¿Qué industrias usan Mr-Robot con más éxito?",
+            question: "¿Qué industrias usan Senior Robot con más éxito?",
             answer: "E-commerce, servicios online, educación, marketing digital, cafés, restaurantes, ventas en línea, y taquerías. En general, cualquier negocio que utilice WhatsApp como un canal principal de comunicación se beneficia enormemente."
         },
         {
-            question: "¿Para qué tipo de empresas NO está diseñado Mr-Robot?",
+            question: "¿Para qué tipo de empresas NO está diseñado Senior Robot?",
             answer: "No es ideal para negocios unipersonales sin proyección de crecimiento inmediato, empresas sin una estructura mínima de atención al cliente o quienes aún tienen un volumen muy bajo de mensajes. Está pensado para potenciar equipos de al menos 3 o más agentes."
         },
         {
-            question: "¿Cuánto cuesta Mr-Robot y qué incluye?",
+            question: "¿Cuánto cuesta Senior Robot y qué incluye?",
             answer: "Nuestros planes inician desde 2,490 mxn. Todos incluyen agente, línea, contactos ilimitados, créditos de IA. "
         },
         {
-            question: "¿Qué soporte ofrece Mr-Robot?",
+            question: "¿Qué soporte ofrece Senior Robot?",
             answer: "Ofrecemos un soporte cercano y humano. No te dejamos solo con documentación: acompañamos a tu equipo con guías, videos y asistencia directa siempre que lo necesites para asegurar tu éxito durante los primeros 3meses."
         },
         {
-            question: "¿Qué resultados puedo esperar al usar Mr-Robot?",
-            answer: "Con Mr-Robot tu equipo ganará orden y velocidad desde el primer día: ningún mensaje se quedará sin responder, los supervisores tendrán control total en tiempo real y tus clientes recibirán respuestas más rápidas y profesionales. Esto se traduce directamente en más ventas, menos quejas y una experiencia de atención sólida."
+            question: "¿Qué resultados puedo esperar al usar Senior Robot?",
+            answer: "Con Senior Robot tu equipo ganará orden y velocidad desde el primer día: ningún mensaje se quedará sin responder, los supervisores tendrán control total en tiempo real y tus clientes recibirán respuestas más rápidas y profesionales. Esto se traduce directamente en más ventas, menos quejas y una experiencia de atención sólida."
         },
         {
-            question: "¿Cuánto tiempo me toma empezar a usar Mr-Robot?",
+            question: "¿Cuánto tiempo me toma empezar a usar Senior Robot?",
             answer: "El proceso es rápido y sencillo. En cuestión de horas puedes tener tu número conectado y a tu equipo atendiendo desde la plataforma. Sin configuraciones técnicas complicadas: todo está diseñado para que arranques sin fricciones."
         },
         {
-            question: "¿Por qué elegir Mr-Robot y no otra herramienta?",
+            question: "¿Por qué elegir Senior Robot y no otra herramienta?",
             answer: (
                 <>
-                    Porque Mr-Robot está hecho específicamente para empresas que dependen de WhatsApp y sienten que su operación manual los limita. No somos un CRM genérico ni una app improvisada:
+                    Porque Senior Robot está hecho específicamente para empresas que dependen de WhatsApp y sienten que su operación manual los limita. No somos un CRM genérico ni una app improvisada:
                     <br /><br />
                     ✅ <strong>Seguridad y estabilidad:</strong> Trabajamos exclusivamente con la API oficial de WhatsApp.<br />
                     ✅ <strong>Escalabilidad real:</strong> Puedes crecer de 5 a 50+ agentes sin cambiar de sistema.<br />
@@ -74,7 +74,7 @@ const FAQ = () => {
                     ✅ <strong>Automatización inteligente:</strong> Chatbots y asistentes de IA que liberan carga de trabajo sin necesidad de programar.<br />
                     ✅ <strong>Soporte cercano:</strong> Nunca estarás solo, siempre habrá alguien listo para ayudarte.
                     <br /><br />
-                    En pocas palabras: Mr-Robot no es “otra herramienta más”, es la solución definitiva que ordena tu WhatsApp, da control a tu equipo y convierte el caos en ventas.
+                    En pocas palabras: Senior Robot no es “otra herramienta más”, es la solución definitiva que ordena tu WhatsApp, da control a tu equipo y convierte el caos en ventas.
                 </>
             )
         }

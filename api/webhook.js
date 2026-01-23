@@ -111,6 +111,10 @@ export default async function handler(req, res) {
                 else if (msg_body === 'btn_schedule' || msg_body === 'btn_consulting' || msg_body.includes('agendar') || msg_body.includes('consultoría')) {
                     responseText = "¡Excelente decisión! 🎯 El siguiente paso es una breve llamada de diagnóstico para detectar los cuellos de botella en tu proceso y ver cómo Senior Robot los va a eliminar. 🚫🍾\n\nPor favor, elige el horario que mejor te acomode en nuestro calendario oficial: 👉 https://calendar.app.google/1VzMDX3u7EunndcYA 📅\n\nNota: Atendemos de forma personalizada para asegurar la máxima calidad en cada integración. 🦾";
                 }
+                // CONTACT HUMAN (Direct Call)
+                else if (msg_body === 'btn_contact_human' || msg_body.includes('llamar')) {
+                    responseText = "📞 Puedes contactarnos directamente al: +52 220 613 4842\n\nEstamos disponibles para atenderte personalmente. 🤝";
+                }
 
                 // 4. Send Response if matched an option
                 if (responseText) {
@@ -126,12 +130,28 @@ export default async function handler(req, res) {
                     return res.status(200).send('EVENT_RECEIVED');
                 }
 
-                // 5. CATCH-ALL / DEFAULT: Welcome & Needs Assessment
-                // This acts as the Entry Point (Step 1)
+                // 5. GREETING CHECK
+                // Restore explicit check for greetings to trigger the Welcome Flow
+                const greetingKeywords = ['hola', 'hi', 'hello', 'buenos', 'buenas', 'inicio', 'empezar', 'menu'];
+                const isGreeting = greetingKeywords.some(keyword => msg_body.includes(keyword));
+
                 try {
-                    await sendWelcomeAndNeeds(phone_number_id, from);
+                    if (isGreeting) {
+                        // Triggers the Welcome & Needs Assessment (Step 1)
+                        await sendWelcomeAndNeeds(phone_number_id, from);
+                    } else {
+                        // 6. FALLBACK: HUMAN HANDOFF / SENIOR ROBOT INTRO
+                        // If it's unknown text (e.g. user writing after flow), offer human contact.
+                        const fallbackText = "Soy Senior Robot, tu Asistente Digital 🤖.\n\nSi deseas hablar con un humano, puedes agendar una cita, llamar directo o volver al menú. 👇";
+                        const fallbackButtons = [
+                            { type: "reply", reply: { id: "btn_schedule", title: "Agendar Cita 📅" } },
+                            { type: "reply", reply: { id: "btn_contact_human", title: "Llamar Ahora 📞" } },
+                            { type: "reply", reply: { id: "btn_main_menu", title: "Menú Principal ⬅️" } }
+                        ];
+                        await sendCustomButtonMessage(phone_number_id, from, fallbackText, fallbackButtons);
+                    }
                 } catch (error) {
-                    console.error('Error sending welcome flow:', error);
+                    console.error('Error sending fallback flow:', error);
                 }
             }
             return res.status(200).send('EVENT_RECEIVED');

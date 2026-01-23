@@ -53,7 +53,7 @@ const Benefits = () => {
       <div className="relative z-10 max-w-7xl mx-auto">
         {/* Titular de sección en Bold */}
         <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-12">
-          ¿Por qué elegir Mr-Robot?
+          ¿Por qué elegir Senior Robot?
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

@@ -1,129 +1,112 @@
 import React from 'react';
-import { CheckCircleIcon, PlayCircleIcon } from '@heroicons/react/24/solid';
 import DynamicBackground from './DynamicBackground';
 import ChatSimulation from './ChatSimulation';
-import HeroRobotGif from '../assets/hero-faded-robot.gif';
 
 const Header = () => {
+  const leftChatMessages = [
+    { type: 'user', text: 'Hola, quisiera agendar una cita para uñas 💅', delay: 1000 },
+    { type: 'bot', text: '¡Hola! Claro. Tengo espacio hoy a las 4:00 PM.', delay: 2500 },
+    { type: 'user', text: '¿Podría ser más tarde? Como a las 6?', delay: 4000 },
+    { type: 'bot', text: 'Listo. Tu cita quedó reagendada para las 6:00 PM. ✅', delay: 5500 },
+  ];
+
+  const rightChatMessages = [
+    { type: 'user', text: 'Quiero 5 tacos al pastor con todo 🌮', delay: 1500 },
+    { type: 'bot', text: '¡A la orden! ¿Paso por ello o te lo envío?', delay: 3000 },
+    { type: 'user', text: 'Paso yo. ¿Me das la ubicación?', delay: 4500 },
+    { type: 'bot', text: '📍 Av. Reforma 123. Tu pedido estará listo en 15 min.', delay: 6000 },
+  ];
+
   return (
     <header className="relative w-full min-h-screen flex items-center justify-center overflow-hidden pt-20 lg:pt-0">
 
       {/* 1. Dynamic Background */}
       <DynamicBackground />
 
-      {/* 2. Main Content Container */}
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center">
+      {/* 3. Main Content Container (Centered) */}
+      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center h-full">
 
-        {/* --- Left Column: Copy & CTAs --- */}
-        <div className="w-full lg:w-1/2 text-center lg:text-left space-y-8 lg:pr-12">
+        {/* Removed Badge as requested */}
 
-          {/* Badge */}
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm border border-emerald-100 shadow-sm animate-fade-in-down">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
-            <span className="text-sm font-semibold text-emerald-800 tracking-wide">
-              IA Revolucionaria para WhatsApp
+        {/* Eyebrow / Top Title */}
+        <p className="text-xl sm:text-2xl font-bold text-gray-300 mb-4 animate-fade-in-up uppercase tracking-widest">
+          ¿Pierdes ventas mientras duermes?
+        </p>
+
+        {/* Main Headline */}
+        <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tighter text-white mb-6 animate-fade-in-up delay-100 uppercase leading-none drop-shadow-2xl max-w-5xl">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500">
+            Senior Robot
+          </span> vende por ti 24/7. <br className="hidden lg:block" />
+          <span className="text-gray-200">Sin sueldos, sin descansos, solo resultados.</span>
+        </h1>
+
+        {/* Subheadline/Description */}
+        <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto animate-fade-in-up delay-200 leading-relaxed font-light mb-10">
+          Convierte chats de WhatsApp en ventas automáticamente. Respuestas instantáneas que eliminan costos y escalan tu atención al cliente sin límites.
+        </p>
+
+        {/* CTA */}
+        <div className="flex flex-col items-center gap-6 animate-fade-in-up delay-300">
+          <a href="https://wa.me/522206134842" target="_blank" rel="noopener noreferrer" className="group relative px-10 py-5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-full shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] transition-all transform hover:-translate-y-1 overflow-hidden">
+            <span className="relative z-10 flex items-center gap-2 uppercase tracking-widest text-base">
+              Empieza a automatizar hoy <span className="group-hover:translate-x-1 transition-transform">→</span>
             </span>
-          </div>
+          </a>
 
-          {/* Headline (Visual only, semantically secondary) */}
-          <p className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight tracking-tight animate-fade-in-up">
-            ¿Pierdes ventas mientras duermes?
-          </p>
-
-          {/* Main H1 (SEO optimized) */}
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight mt-4 animate-fade-in-up delay-100">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">
-              Mr-Robot vende por ti 24/7. Sin sueldos, sin descansos, solo resultados.
-            </span>
-          </h1>
-
-          {/* Subheadline */}
-          <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto lg:mx-0 animate-fade-in-up delay-200">
-            Convierte chats de WhatsApp en ventas automáticamente. Respuestas instantáneas que eliminan costos y escalan tu atención al cliente sin límites.
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 animate-fade-in-up delay-300">
-            <a href="https://wa.me/522206134842" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg hover:shadow-emerald-500/30 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2">
-              <span className="text-xl">🚀</span>
-              Empieza a automatizar hoy
-            </a>
-          </div>
-
-          {/* Trust Signal */}
-          <div className="flex items-center justify-center lg:justify-start gap-2 text-sm font-medium text-gray-500 animate-fade-in-up delay-300">
-            <div className="flex -space-x-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs overflow-hidden">
-                  <img src={`https://i.pravatar.cc/100?img=${i + 10}`} alt="User" />
+          {/* Trust Signal (Users + Rating) */}
+          <div className="flex items-center gap-3">
+            <div className="flex -space-x-3">
+              {[10, 12, 11, 8].map((imgId, i) => (
+                <div key={i} className={`w-10 h-10 rounded-full border-2 border-black bg-gray-700 overflow-hidden relative z-[${10 - i}]`}>
+                  <img src={`https://i.pravatar.cc/100?img=${imgId}`} alt="User" className="w-full h-full object-cover" />
                 </div>
               ))}
             </div>
-            <p>⭐ 4.9/5 de valoración promedio.</p>
+            <div className="flex flex-col items-start">
+              <div className="flex text-yellow-400 text-sm">
+                {'★★★★★'}
+              </div>
+              <p className="text-gray-400 text-xs font-medium">4.9/5 de valoración promedio.</p>
+            </div>
           </div>
+
         </div>
 
-        {/* --- Right Column: Visuals (Robot + Chat) --- */}
-        <div className="w-full lg:w-1/2 mt-32 lg:mt-0 relative flex items-center justify-center perspective-1000">
+      </div>
 
-          {/* Visuals Wrapper - Keeps elements together and centered */}
-          <div className="relative w-auto h-auto">
+      {/* 4. Floating Chats (Absolute Positioning) */}
 
-            {/* Robot GIF (Floating) */}
-            <div className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 z-10 animate-float-slow -translate-x-20 sm:-translate-x-16 lg:-translate-x-24">
-              <img
-                src={HeroRobotGif}
-                alt="Mr. Robot AI"
-                className="w-full h-full object-contain mix-blend-multiply"
-              />
+      {/* Left Chat */}
+      <div className="absolute left-4 lg:left-10 top-1/2 -translate-y-1/2 hidden xl:block z-20 hover:z-30 transition-all duration-500 hover:scale-105 perspective-1000">
+        <div className="transform rotate-y-6 rotate-z-2 shadow-2xl">
+          <ChatSimulation messages={leftChatMessages} botName="Senior Robot AI" />
+        </div>
+      </div>
 
-              {/* Glowing Effect behind Robot */}
-              <div className="absolute inset-0 bg-emerald-400/20 blur-3xl rounded-full -z-10 animate-pulse-slow"></div>
-            </div>
-
-            {/* Chat Simulation (Overlapping/Positioned relative to wrapper) */}
-            <div className="absolute -right-24 bottom-0 sm:-right-20 sm:bottom-10 lg:-right-36 lg:bottom-12 z-20 transform scale-75 sm:scale-90 lg:scale-100 origin-bottom-right">
-              <ChatSimulation />
-            </div>
-
-          </div>
-
-          {/* Decorative Elements (Background) */}
-          <div className="absolute top-0 right-0 lg:right-10 w-20 h-20 bg-teal-100 rounded-full blur-xl opacity-50 animate-blob"></div>
-          <div className="absolute bottom-10 left-10 w-32 h-32 bg-emerald-100 rounded-full blur-xl opacity-50 animate-blob animation-delay-2000"></div>
-
+      {/* Right Chat */}
+      <div className="absolute right-4 lg:right-10 top-1/2 -translate-y-1/2 hidden xl:block z-20 hover:z-30 transition-all duration-500 hover:scale-105 perspective-1000">
+        <div className="transform -rotate-y-6 -rotate-z-2 shadow-2xl">
+          <ChatSimulation messages={rightChatMessages} botName="Senior Robot AI" status="escribiendo..." />
         </div>
       </div>
 
       {/* CSS Animations */}
       <style>{`
-        @keyframes float-slow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-20px); }
-        }
-        .animate-float-slow {
-          animation: float-slow 6s ease-in-out infinite;
-        }
         .animate-fade-in-up {
-          animation: fadeInUp 0.8s ease-out forwards;
+          animation: fadeInUp 1s ease-out forwards;
           opacity: 0;
-          transform: translateY(20px);
-        }
-        .animate-fade-in-down {
-          animation: fadeInDown 0.8s ease-out forwards;
-          opacity: 0;
-          transform: translateY(-20px);
+          transform: translateY(30px);
         }
         @keyframes fadeInUp {
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeInDown {
           to { opacity: 1; transform: translateY(0); }
         }
         .delay-100 { animation-delay: 0.1s; }
         .delay-200 { animation-delay: 0.2s; }
         .delay-300 { animation-delay: 0.3s; }
         .perspective-1000 { perspective: 1000px; }
+        .rotate-y-6 { transform: rotateY(10deg); }
+        .-rotate-y-6 { transform: rotateY(-10deg); }
       `}</style>
     </header>
   );

@@ -21,7 +21,7 @@ const Conoceme = () => {
             <div className="relative">
               <img
                 src={JoabFoto}
-                alt="Joab Romero, Fundador de Mr-Robot"
+                alt="Joab Romero, Fundador de Senior Robot"
                 className="w-64 h-64 sm:w-80 sm:h-80 object-cover rounded-2xl shadow-2xl border-4 border-white transform transition-transform duration-500 hover:scale-[1.02]"
               />
               {/* Pequeño detalle de "verificado" o adorno */}

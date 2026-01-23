@@ -42,7 +42,7 @@ const HowItWorks = () => {
     },
     {
       icon: IconoMrRobotHead,
-      title: 'Mr-Robot',
+      title: 'Senior Robot',
       description: 'Recibe y contesta automáticamente.',
     },
     {
@@ -57,7 +57,7 @@ const HowItWorks = () => {
       <div className="max-w-7xl mx-auto">
         {/* CAMBIO DE PESO: Titular de sección en Bold (ya estaba) */}
         <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-16 relative z-10">
-          ¿Cómo funciona Mr-Robot?
+          ¿Cómo funciona Senior Robot?
         </h2>
 
         {/* --- SECCIÓN 1: LOS 3 PASOS (Análisis, Creación, Lanzamiento) --- */}

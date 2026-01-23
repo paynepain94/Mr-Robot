@@ -5,7 +5,7 @@ const Testimonials = () => {
     {
       name: 'Roberto "El Charro" Méndez',
       role: 'Dueño de Taquería Fuego y Sabor',
-      quote: 'En una taquería el ritmo es frenético. Mr-Robot automatizó nuestros pedidos de WhatsApp. Ahora no perdemos ni un solo cliente en hora pico, ¡incluso cuando estamos llenos!',
+      quote: 'En una taquería el ritmo es frenético. Senior Robot automatizó nuestros pedidos de WhatsApp. Ahora no perdemos ni un solo cliente en hora pico, ¡incluso cuando estamos llenos!',
       image: 'https://i.pravatar.cc/150?img=11', // Foto real/estilo persona
     },
     {

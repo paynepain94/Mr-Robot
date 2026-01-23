@@ -10,7 +10,7 @@ const NavBar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 transition-all duration-300">
+    <nav className="sticky top-0 z-50 bg-[#0f172a]/80 backdrop-blur-md shadow-lg border-b border-white/10 transition-all duration-300">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-3">
 
@@ -18,10 +18,10 @@ const NavBar = () => {
           <a href="#inicio" className="flex items-center space-x-3 flex-shrink-0 group">
             <img
               src={MrRobotNavLogo}
-              alt="Mr-Robot Logo"
+              alt="Senior Robot Logo"
               className="h-14 w-14 sm:h-16 sm:w-16 transition-transform duration-300 group-hover:scale-105"
             />
-            <span className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">Mr-Robot</span>
+            <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">Senior Robot</span>
           </a>
 
           {/* BOTÓN DE HAMBURGUESA (visible solo en móvil) */}
@@ -29,7 +29,7 @@ const NavBar = () => {
             <button
               onClick={() => setIsOpen(!isOpen)}
               type="button"
-              className="text-gray-500 hover:text-emerald-600 focus:outline-none focus:text-emerald-600 transition duration-150 ease-in-out"
+              className="text-gray-300 hover:text-emerald-400 focus:outline-none focus:text-emerald-400 transition duration-150 ease-in-out"
               aria-label="Toggle menu"
             >
               {isOpen ? (
@@ -45,7 +45,7 @@ const NavBar = () => {
             <li>
               <a
                 href="#inicio"
-                className="px-4 py-2 text-base font-medium text-gray-700 rounded-full hover:bg-gray-100 hover:text-emerald-600 transition-all duration-200"
+                className="px-4 py-2 text-base font-medium text-gray-300 rounded-full hover:bg-white/10 hover:text-white transition-all duration-200"
               >
                 Inicio
               </a>
@@ -53,7 +53,7 @@ const NavBar = () => {
             <li>
               <a
                 href="#conoceme"
-                className="px-4 py-2 text-base font-medium text-gray-700 rounded-full hover:bg-gray-100 hover:text-emerald-600 transition-all duration-200"
+                className="px-4 py-2 text-base font-medium text-gray-300 rounded-full hover:bg-white/10 hover:text-white transition-all duration-200"
               >
                 Conóceme
               </a>
@@ -63,7 +63,7 @@ const NavBar = () => {
                 href="https://wa.me/522206134842"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-6 py-2.5 text-base font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
+                className="inline-flex items-center justify-center px-6 py-2.5 text-base font-bold text-black bg-emerald-500 rounded-xl hover:bg-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.5)] hover:shadow-[0_0_20px_rgba(16,185,129,0.7)] transition-all duration-200 transform hover:-translate-y-0.5"
               >
                 Contáctame
               </a>
@@ -75,14 +75,14 @@ const NavBar = () => {
       {/* --- MENÚ MÓVIL (se muestra/oculta con el estado) --- */}
       <div
         className={`md:hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
-          } overflow-hidden bg-white/95 backdrop-blur-xl border-t border-gray-100 shadow-lg`}
+          } overflow-hidden bg-[#0f172a]/95 backdrop-blur-xl border-t border-white/10 shadow-lg`}
       >
         <ul className="px-4 pt-4 pb-6 space-y-3 text-center">
           <li>
             <a
               href="#inicio"
               onClick={handleNavLinkClick}
-              className="block py-2 text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-50 rounded-lg transition duration-200"
+              className="block py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition duration-200"
             >
               Inicio
             </a>
@@ -91,7 +91,7 @@ const NavBar = () => {
             <a
               href="#conoceme"
               onClick={handleNavLinkClick}
-              className="block py-2 text-base font-medium text-gray-700 hover:text-emerald-600 hover:bg-gray-50 rounded-lg transition duration-200"
+              className="block py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition duration-200"
             >
               Conóceme
             </a>
@@ -102,7 +102,7 @@ const NavBar = () => {
               target="_blank"
               rel="noopener noreferrer"
               onClick={handleNavLinkClick}
-              className="block w-full py-3 text-base font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 shadow-md transition duration-200"
+              className="block w-full py-3 text-base font-bold text-black bg-emerald-500 rounded-xl hover:bg-emerald-400 shadow-md transition duration-200"
             >
               Contáctame
             </a>
