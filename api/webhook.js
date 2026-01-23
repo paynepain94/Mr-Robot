@@ -83,7 +83,7 @@ export default async function handler(req, res) {
                 }
                 // LEVEL 3: 51+ chats
                 else if (msg_body === 'btn_level_3' || msg_body.includes('51') || msg_body.includes('más')) {
-                    responseText = "¡Entendido! ⚡ A este volumen, la eficiencia es crítica. Nuestro Plan Premium integra un Agente de IA entrenado específicamente con el ADN de tu marca. 🧠🤖\n\nLo que obtienes:\n✅ IA Avanzada: Respuestas inteligentes y naturales a consultas complejas. 🤯\n✅ Ecosistema Conectado: Integración total con tu CRM para un seguimiento perfecto. 🔗\n✅ Máxima Resiliencia: Infraestructura diseñada bajo estándares de ciberseguridad profesional. 🛡️\n\n💰 Inversión: Desde $15,000 MXN.\n\nEste nivel requiere una consultoría técnica personalizada Gratis. ¿Agendamos tu sesión ahora? 💡";
+                    responseText = "¡Entendido! ⚡ A este volumen, la eficiencia es crítica. Nuestro Plan Premium integra un Agente de IA entrenado específicamente con el ADN de tu marca. 🧠🤖\n\nLo que obtienes:\n✅ IA Avanzada: Respuestas inteligentes y naturales a consultas complejas. 🤯\n✅ Ecosistema Conectado: Integración total con tu CRM para un seguimiento perfecto. 🔗\n✅ Máxima Resiliencia: Infraestructura diseñada bajo estándares de ciberseguridad profesional. 🛡️\n\n💰 Inversión: Desde $15,000 MXN.\n\nEste nivel requiere una consultoría técnica personalizada. ¿Agendamos tu sesión ahora? 💡";
                     nextButtons = [
                         { type: "reply", reply: { id: "btn_consulting", title: "Consultoría 🛠️" } },
                         { type: "reply", reply: { id: "btn_main_menu", title: "Menú Principal ⬅️" } }
@@ -112,7 +112,7 @@ export default async function handler(req, res) {
                 // If it wasn't a Main Menu click AND not a known option, assume it's a Greeting or valid input.
                 // This acts as a Catch-All for new users or random text.
                 try {
-                    const welcomeText = "¡Hola! 👋 Bienvenido a Senior Robot, ingeniería en automatización de élite. 🤖🚀\n\nSoy tu asistente virtual y estoy aquí para ayudarte a escalar tus ventas con tecnología inteligente. 📈\n\nDiseñamos soluciones con más de 10 años de experiencia en infraestructura y ciberseguridad 🛡️, garantizando que tu bot sea una herramienta blindada y ultra eficiente.\n\nPara darte el diagnóstico correcto, ¿Cuántos chats recibe tu negocio en promedio al día? 👇";
+                    const welcomeText = "¡Hola! 👋 Bienvenido a Senior Robot, ingeniería en automatización de élite. 🤖🚀\n\nSoy tu asistente virtual y estoy aquí para ayudarte a escalar tus ventas con tecnología inteligente. 📈\n\nDiseñamos soluciones con más de 10 años de experiencia en infraestructura y ciberseguridad 🛡️, garantizando que tu bot sea una herramienta blindada y ultra eficiente.\n\nPara darte el diagnóstico correcto, ¿cuántos chats recibe tu negocio en promedio al día? 👇\n\n1️⃣ 1 - 25 chats (Perfil Emprendedor / Micro) 🐣\n2️⃣ 25 - 50 chats (Empresa en Crecimiento) 📈\n3️⃣ 51 o más chats (Nivel Corporativo / Alto Flujo) 🏢";
                     await sendMessage(phone_number_id, from, welcomeText);
 
                     // Wait a bit for natural pacing
