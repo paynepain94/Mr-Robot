@@ -53,7 +53,7 @@ const HowItWorks = () => {
         <div className="relative w-full min-h-[600px] lg:h-[700px] flex flex-col lg:justify-center items-center">
 
           {/* SVG Circuits */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 hidden lg:block" xmlns="http://www.w3.org/2000/svg">
+          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 hidden lg:block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">
             <defs>
               <linearGradient id="circuitGradient" x1="0%" y1="100%" x2="0%" y2="0%">
                 <stop offset="0%" stopColor="#10B981" stopOpacity="0.2" />
@@ -68,10 +68,10 @@ const HowItWorks = () => {
 
             {/* Left Circuit - Tech Style */}
             <motion.path
-              d="M50% 88% V 60% H 22% V 40%"
+              d="M50 88 V 60 H 22 V 40"
               fill="none"
               stroke="url(#circuitGradient)"
-              strokeWidth="3"
+              strokeWidth="0.3"
               strokeLinecap="round"
               filter="url(#glow)"
               initial={{ pathLength: 0, opacity: 0 }}
@@ -79,14 +79,14 @@ const HowItWorks = () => {
               transition={{ duration: 1.5, delay: 0.2 }}
             />
             {/* Left Dot */}
-            <circle cx="22%" cy="40%" r="4" fill="#34D399" className="animate-pulse" />
+            <circle cx="22" cy="40" r="0.5" fill="#34D399" className="animate-pulse" />
 
             {/* Center Circuit */}
             <motion.path
-              d="M50% 88% V 35%"
+              d="M50 88 V 35"
               fill="none"
               stroke="url(#circuitGradient)"
-              strokeWidth="3"
+              strokeWidth="0.3"
               strokeLinecap="round"
               filter="url(#glow)"
               initial={{ pathLength: 0, opacity: 0 }}
@@ -94,14 +94,14 @@ const HowItWorks = () => {
               transition={{ duration: 1.5, delay: 0.4 }}
             />
             {/* Center Dot */}
-            <circle cx="50%" cy="35%" r="4" fill="#34D399" className="animate-pulse" />
+            <circle cx="50" cy="35" r="0.5" fill="#34D399" className="animate-pulse" />
 
             {/* Right Circuit - Tech Style */}
             <motion.path
-              d="M50% 88% V 60% H 78% V 40%"
+              d="M50 88 V 60 H 78 V 40"
               fill="none"
               stroke="url(#circuitGradient)"
-              strokeWidth="3"
+              strokeWidth="0.3"
               strokeLinecap="round"
               filter="url(#glow)"
               initial={{ pathLength: 0, opacity: 0 }}
@@ -109,17 +109,17 @@ const HowItWorks = () => {
               transition={{ duration: 1.5, delay: 0.6 }}
             />
             {/* Right Dot */}
-            <circle cx="78%" cy="40%" r="4" fill="#34D399" className="animate-pulse" />
+            <circle cx="78" cy="40" r="0.5" fill="#34D399" className="animate-pulse" />
 
             {/* Moving Pulses on Circuits */}
-            <circle r="3" fill="#ffffff">
-              <animateMotion dur="4s" repeatCount="indefinite" path="M50% 88% V 60% H 22% V 40%" />
+            <circle r="0.8" fill="#ffffff">
+              <animateMotion dur="4s" repeatCount="indefinite" path="M50 88 V 60 H 22 V 40" />
             </circle>
-            <circle r="3" fill="#ffffff">
-              <animateMotion dur="3s" repeatCount="indefinite" path="M50% 88% V 35%" />
+            <circle r="0.8" fill="#ffffff">
+              <animateMotion dur="3s" repeatCount="indefinite" path="M50 88 V 35" />
             </circle>
-            <circle r="3" fill="#ffffff">
-              <animateMotion dur="4s" repeatCount="indefinite" path="M50% 88% V 60% H 78% V 40%" />
+            <circle r="0.8" fill="#ffffff">
+              <animateMotion dur="4s" repeatCount="indefinite" path="M50 88 V 60 H 78 V 40" />
             </circle>
           </svg>
 
