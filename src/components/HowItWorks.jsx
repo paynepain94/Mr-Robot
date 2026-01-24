@@ -1,30 +1,31 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Cog6ToothIcon, LinkIcon, RocketLaunchIcon } from '@heroicons/react/24/outline';
-import IconoMrRobotHead from '../assets/icon-mr-robot-head.svg';
+import IconoMrRobotHead from '../assets/hero-faded-robot.svg';
+
 
 const HowItWorks = () => {
   const steps = [
     {
       id: 1,
-      title: '1. Análisis Humano',
-      description: 'Entendemos a fondo tu negocio y tus clientes para diseñar conversaciones ideales.',
+      title: '1. Primer Contacto con el Cliente',
+      description: 'Es el primer contacto con el Cliente para entender sus necesidades y definir el rumbo del proyecto.',
       icon: <Cog6ToothIcon className="w-8 h-8 text-emerald-400" />,
-      position: 'md:-translate-x-64 md:translate-y-12', // Left
+      position: 'lg:-translate-x-[350px] lg:translate-y-10', // Left
     },
     {
       id: 2,
-      title: '2. Creación a Medida',
-      description: 'Programamos tu chatbot con respuestas clave, haciéndolo sentir humano y efectivo.',
+      title: '2. Definir Alcances',
+      description: 'Definimos los alcances del proceso, configuramos las respuestas clave y personalizamos la experiencia.',
       icon: <LinkIcon className="w-8 h-8 text-emerald-400" />,
-      position: 'md:-translate-y-12', // Center Top
+      position: 'lg:-translate-y-16', // Center Top
     },
     {
       id: 3,
-      title: '3. Lanzamiento',
-      description: 'Tu bot empieza a trabajar 24/7, y nosotros te acompañamos para asegurar su rendimiento.',
+      title: '3. Configurar su número de WhatsApp',
+      description: 'Configuramos tu número de WhatsApp para que el bot empiece a trabajar 24/7 de inmediato.',
       icon: <RocketLaunchIcon className="w-8 h-8 text-emerald-400" />,
-      position: 'md:translate-x-64 md:translate-y-12', // Right
+      position: 'lg:translate-x-[350px] lg:translate-y-10', // Right
     },
   ];
 
@@ -45,72 +46,85 @@ const HowItWorks = () => {
           viewport={{ once: true }}
           className="text-3xl md:text-5xl font-black text-center mb-24 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-200"
         >
-          Senior Robot Process Flow
+          Senior Robot Circular Process Flow
         </motion.h2>
 
-        {/* Central Visualization Area */}
-        <div className="relative w-full h-[600px] flex justify-center items-end pb-10">
+        {/* Central Visualization Area - Increased height for mobile flow */}
+        <div className="relative w-full min-h-[600px] lg:h-[700px] flex flex-col lg:justify-center items-center">
 
           {/* SVG Circuits */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
+          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 hidden lg:block" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="circuitGradient" x1="0%" y1="100%" x2="0%" y2="0%">
-                <stop offset="0%" stopColor="#10B981" stopOpacity="0" />
-                <stop offset="100%" stopColor="#34D399" />
+                <stop offset="0%" stopColor="#10B981" stopOpacity="0.2" />
+                <stop offset="50%" stopColor="#10B981" stopOpacity="1" />
+                <stop offset="100%" stopColor="#34D399" stopOpacity="1" />
               </linearGradient>
+              <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="2" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+              </filter>
             </defs>
 
-            {/* Circuit Paths matching the card positions roughly */}
-            {/* Left Path */}
+            {/* Left Circuit - Tech Style */}
             <motion.path
-              d="M50% 90% C 30% 90%, 20% 60%, 25% 35%"
+              d="M50% 88% V 60% H 22% V 40%"
               fill="none"
               stroke="url(#circuitGradient)"
-              strokeWidth="2"
-              initial={{ pathLength: 0 }}
-              whileInView={{ pathLength: 1 }}
+              strokeWidth="3"
+              strokeLinecap="round"
+              filter="url(#glow)"
+              initial={{ pathLength: 0, opacity: 0 }}
+              whileInView={{ pathLength: 1, opacity: 1 }}
               transition={{ duration: 1.5, delay: 0.2 }}
-              className="opacity-50 md:block hidden"
             />
+            {/* Left Dot */}
+            <circle cx="22%" cy="40%" r="4" fill="#34D399" className="animate-pulse" />
 
-            {/* Center Path */}
+            {/* Center Circuit */}
             <motion.path
-              d="M50% 90% L 50% 30%"
+              d="M50% 88% V 35%"
               fill="none"
               stroke="url(#circuitGradient)"
-              strokeWidth="2"
-              initial={{ pathLength: 0 }}
-              whileInView={{ pathLength: 1 }}
+              strokeWidth="3"
+              strokeLinecap="round"
+              filter="url(#glow)"
+              initial={{ pathLength: 0, opacity: 0 }}
+              whileInView={{ pathLength: 1, opacity: 1 }}
               transition={{ duration: 1.5, delay: 0.4 }}
-              className="opacity-50 md:block hidden"
             />
+            {/* Center Dot */}
+            <circle cx="50%" cy="35%" r="4" fill="#34D399" className="animate-pulse" />
 
-            {/* Right Path */}
+            {/* Right Circuit - Tech Style */}
             <motion.path
-              d="M50% 90% C 70% 90%, 80% 60%, 75% 35%"
+              d="M50% 88% V 60% H 78% V 40%"
               fill="none"
               stroke="url(#circuitGradient)"
-              strokeWidth="2"
-              initial={{ pathLength: 0 }}
-              whileInView={{ pathLength: 1 }}
+              strokeWidth="3"
+              strokeLinecap="round"
+              filter="url(#glow)"
+              initial={{ pathLength: 0, opacity: 0 }}
+              whileInView={{ pathLength: 1, opacity: 1 }}
               transition={{ duration: 1.5, delay: 0.6 }}
-              className="opacity-50 md:block hidden"
             />
+            {/* Right Dot */}
+            <circle cx="78%" cy="40%" r="4" fill="#34D399" className="animate-pulse" />
 
-            {/* Animated Particles flowing on paths */}
-            <circle r="4" fill="#34D399" className="hidden md:block">
-              <animateMotion dur="3s" repeatCount="indefinite" path="M50% 90% C 30% 90%, 20% 60%, 25% 35%" />
+            {/* Moving Pulses on Circuits */}
+            <circle r="3" fill="#ffffff">
+              <animateMotion dur="4s" repeatCount="indefinite" path="M50% 88% V 60% H 22% V 40%" />
             </circle>
-            <circle r="4" fill="#34D399" className="hidden md:block">
-              <animateMotion dur="2.5s" repeatCount="indefinite" path="M50% 90% L 50% 30%" />
+            <circle r="3" fill="#ffffff">
+              <animateMotion dur="3s" repeatCount="indefinite" path="M50% 88% V 35%" />
             </circle>
-            <circle r="4" fill="#34D399" className="hidden md:block">
-              <animateMotion dur="3s" repeatCount="indefinite" path="M50% 90% C 70% 90%, 80% 60%, 75% 35%" />
+            <circle r="3" fill="#ffffff">
+              <animateMotion dur="4s" repeatCount="indefinite" path="M50% 88% V 60% H 78% V 40%" />
             </circle>
           </svg>
 
-          {/* Steps - Positioned Absolute for Desktop, Stacked for Mobile */}
-          <div className="absolute inset-0 flex flex-col md:block">
+          {/* Steps - Positioned Absolute for Desktop (lg), Stacked for Mobile */}
+          <div className="relative lg:absolute inset-0 flex flex-col lg:block items-center justify-center space-y-8 lg:space-y-0 w-full">
             {steps.map((step, index) => (
               <motion.div
                 key={step.id}
@@ -120,11 +134,11 @@ const HowItWorks = () => {
                 transition={{ delay: 0.5 + (index * 0.2) }}
                 className={`
                             relative z-10 
-                            w-full max-w-xs mx-auto md:absolute md:left-1/2 md:top-1/4 md:-ml-[160px]
+                            w-full max-w-xs mx-auto lg:absolute lg:left-1/2 lg:top-1/4 lg:-ml-[160px]
                             p-6 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md shadow-2xl
                             transform ${step.position}
                             transition-all duration-300 hover:bg-white/10 hover:border-emerald-500/50 hover:shadow-emerald-500/20 group
-                            cursor-pointer mb-8 md:mb-0
+                            cursor-pointer
                         `}
               >
                 <div className="bg-emerald-500/10 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto group-hover:bg-emerald-500/20 transition-colors">
@@ -145,13 +159,17 @@ const HowItWorks = () => {
             initial={{ opacity: 0, scale: 0 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="relative z-20 mt-auto"
+            className="relative z-20 mt-12 lg:mt-auto"
           >
-            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shadow-[0_0_50px_rgba(16,185,129,0.3)] animate-pulse-slow">
+            {/* Glowing Backdrop */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-emerald-500/30 rounded-full blur-[60px] animate-pulse-slow"></div>
+
+            <div className="relative w-40 h-40 md:w-52 md:h-52 rounded-full border border-emerald-500/50 bg-black/40 backdrop-blur-sm flex items-center justify-center shadow-[0_0_60px_rgba(16,185,129,0.4)]">
+              <div className="absolute inset-0 rounded-full border border-emerald-400/20 animate-spin-slow-reverse"></div>
               <img
-                src={IconoMrRobotHead}
+                src="/mr-robot-logo.png"
                 alt="Senior Robot Brain"
-                className="w-20 h-20 md:w-24 md:h-24 object-contain drop-shadow-[0_0_15px_rgba(52,211,153,0.8)]"
+                className="w-28 h-28 md:w-36 md:h-36 object-contain drop-shadow-[0_0_20px_rgba(52,211,153,0.6)]"
               />
             </div>
             {/* Connecting lines glowing base */}
@@ -164,11 +182,18 @@ const HowItWorks = () => {
 
       <style>{`
         @keyframes pulse-slow {
-            0%, 100% { box-shadow: 0 0 50px rgba(16,185,129,0.3); }
-            50% { box-shadow: 0 0 80px rgba(16,185,129,0.6); }
+            0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
         }
         .animate-pulse-slow {
-            animation: pulse-slow 3s infinite;
+            animation: pulse-slow 4s ease-in-out infinite;
+        }
+        @keyframes spin-slow-reverse {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+        .animate-spin-slow-reverse {
+            animation: spin-slow-reverse 15s linear infinite;
         }
       `}</style>
     </section>
