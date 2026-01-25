@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 // Removing Heroicons imports
 // Suggesting Imports for new images
-import ImgRelog from '@/assets/relog.png';
+import ImgRelog from '@/assets/reloj.png';
 import ImgVentas from '@/assets/ventas.png';
 import ImgRobot from '@/assets/robot.png';
 import ImgEscala from '@/assets/escala.png';
