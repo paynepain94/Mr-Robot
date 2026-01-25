@@ -18,7 +18,7 @@ const Header = () => {
   ];
 
   return (
-    <header className="relative w-full min-h-screen flex items-center justify-center overflow-hidden pt-20 lg:pt-0">
+    <header id="inicio" className="relative w-full min-h-screen flex items-center justify-center overflow-hidden pt-20 lg:pt-0">
 
       {/* 1. Dynamic Background */}
       <DynamicBackground />
@@ -35,12 +35,12 @@ const Header = () => {
 
         {/* Main Headline */}
         <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tighter text-white mb-6 animate-fade-in-up delay-100 uppercase leading-none drop-shadow-2xl max-w-5xl">
-          Automatiza tu atención en WhatsApp y deja de perder ventas
+          Automatiza tu <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500"><br />WhatsApp</span>
         </h1>
 
         {/* Subheadline/Description */}
         <h2 className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto animate-fade-in-up delay-200 leading-relaxed font-light mb-10">
-          Tu primer empleado digital: trabaja 24/7 y cuesta una fracción de un sueldo mínimo
+          <br /> Tu primer empleado digital: trabaja 24/7 y cuesta una fracción de un sueldo mínimo
         </h2>
 
         {/* CTA */}
