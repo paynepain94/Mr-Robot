@@ -35,22 +35,19 @@ const Header = () => {
 
         {/* Main Headline */}
         <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tighter text-white mb-6 animate-fade-in-up delay-100 uppercase leading-none drop-shadow-2xl max-w-5xl">
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500">
-            Senior Robot
-          </span> vende por ti 24/7. <br className="hidden lg:block" />
-          <span className="text-gray-200">Sin sueldos, sin descansos, solo resultados.</span>
+          Automatiza tu atención en WhatsApp y deja de perder ventas
         </h1>
 
         {/* Subheadline/Description */}
-        <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto animate-fade-in-up delay-200 leading-relaxed font-light mb-10">
-          Convierte chats de WhatsApp en ventas automáticamente. Respuestas instantáneas que eliminan costos y escalan tu atención al cliente sin límites.
-        </p>
+        <h2 className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto animate-fade-in-up delay-200 leading-relaxed font-light mb-10">
+          Tu primer empleado digital: trabaja 24/7 y cuesta una fracción de un sueldo mínimo
+        </h2>
 
         {/* CTA */}
         <div className="flex flex-col items-center gap-6 animate-fade-in-up delay-300">
           <a href="https://wa.me/522206134842" target="_blank" rel="noopener noreferrer" className="group relative px-10 py-5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-full shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] transition-all transform hover:-translate-y-1 overflow-hidden">
             <span className="relative z-10 flex items-center gap-2 uppercase tracking-widest text-base">
-              Empieza a automatizar hoy <span className="group-hover:translate-x-1 transition-transform">→</span>
+              PRUEBA SENIOR ROBOT AHORA <span className="group-hover:translate-x-1 transition-transform">→</span>
             </span>
           </a>
 

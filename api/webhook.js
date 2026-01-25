@@ -1,13 +1,42 @@
+import crypto from 'crypto';
+
 export default async function handler(req, res) {
+    // -------------------------------------------------------------------------
+    // SECURITY: Signature Verification
+    // -------------------------------------------------------------------------
+    const APP_SECRET = process.env.APP_SECRET;
+    const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
+
+    // 1. Verify Request Signature (POST only)
+    if (req.method === 'POST') {
+        const signature = req.headers['x-hub-signature-256'];
+        if (!signature || !APP_SECRET) {
+            console.warn('WARNING: Missing signature or APP_SECRET');
+            // In production, you might return 401 or 403.
+            // For now, if APP_SECRET is missing, we proceed but warn.
+            // If signature is missing but APP_SECRET exists, we reject.
+            if (APP_SECRET && !signature) {
+                return res.status(401).send('Missing X-Hub-Signature-256');
+            }
+        } else {
+            const elements = signature.split('=');
+            const signatureHash = elements[1];
+            const expectedHash = crypto
+                .createHmac('sha256', APP_SECRET)
+                .update(JSON.stringify(req.body))
+                .digest('hex');
+
+            if (signatureHash !== expectedHash) {
+                console.error('Signature verification failed');
+                return res.status(403).send('Forbidden: Invalid Signature');
+            }
+        }
+    }
+
     if (req.method === 'GET') {
         const mode = req.query['hub.mode'];
         const token = req.query['hub.verify_token'];
         const challenge = req.query['hub.challenge'];
-
-        // Use hardcoded token as requested/debugged
-        // Load env via process.env (Standard Node/Vercel behavior)
-        // FALLBACK: Use hardcoded token if env var is missing (Hotfix for immediate deployment)
-        const VERIFY_TOKEN = process.env.VERIFY_TOKEN || 'mr_robot_secret_8909789';
 
         if (mode && token) {
             if (mode === 'subscribe' && token === VERIFY_TOKEN) {
@@ -165,7 +194,7 @@ export default async function handler(req, res) {
 
 // Helper to send text messages
 async function sendMessage(phoneNumberId, to, text) {
-    const token = process.env.WHATSAPP_API_TOKEN || 'EAAL9iuGZC5pwBQc3QrfiZCEAb0EkAT5OOJW2OkoRWfMQXk1qZCGvFeGb77yrXnQAZC1w5UkIJ8GjoCbxYGBq6DIfGMoekKcrZCeZApp84RBsdQkYt4lCWLk3ZAXMoNZCWh29ssrcazoVCNGWZBBnWBLZCJLCffnZA86rbpIENjONOnrQzBzfCUqCgNZBFGwqrChPxOwvmz7TqHFsERh3cH8M5bptZBtZBx2oRXIr5Uq1tyY6IZB';
+    const token = process.env.WHATSAPP_API_TOKEN;
 
     const response = await fetch(
         `https://graph.facebook.com/v17.0/${phoneNumberId}/messages`,
@@ -210,7 +239,7 @@ async function sendWelcomeAndNeeds(phoneNumberId, to) {
 
 // Generic Helper to send Button Messages
 async function sendCustomButtonMessage(phoneNumberId, to, bodyText, buttons) {
-    const token = process.env.WHATSAPP_API_TOKEN || 'EAAL9iuGZC5pwBQc3QrfiZCEAb0EkAT5OOJW2OkoRWfMQXk1qZCGvFeGb77yrXnQAZC1w5UkIJ8GjoCbxYGBq6DIfGMoekKcrZCeZApp84RBsdQkYt4lCWLk3ZAXMoNZCWh29ssrcazoVCNGWZBBnWBLZCJLCffnZA86rbpIENjONOnrQzBzfCUqCgNZBFGwqrChPxOwvmz7TqHFsERh3cH8M5bptZBtZBx2oRXIr5Uq1tyY6IZB';
+    const token = process.env.WHATSAPP_API_TOKEN;
 
     const messagePayload = {
         messaging_product: "whatsapp",
