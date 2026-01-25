@@ -1,92 +1,141 @@
 import React from 'react';
-
-// --- IMPORTA TUS ILUSTRACIONES AQUÍ ---
-import tiempo from '../assets/tiempo.svg';
-import ventas from '../assets/ventas.svg';
-import atencion from '../assets/atencion.svg';
-import escala from '../assets/escala.svg';
-
-// --- IMPORTA LOS PATRONES DE FONDO ---
-import techLinesBottom from '../assets/tech-lines-bottom.svg';
-import techLinesTop from '../assets/tech-lines-top.svg';
-import techLinesTopLeft from '../assets/tech-lines-top-left.svg';
-// ------------------------------------
+import { motion } from 'framer-motion';
+// Removing Heroicons imports
+// Suggesting Imports for new images
+import ImgRelog from '@/assets/relog.png';
+import ImgVentas from '@/assets/ventas.png';
+import ImgRobot from '@/assets/robot.png';
+import ImgEscala from '@/assets/escala.png';
 
 const Benefits = () => {
-  const benefitsData = [
+  const features = [
     {
-      illustration: tiempo,
+      id: '01',
       title: 'Ahorra Tiempo',
       description: 'Automatiza respuestas repetitivas y dedica tu energía a lo que realmente importa.',
-      sizeClass: 'w-56 h-56',
+      icon: ImgRelog,
     },
     {
-      illustration: ventas,
+      id: '02',
       title: 'Impulsa Ventas',
       description: 'Respuestas instantáneas que convierten consultas en ventas confirmadas.',
-      sizeClass: 'w-56 h-56',
+      icon: ImgVentas,
     },
     {
-      illustration: atencion,
+      id: '03',
       title: 'Mejora la Atención',
       description: 'Clientes satisfechos con respuestas al instante, 24/7 sin descanso.',
-      sizeClass: 'w-56 h-56',
+      icon: ImgRobot,
     },
     {
-      illustration: escala,
+      id: '04',
       title: 'Escala sin Límites',
       description: 'Maneja cientos de conversaciones simultáneamente sin aumentar costos.',
-      sizeClass: 'w-56 h-56',
+      icon: ImgEscala,
     },
   ];
 
   return (
-    <section className="relative py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gray-50 text-center overflow-hidden">
+    <section className="relative w-full py-24 px-4 bg-black overflow-hidden font-sans">
 
-      {/* --- PATRONES DE FONDO (Tech Lines) --- */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <img src={techLinesTopLeft} alt="" className="absolute top-0 left-0 w-64 sm:w-96 opacity-5" />
-        <img src={techLinesTop} alt="" className="absolute top-0 right-0 w-full sm:w-2/3 opacity-5" />
-        <img src={techLinesBottom} alt="" className="absolute bottom-0 left-0 w-full opacity-5" />
+      {/* 1. Fondo: Black with Green Radial Gradient & Honeycomb Pattern */}
+      <div className="absolute inset-0 z-0 bg-black">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#002b20_0%,_#000000_70%)] opacity-80"></div>
+        {/* Honeycomb Pattern (SVG) */}
+        <div className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='56' height='100' viewBox='0 0 56 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='%2300ffcc' stroke-width='1'/%3E%3Cpath d='M28 0L28 34L0 50L0 84L28 100L56 84L56 50L28 34' fill='none' stroke='%2300ffcc' stroke-width='1'/%3E%3C/svg%3E")`,
+            backgroundSize: '56px 100px'
+          }}>
+        </div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Titular de sección en Bold */}
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-12">
+
+        {/* Encabezado */}
+        <motion.h2
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-3xl md:text-5xl font-bold text-center text-white mb-16 tracking-wide drop-shadow-[0_0_10px_rgba(0,255,204,0.3)]"
+        >
           ¿Por qué elegir Senior Robot?
-        </h2>
+        </motion.h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {benefitsData.map((benefit, index) => (
-            <div
-              key={index}
-              // --- CAMBIOS AQUÍ: Animación, Efecto de Levantamiento y Bordes Interactivos ---
-              className="group relative bg-white p-6 sm:p-8 rounded-xl shadow-md overflow-hidden 
-                         flex flex-col items-center justify-center text-center h-72 sm:h-80
-                         transform transition-all duration-300 ease-in-out 
-                         hover:scale-[1.02] hover:shadow-xl hover:border-[#25D366] border border-[#e6ffe6] cursor-pointer"
-              style={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(240,255,240,1) 100%)',
-              }}
+        {/* Grid 2x2 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+          {features.map((feature, index) => (
+            <motion.div
+              key={feature.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ delay: index * 0.1, duration: 0.4 }}
+              className="relative group h-full"
             >
-              {/* --- MARCA DE AGUA (Watermark Number) --- */}
-              <div className="absolute top-2 right-4 text-6xl sm:text-7xl font-extrabold text-gray-100 group-hover:text-gray-200 transition-colors duration-300 select-none pointer-events-none">
-                {`0${index + 1}`}
-              </div>
+              {/* 
+                  2. Contenedor Hexagonal "Cyberpunk" 
+              */}
+              <div
+                className="
+                  relative h-full p-[1px] 
+                  bg-gradient-to-r from-[#00ffcc]/30 via-transparent to-[#00ffcc]/30
+                  clip-path-hex
+                "
+                style={{
+                  clipPath: 'polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0% 50%)'
+                }}
+              >
+                {/* Inner Card Content */}
+                <div
+                  className="
+                    relative h-full bg-[#001a14]/60 backdrop-blur-xl 
+                    flex flex-col justify-center
+                    p-8 lg:p-10
+                    hover:bg-[#002b20]/80 transition-all duration-300
+                  "
+                  style={{
+                    clipPath: 'polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0% 50%)'
+                  }}
+                >
 
-              <img
-                src={benefit.illustration}
-                alt={benefit.title}
-                className={`${benefit.sizeClass} object-contain mx-auto mb-4 relative z-10`}
-              />
+                  {/* Top & Bottom "Light Tube" Accents */}
+                  <div className="absolute top-0 left-1/4 right-1/4 h-[2px] bg-[#00ffcc] shadow-[0_0_15px_#00ffcc]"></div>
+                  <div className="absolute bottom-0 left-1/4 right-1/4 h-[2px] bg-[#00ffcc] shadow-[0_0_15px_#00ffcc]"></div>
 
-              <div className="w-full text-center relative z-10">
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-[#25D366] transition-colors duration-300">{benefit.title}</h3>
-                <p className="text-gray-600 text-sm font-medium">{benefit.description}</p>
+                  {/* 3. Contenido */}
+                  <div className="flex items-center justify-between relative z-20">
+
+                    {/* Image Icon Left */}
+                    <div className="mr-6 flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                      <img
+                        src={feature.icon}
+                        alt={feature.title}
+                        className="w-16 h-16 lg:w-20 lg:h-20 object-contain drop-shadow-[0_0_10px_rgba(0,255,204,0.5)]"
+                      />
+                    </div>
+
+                    {/* Text Content */}
+                    <div className="flex-1 text-left z-20">
+                      <h3 className="text-xl lg:text-2xl font-bold text-white mb-2 group-hover:text-[#00ffcc] transition-colors">
+                        {feature.title}
+                      </h3>
+                      <p className="text-gray-300 text-sm lg:text-base leading-relaxed opacity-90">
+                        {feature.description}
+                      </p>
+                    </div>
+
+                    {/* Large Background Number */}
+                    <div className="absolute -top-4 -right-2 text-7xl font-black text-[#00ffcc] opacity-10 select-none z-10 pointer-events-none">
+                      {feature.id}
+                    </div>
+
+                  </div>
+                </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
+
       </div>
     </section>
   );
