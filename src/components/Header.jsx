@@ -4,17 +4,17 @@ import ChatSimulation from './ChatSimulation';
 
 const Header = () => {
   const leftChatMessages = [
-    { type: 'user', text: 'Hola, quisiera agendar una cita para uñas 💅', delay: 1000 },
-    { type: 'bot', text: '¡Hola! Claro. Tengo espacio hoy a las 4:00 PM.', delay: 2500 },
-    { type: 'user', text: '¿Podría ser más tarde? Como a las 6?', delay: 4000 },
-    { type: 'bot', text: 'Listo. Tu cita quedó reagendada para las 6:00 PM. ✅', delay: 5500 },
+    { type: 'user', text: 'Hola, tienen citas? 💅', delay: 1000 },
+    { type: 'bot', text: '¡Hola Hermosa! Claro que sí, nos encantaría atenderte. 💖 ¿Para qué día te gustaría?', delay: 2500 },
+    { type: 'user', text: 'Para el viernes a las 5 pls', delay: 4000 },
+    { type: 'bot', text: 'Listo Hermosa. Tu cita quedó agendada para el viernes 5:00 PM. ✨', delay: 5500 },
   ];
 
   const rightChatMessages = [
-    { type: 'user', text: 'Quiero 5 tacos al pastor con todo 🌮', delay: 1500 },
-    { type: 'bot', text: '¡A la orden! ¿Paso por ello o te lo envío?', delay: 3000 },
-    { type: 'user', text: 'Paso yo. ¿Me das la ubicación?', delay: 4500 },
-    { type: 'bot', text: '📍 Av. Reforma 123. Tu pedido estará listo en 15 min.', delay: 6000 },
+    { type: 'user', text: '¿Tienes servicio a domicilio? 🌮', delay: 1500 },
+    { type: 'bot', text: '¡Claro amigo! 🌮🔥 Mándanos tu ubicación y te mandamos los mejores tacos en minutos.', delay: 3000 },
+    { type: 'user', text: 'Va, les mando ubicación...', delay: 4500 },
+    { type: 'bot', text: '¡Excelente! En 15 min llegan tus tacos. 🏍️💨', delay: 6000 },
   ];
 
   return (
@@ -77,14 +77,14 @@ const Header = () => {
       {/* Left Chat */}
       <div className="absolute left-4 lg:left-10 top-1/2 -translate-y-1/2 hidden xl:block z-20 hover:z-30 transition-all duration-500 hover:scale-105 perspective-1000">
         <div className="transform rotate-y-6 rotate-z-2 shadow-2xl">
-          <ChatSimulation messages={leftChatMessages} botName="Senior Robot AI" />
+          <ChatSimulation messages={leftChatMessages} botName="Uñas, Gelish Y Más" />
         </div>
       </div>
 
       {/* Right Chat */}
       <div className="absolute right-4 lg:right-10 top-1/2 -translate-y-1/2 hidden xl:block z-20 hover:z-30 transition-all duration-500 hover:scale-105 perspective-1000">
         <div className="transform -rotate-y-6 -rotate-z-2 shadow-2xl">
-          <ChatSimulation messages={rightChatMessages} botName="Senior Robot AI" status="escribiendo..." />
+          <ChatSimulation messages={rightChatMessages} botName="Taqueria El Charro" status="escribiendo..." />
         </div>
       </div>
 

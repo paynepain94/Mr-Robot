@@ -45,7 +45,7 @@ const HowItWorks = () => {
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center absolute top-0 w-full z-20"
+          className="text-center relative mb-12 lg:mb-0 lg:absolute lg:top-0 w-full z-20"
         >
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white drop-shadow-[0_0_15px_rgba(0,255,204,0.6)]">
             Proceso de Integración
@@ -200,7 +200,7 @@ const HowItWorks = () => {
         ))}
 
         {/* --- Robot Central --- */}
-        <div className="relative mt-auto lg:absolute lg:bottom-[5%] lg:left-1/2 lg:-translate-x-1/2 w-48 h-48 flex justify-center items-center z-20">
+        <div className="relative mx-auto mt-auto lg:absolute lg:bottom-[5%] lg:left-1/2 lg:-translate-x-1/2 w-48 h-48 flex justify-center items-center z-20">
           {/* Outer Glow */}
           <div className="absolute inset-0 bg-[#00ffcc]/30 blur-[60px] rounded-full animate-pulse-slow"></div>
 
