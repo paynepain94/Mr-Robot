@@ -110,7 +110,7 @@ const Benefits = () => {
                       <img
                         src={feature.icon}
                         alt={feature.title}
-                        className="w-16 h-16 lg:w-20 lg:h-20 object-contain drop-shadow-[0_0_10px_rgba(0,255,204,0.5)]"
+                        className="w-16 h-16 lg:w-20 lg:h-20 object-contain drop-shadow-[0_0_10px_rgba(0,255,204,0.5)] mix-blend-screen"
                       />
                     </div>
 
