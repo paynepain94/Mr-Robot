@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDownIcon, ChevronUpIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 const FAQ = () => {
     const [openIndex, setOpenIndex] = useState(null);
@@ -44,15 +44,15 @@ const FAQ = () => {
         },
         {
             question: "¿Para qué tipo de empresas NO está diseñado Senior Robot?",
-            answer: "No es ideal para negocios unipersonales sin proyección de crecimiento inmediato, empresas sin una estructura mínima de atención al cliente o quienes aún tienen un volumen muy bajo de mensajes. Está pensado para potenciar equipos de al menos 3 o más agentes."
+            answer: "No es ideal para negocios sin proyección de crecimiento inmediato, empresas sin una estructura mínima de atención al cliente o quienes aún tienen un volumen muy bajo de mensajes, menos de 10 mensajes al día no aplican."
         },
         {
             question: "¿Cuánto cuesta Senior Robot y qué incluye?",
-            answer: "Nuestros planes inician desde 2,490 mxn. Todos incluyen agente, línea, contactos ilimitados, créditos de IA. "
+            answer: "Nuestros planes inician desde 3,000 mxn. Todos incluyen agente, línea, contactos ilimitados, créditos de IA. "
         },
         {
             question: "¿Qué soporte ofrece Senior Robot?",
-            answer: "Ofrecemos un soporte cercano y humano. No te dejamos solo con documentación: acompañamos a tu equipo con guías, videos y asistencia directa siempre que lo necesites para asegurar tu éxito durante los primeros 3meses."
+            answer: "Ofrecemos un soporte cercano y humano. No te dejamos solo con documentación: acompañamos a tu equipo con guías, videos y asistencia directa siempre que lo necesites para asegurar tu éxito durante los primeros 1 ó 3 meses(Depende el plan)."
         },
         {
             question: "¿Qué resultados puedo esperar al usar Senior Robot?",
@@ -72,7 +72,8 @@ const FAQ = () => {
                     ✅ <strong>Escalabilidad real:</strong> Puedes crecer de 5 a 50+ agentes sin cambiar de sistema.<br />
                     ✅ <strong>Simplicidad:</strong> Tu equipo lo dominará desde el primer uso, sin curvas de aprendizaje complejas.<br />
                     ✅ <strong>Automatización inteligente:</strong> Chatbots y asistentes de IA que liberan carga de trabajo sin necesidad de programar.<br />
-                    ✅ <strong>Soporte cercano:</strong> Nunca estarás solo, siempre habrá alguien listo para ayudarte.
+                    ✅ <strong>Soporte cercano:</strong> Nunca estarás solo, siempre habrá alguien listo para ayudarte. <br />
+                    ✅ <strong>Precio competitivo:</strong> Costos adaptables para distintos tipos de negocio.
                     <br /><br />
                     En pocas palabras: Senior Robot no es “otra herramienta más”, es la solución definitiva que ordena tu WhatsApp, da control a tu equipo y convierte el caos en ventas.
                 </>
@@ -86,44 +87,59 @@ const FAQ = () => {
     );
 
     return (
-        <section id="faq" className="py-20 sm:py-24 bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section id="faq" className="relative py-20 sm:py-24 bg-black overflow-hidden font-sans text-white">
+
+            {/* Gradient Background Matches Hero */}
+            <div className="absolute inset-0 z-0 bg-black">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#002b20_0%,_#000000_80%)] opacity-70"></div>
+                <div className="absolute inset-0 opacity-20 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+            </div>
+
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">
+                    <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 drop-shadow-[0_0_10px_rgba(0,255,204,0.3)]">
                         Preguntas Frecuentes
                     </h2>
-                    <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                    <p className="text-lg text-gray-300 max-w-2xl mx-auto font-light">
                         Sabemos que al conocer Mr-Robot pueden surgir dudas. Aquí reunimos algunas de las más comunes para que tengas claridad desde el inicio.
                     </p>
                 </div>
 
-                <div className="max-w-2xl mx-auto mb-12 relative">
+                {/* Search Bar */}
+                <div className="max-w-2xl mx-auto mb-12 relative group">
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-[#00ffcc] to-[#00aa88] rounded-lg blur opacity-25 group-hover:opacity-60 transition duration-500"></div>
                     <input
                         type="text"
-                        placeholder="Search"
+                        placeholder="Buscar..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full py-3 px-4 pr-12 rounded-lg bg-gray-100 border-none focus:ring-2 focus:ring-emerald-500 text-gray-700 placeholder-gray-500 outline-none transition-all"
+                        className="relative w-full py-3 px-4 pr-12 rounded-lg bg-black border border-white/10 focus:border-[#00ffcc]/50 focus:ring-1 focus:ring-[#00ffcc] text-white placeholder-gray-500 outline-none transition-all"
                     />
-                    <MagnifyingGlassIcon className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-emerald-600" />
+                    <MagnifyingGlassIcon className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#00ffcc] z-10" />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     {filteredFaqs.map((faq, index) => (
                         <div
                             key={index}
-                            className={`rounded-xl transition-all duration-300 border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] ${openIndex === index ? 'bg-emerald-50 ring-1 ring-emerald-500 shadow-md' : 'bg-white'}`}
+                            className={`
+                                rounded-xl transition-all duration-300 border 
+                                backdrop-blur-md
+                                ${openIndex === index
+                                    ? 'bg-[#001a14]/60 border-[#00ffcc]/40 shadow-[0_0_20px_rgba(0,255,204,0.1)]'
+                                    : 'bg-white/5 border-white/10 hover:border-[#00ffcc]/30 hover:bg-white/10'}
+                            `}
                         >
                             <button
                                 onClick={() => toggleFAQ(index)}
                                 className="w-full flex justify-between items-center p-5 sm:p-6 text-left focus:outline-none group bg-transparent"
                             >
-                                <span className={`text-base sm:text-lg font-bold transition-colors duration-300 pr-4 ${openIndex === index ? 'text-emerald-800' : 'text-gray-900 group-hover:text-emerald-600'}`}>
+                                <span className={`text-base sm:text-lg font-bold transition-colors duration-300 pr-4 ${openIndex === index ? 'text-[#00ffcc]' : 'text-gray-200 group-hover:text-white'}`}>
                                     {faq.question}
                                 </span>
                                 <span className="flex-shrink-0 ml-2">
                                     <ChevronDownIcon
-                                        className={`h-5 w-5 transition-transform duration-300 ease-in-out ${openIndex === index ? 'rotate-180 text-emerald-600' : 'text-gray-400 group-hover:text-emerald-500'}`}
+                                        className={`h-5 w-5 transition-transform duration-300 ease-in-out ${openIndex === index ? 'rotate-180 text-[#00ffcc]' : 'text-gray-500 group-hover:text-[#00ffcc]'}`}
                                     />
                                 </span>
                             </button>
@@ -132,7 +148,7 @@ const FAQ = () => {
                                 className={`overflow-hidden transition-all duration-300 ease-in-out ${openIndex === index ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
                                     }`}
                             >
-                                <div className={`px-5 sm:px-6 pb-6 leading-relaxed text-sm sm:text-base font-normal border-t pt-4 mt-2 ${openIndex === index ? 'text-emerald-900 border-emerald-100' : 'text-gray-700 border-gray-50'}`}>
+                                <div className={`px-5 sm:px-6 pb-6 leading-relaxed text-sm sm:text-base font-light border-t pt-4 mt-2 ${openIndex === index ? 'text-gray-300 border-[#00ffcc]/10' : 'text-gray-400 border-white/5'}`}>
                                     {faq.answer}
                                 </div>
                             </div>
