@@ -36,7 +36,7 @@ const Benefits = () => {
   ];
 
   return (
-    <section className="relative w-full py-24 px-4 bg-black overflow-hidden font-sans">
+    <section id="benefits" className="relative w-full py-24 px-4 bg-black overflow-hidden font-sans">
 
       {/* 1. Fondo: Black with Green Radial Gradient & Honeycomb Pattern */}
       <div className="absolute inset-0 z-0 bg-black">

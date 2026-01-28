@@ -33,10 +33,10 @@ const Footer = () => {
         <div>
           <h4 className="text-xl font-bold mb-4 text-white">Explorar</h4>
           <ul className="space-y-2 font-light">
-            <li><a href="#Header" className="text-gray-400 hover:text-[#00ffcc] transition duration-200">Inicio</a></li>
-            <li><a href="#Benefits" className="text-gray-400 hover:text-[#00ffcc] transition duration-200">Beneficios</a></li>
-            <li><a href="#HowItWorks" className="text-gray-400 hover:text-[#00ffcc] transition duration-200">Cómo Funciona</a></li>
-            <li><a href="#Contact" className="text-gray-400 hover:text-[#00ffcc] transition duration-200">Contacto</a></li>
+            <li><a href="#inicio" className="text-gray-400 hover:text-[#00ffcc] transition duration-200">Inicio</a></li>
+            <li><a href="#benefits" className="text-gray-400 hover:text-[#00ffcc] transition duration-200">Beneficios</a></li>
+            <li><a href="#howitworks" className="text-gray-400 hover:text-[#00ffcc] transition duration-200">Cómo Funciona</a></li>
+            <li><a href="#conoceme" className="text-gray-400 hover:text-[#00ffcc] transition duration-200">Contacto</a></li>
           </ul>
         </div>
 

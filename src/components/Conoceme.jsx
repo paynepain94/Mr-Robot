@@ -57,7 +57,7 @@ const Conoceme = () => {
                 Soy ingeniero en desarrollo de software con más de 15 años dedicándome a la tecnología. Durante más de una década, he ayudado a empresas en México y el extranjero a <span className="font-semibold text-white">reducir hasta un 70% sus gastos operativos</span> mediante automatización inteligente.
               </p>
               <p>
-                Me apasiona la ciberseguridad y la inteligencia artificial, pero mi verdadero enfoque es práctico: encontrar la manera más eficiente de que tu negocio ahorre tiempo y dinero.
+                Me apasiona la ciberseguridad y la inteligencia artificial, pero mi verdadero enfoque es encontrar la manera más eficiente de que tu negocio ahorre tiempo y dinero.
               </p>
               <p className="font-medium text-[#00ffcc]">
                 Cuento con certificaciones internacionales que respaldan mi experiencia técnica y estratégica.

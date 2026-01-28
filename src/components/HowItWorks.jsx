@@ -30,7 +30,7 @@ const HowItWorks = () => {
   ];
 
   return (
-    <section className="relative w-full min-h-screen bg-[#000000] overflow-hidden font-sans text-white py-20 flex flex-col items-center justify-center">
+    <section id="howitworks" className="relative w-full min-h-screen bg-[#000000] overflow-hidden font-sans text-white py-20 flex flex-col items-center justify-center">
 
       {/* Background Gradient */}
       <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_bottom_center,_#002419_0%,_#000000_70%)]"></div>
