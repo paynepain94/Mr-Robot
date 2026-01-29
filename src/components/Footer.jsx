@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import instagramIcon from '../assets/instagram.svg';
 import linkedinIcon from '../assets/linkedin.svg';
@@ -33,10 +34,10 @@ const Footer = () => {
         <div>
           <h4 className="text-xl font-bold mb-4 text-white">Explorar</h4>
           <ul className="space-y-2 font-light">
-            <li><a href="#inicio" className="text-gray-400 hover:text-[#00ffcc] transition duration-200">Inicio</a></li>
-            <li><a href="#benefits" className="text-gray-400 hover:text-[#00ffcc] transition duration-200">Beneficios</a></li>
-            <li><a href="#howitworks" className="text-gray-400 hover:text-[#00ffcc] transition duration-200">Cómo Funciona</a></li>
-            <li><a href="#conoceme" className="text-gray-400 hover:text-[#00ffcc] transition duration-200">Contacto</a></li>
+            <li><Link to="/" className="text-gray-400 hover:text-[#00ffcc] transition duration-200">Inicio</Link></li>
+            <li><a href="/#benefits" className="text-gray-400 hover:text-[#00ffcc] transition duration-200">Beneficios</a></li>
+            <li><a href="/#howitworks" className="text-gray-400 hover:text-[#00ffcc] transition duration-200">Cómo Funciona</a></li>
+            <li><a href="/#conoceme" className="text-gray-400 hover:text-[#00ffcc] transition duration-200">Contacto</a></li>
           </ul>
         </div>
 
@@ -46,25 +47,31 @@ const Footer = () => {
           <ul className="space-y-2 mb-6 font-light">
             {/* ENLACE TÉRMINOS Y CONDICIONES ACTUALIZADO */}
             <li>
-              <a
-                href={terminosLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#00ffcc] transition duration-200"
-              >
-                Términos y Condiciones
-              </a>
+              <li>
+                <Link
+                  to="/terminos_y_condiciones"
+                  className="text-gray-400 hover:text-[#00ffcc] transition duration-200"
+                >
+                  Términos y Condiciones
+                </Link>
+              </li>
             </li>
             {/* ENLACE AVISO DE PRIVACIDAD ACTUALIZADO Y REUBICADO */}
             <li>
-              <a
-                href={privacidadLink}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                to="/politica-de-eliminacion-de-datos-de-usuario"
+                className="text-gray-400 hover:text-[#00ffcc] transition duration-200"
+              >
+                Política de Eliminación de Datos de Usuario
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/aviso-de-privacidad"
                 className="text-gray-400 hover:text-[#00ffcc] transition duration-200"
               >
                 Aviso de Privacidad
-              </a>
+              </Link>
             </li>
           </ul>
 

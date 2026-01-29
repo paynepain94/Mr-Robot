@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import MrRobotNavLogo from '../assets/mr-robot-logo-circle.svg';
 
@@ -15,14 +16,14 @@ const NavBar = () => {
         <div className="flex justify-between items-center py-3">
 
           {/* Logo y Nombre de la Marca */}
-          <a href="#inicio" className="flex items-center space-x-3 flex-shrink-0 group">
+          <Link to="/" className="flex items-center space-x-3 flex-shrink-0 group">
             <img
               src={MrRobotNavLogo}
               alt="Senior Robot Logo"
               className="h-14 w-14 sm:h-16 sm:w-16 transition-transform duration-300 group-hover:scale-105"
             />
             <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">Senior Robot</span>
-          </a>
+          </Link>
 
           {/* BOTÓN DE HAMBURGUESA (visible solo en móvil) */}
           <div className="md:hidden">
@@ -43,16 +44,16 @@ const NavBar = () => {
           {/* MENÚ DE ESCRITORIO (siempre visible en md y más grande) */}
           <ul className="hidden md:flex items-center space-x-2">
             <li>
-              <a
-                href="#inicio"
+              <Link
+                to="/"
                 className="px-4 py-2 text-base font-medium text-gray-300 rounded-full hover:bg-white/10 hover:text-white transition-all duration-200"
               >
                 Inicio
-              </a>
+              </Link>
             </li>
             <li>
               <a
-                href="#conoceme"
+                href="/#conoceme"
                 className="px-4 py-2 text-base font-medium text-gray-300 rounded-full hover:bg-white/10 hover:text-white transition-all duration-200"
               >
                 Conóceme
@@ -79,17 +80,17 @@ const NavBar = () => {
       >
         <ul className="px-4 pt-4 pb-6 space-y-3 text-center">
           <li>
-            <a
-              href="#inicio"
+            <Link
+              to="/"
               onClick={handleNavLinkClick}
               className="block py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition duration-200"
             >
               Inicio
-            </a>
+            </Link>
           </li>
           <li>
             <a
-              href="#conoceme"
+              href="/#conoceme"
               onClick={handleNavLinkClick}
               className="block py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition duration-200"
             >
