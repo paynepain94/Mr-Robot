@@ -47,14 +47,12 @@ const Footer = () => {
           <ul className="space-y-2 mb-6 font-light">
             {/* ENLACE TÉRMINOS Y CONDICIONES ACTUALIZADO */}
             <li>
-              <li>
-                <Link
-                  to="/terminos_y_condiciones"
-                  className="text-gray-400 hover:text-[#00ffcc] transition duration-200"
-                >
-                  Términos y Condiciones
-                </Link>
-              </li>
+              <Link
+                to="/terminos-y-condiciones"
+                className="text-gray-400 hover:text-[#00ffcc] transition duration-200"
+              >
+                Términos y Condiciones
+              </Link>
             </li>
             {/* ENLACE AVISO DE PRIVACIDAD ACTUALIZADO Y REUBICADO */}
             <li>

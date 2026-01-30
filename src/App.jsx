@@ -55,7 +55,7 @@ function App() {
                         </>
                     } />
                     <Route path="/aviso-de-privacidad" element={<AvisoDePrivacidad />} />
-                    <Route path="/terminos_y_condiciones" element={<TerminosYCondiciones />} />
+                    <Route path="/terminos-y-condiciones" element={<TerminosYCondiciones />} />
                     <Route path="/politica-de-eliminacion-de-datos-de-usuario" element={<PoliticaEliminacionDatos />} />
                 </Routes>
                 <Footer />
