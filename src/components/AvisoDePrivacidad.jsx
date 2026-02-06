@@ -14,7 +14,7 @@ const AvisoDePrivacidad = () => {
 
                 <div className="space-y-6 text-sm md:text-base leading-relaxed">
                     <section>
-                        <h2 className="text-xl font-bold text-white mb-2">Mr-Robot (Joab Romero)</h2>
+                        <h2 className="text-xl font-bold text-white mb-2">Senior Robot (Joab Romero)</h2>
                         <p className="text-gray-400">Última actualización: 20 de noviembre de 2025</p>
                         <p className="font-semibold mt-2">Seguridad de datos, encriptación y manejo de automatizaciones.</p>
                     </section>
@@ -22,7 +22,7 @@ const AvisoDePrivacidad = () => {
                     <section>
                         <h3 className="text-lg font-bold text-emerald-500 mb-2">I. Responsable de la protección de datos personales</h3>
                         <p>
-                            Mr-Robot (en adelante “El Responsable”), es responsable de la protección y tratamiento de los datos personales recabados a través de sus servicios de automatización y chatbots. Puede contactarnos a través de nuestro sitio web <a href="https://mr-robot.mx" className="text-emerald-400 hover:underline">mr-robot.mx</a> o mediante los canales de atención al cliente establecidos. El Responsable se compromete a asegurar la privacidad de la información personal obtenida a través de sus servicios en línea y otros medios permitidos por la ley.
+                            Senior Robot (en adelante “El Responsable”), es responsable de la protección y tratamiento de los datos personales recabados a través de sus servicios de automatización y chatbots. Puede contactarnos a través de nuestro sitio web <a href="https://senior-robot.com" className="text-emerald-400 hover:underline">senior-robot.com</a> o mediante los canales de atención al cliente establecidos. El Responsable se compromete a asegurar la privacidad de la información personal obtenida a través de sus servicios en línea y otros medios permitidos por la ley.
                         </p>
                     </section>
 
