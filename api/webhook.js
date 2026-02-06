@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     // SECURITY: Signature Verification
     // -------------------------------------------------------------------------
     const APP_SECRET = process.env.APP_SECRET;
-    const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
+    const VERIFY_TOKEN = 'mr_robot_secret_8909789';
 
     // 1. Verify Request Signature (POST only)
     if (req.method === 'POST') {
@@ -194,7 +194,7 @@ export default async function handler(req, res) {
 
 // Helper to send text messages
 async function sendMessage(phoneNumberId, to, text) {
-    const token = process.env.WHATSAPP_API_TOKEN;
+    const token = 'EAAL9iuGZC5pwBQaTSWIfXVoyaqIaVAQNbxJUN7oFWfahYJutzZBDx9uBfr4HG0TrZBAgHSpKXrO2DugVNIZBXEYfSt4Tt6di4QNe8E51JOSxzrQBb4ysKdskZAtAeKdOVgN8TZB66tgektFCNWOsaNRELn2qCkySxpQdzYbaRrzNkT8NqLcY3XajekSVcq2VtBSh1ZAvpIeDUHf1YUH66F6hBQwqZBIKJP9TKSB70nWtZApEkVyiGdgP5UBUqWH2lbYnwg0lnQRxp1ADRVqWxOKVk1XuP';
 
     const response = await fetch(
         `https://graph.facebook.com/v17.0/${phoneNumberId}/messages`,
@@ -239,7 +239,7 @@ async function sendWelcomeAndNeeds(phoneNumberId, to) {
 
 // Generic Helper to send Button Messages
 async function sendCustomButtonMessage(phoneNumberId, to, bodyText, buttons) {
-    const token = process.env.WHATSAPP_API_TOKEN;
+    const token = 'EAAL9iuGZC5pwBQaTSWIfXVoyaqIaVAQNbxJUN7oFWfahYJutzZBDx9uBfr4HG0TrZBAgHSpKXrO2DugVNIZBXEYfSt4Tt6di4QNe8E51JOSxzrQBb4ysKdskZAtAeKdOVgN8TZB66tgektFCNWOsaNRELn2qCkySxpQdzYbaRrzNkT8NqLcY3XajekSVcq2VtBSh1ZAvpIeDUHf1YUH66F6hBQwqZBIKJP9TKSB70nWtZApEkVyiGdgP5UBUqWH2lbYnwg0lnQRxp1ADRVqWxOKVk1XuP';
 
     const messagePayload = {
         messaging_product: "whatsapp",
