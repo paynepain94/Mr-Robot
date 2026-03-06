@@ -12,6 +12,7 @@ import WhatsappButton from './components/WhatsappButton';
 import AvisoDePrivacidad from './components/AvisoDePrivacidad';
 import TerminosYCondiciones from './components/TerminosYCondiciones';
 import PoliticaEliminacionDatos from './components/PoliticaEliminacionDatos';
+import Certificacion from './components/Certificacion';
 import Lenis from 'lenis'; // Importamos Lenis
 
 function App() {
@@ -57,6 +58,7 @@ function App() {
                     <Route path="/aviso-de-privacidad" element={<AvisoDePrivacidad />} />
                     <Route path="/terminos-y-condiciones" element={<TerminosYCondiciones />} />
                     <Route path="/politica-de-eliminacion-de-datos-de-usuario" element={<PoliticaEliminacionDatos />} />
+                    <Route path="/certificacion" element={<Certificacion />} />
                 </Routes>
                 <Footer />
                 <WhatsappButton />
