@@ -45,7 +45,7 @@ const Header = () => {
 
         {/* CTA */}
         <div className="flex flex-col items-center gap-6 animate-fade-in-up delay-300">
-          <a href="https://wa.me/522206134842" target="_blank" rel="noopener noreferrer" className="group relative px-10 py-5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-full shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] transition-all transform hover:-translate-y-1 overflow-hidden">
+          <a href="https://wa.me/523121128434" target="_blank" rel="noopener noreferrer" className="group relative px-10 py-5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-full shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] transition-all transform hover:-translate-y-1 overflow-hidden">
             <span className="relative z-10 flex items-center gap-2 uppercase tracking-widest text-base">
               PRUEBA SENIOR ROBOT AHORA <span className="group-hover:translate-x-1 transition-transform">→</span>
             </span>

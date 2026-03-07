@@ -143,7 +143,7 @@ export default async function handler(req, res) {
                 }
                 // CONTACT HUMAN (Direct Call)
                 else if (msg_body === 'btn_contact_human' || msg_body.includes('llamar')) {
-                    responseText = "📞 Puedes contactarnos directamente al: +52 220 613 4842\n\nEstamos disponibles para atenderte personalmente. 🤝";
+                    responseText = "📞 Puedes contactarnos directamente al: +52 312 112 8434\n\nEstamos disponibles para atenderte personalmente. 🤝";
                 }
 
                 // 4. Send Response if matched an option
