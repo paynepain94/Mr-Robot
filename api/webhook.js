@@ -10,26 +10,37 @@ export default async function handler(req, res) {
     // 1. Verify Request Signature (POST only)
     if (req.method === 'POST') {
         const signature = req.headers['x-hub-signature-256'];
-        if (!signature || !APP_SECRET) {
-            console.warn('WARNING: Missing signature or APP_SECRET');
-            // In production, you might return 401 or 403.
-            // For now, if APP_SECRET is missing, we proceed but warn.
-            // If signature is missing but APP_SECRET exists, we reject.
-            if (APP_SECRET && !signature) {
+        const APP_SECRET_1 = process.env.APP_SECRET;
+        const APP_SECRET_2 = process.env.CALENDAR_APP_SECRET; // Nuevo secret para la app de calendar
+
+        if (!signature || (!APP_SECRET_1 && !APP_SECRET_2)) {
+            console.warn('WARNING: Missing signature or APP_SECRETS');
+            if ((APP_SECRET_1 || APP_SECRET_2) && !signature) {
                 return res.status(401).send('Missing X-Hub-Signature-256');
             }
         } else {
             const elements = signature.split('=');
-            const signatureHash = elements[1];
-            const expectedHash = crypto
-                .createHmac('sha256', APP_SECRET)
-                .update(JSON.stringify(req.body))
-                .digest('hex');
+            if (elements.length > 1) {
+                const signatureHash = elements[1];
+                let isValid = false;
 
-            if (signatureHash !== expectedHash) {
-                console.error('Signature verification failed (App Secret mismatch). Bypassing temporarily.');
-                // TEMPORAL: Desactivado para que puedas probar el bot.
-                // return res.status(403).send('Forbidden: Invalid Signature');
+                // Intentar con el Secret 1 (Senior Robot)
+                if (APP_SECRET_1) {
+                    const expectedHash1 = crypto.createHmac('sha256', APP_SECRET_1).update(JSON.stringify(req.body)).digest('hex');
+                    if (signatureHash === expectedHash1) isValid = true;
+                }
+
+                // Si falla, intentar con el Secret 2 (Calendar Demo)
+                if (!isValid && APP_SECRET_2) {
+                    const expectedHash2 = crypto.createHmac('sha256', APP_SECRET_2).update(JSON.stringify(req.body)).digest('hex');
+                    if (signatureHash === expectedHash2) isValid = true;
+                }
+
+                if (!isValid) {
+                    console.error('Signature verification failed (App Secret mismatch). Bypassing temporarily.');
+                    // TEMPORAL: Desactivado para que puedas probar el bot.
+                    // return res.status(403).send('Forbidden: Invalid Signature');
+                }
             }
         }
     }
