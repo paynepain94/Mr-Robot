@@ -281,6 +281,8 @@ async function sendMessage(phoneNumberId, to, text) {
     const fallbackToken = 'EAAWj2QODFwwBQ9CstPKuZAwLQWEaQi5CRLxkmwT3l0oAzbgZBo5TSSucA0ylLLwUCk7RpeHfqadoAp6i1apO0TgmodMn34CMVo56zEsISCf769A1aJ2B6dHdw11TXv356udEW22lFrtSNs7XNWPwZAZAvNzDWZBRAnq3BmiGgASgjydYDnGjEUT0kw5ZAgsM4vnRFmYXGmOvptKtil0kZAC7d3aNrVfzZCF4iyaKtJYmnCEXzCP48hkScJLkTSmPYTheVinbLo4EN96HhvJigZCSzMMa7oB9Vfzzfm9VHlwZDZD';
     const token = process.env.WHATSAPP_API_TOKEN || fallbackToken;
 
+    console.log(`Intentando enviar mensaje a ${to} usando App/Token configurado en env...`);
+
     const response = await fetch(
         `https://graph.facebook.com/v17.0/${phoneNumberId}/messages`,
         {
@@ -296,10 +298,14 @@ async function sendMessage(phoneNumberId, to, text) {
             }),
         }
     );
+
     if (!response.ok) {
         const errorData = await response.json();
         console.error("WhatsApp API Error (Text):", JSON.stringify(errorData));
         throw new Error(`WhatsApp API Error: ${JSON.stringify(errorData)}`);
+    } else {
+        const responseData = await response.json();
+        console.log(`✅ ¡Mensaje enviado a Meta con éxito! ID: ${responseData.messages?.[0]?.id}`);
     }
 }
 
