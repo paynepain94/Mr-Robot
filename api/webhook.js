@@ -154,7 +154,11 @@ export default async function handler(req, res) {
                         }
                     } catch (error) {
                         console.error('Error en Demo Flow consultando a GAS:', error);
-                        await sendMessage(phone_number_id, from, "❌ No pudimos conectar con los calendarios en este momento. Intenta de nuevo más tarde.");
+                        try {
+                            await sendMessage(phone_number_id, from, "❌ No pudimos conectar con los calendarios en este momento. Intenta de nuevo más tarde.");
+                        } catch (sendError) {
+                            console.error('Failed to send fallback message in Demo Flow:', sendError);
+                        }
                     }
 
                 } else {
