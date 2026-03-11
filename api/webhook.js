@@ -277,12 +277,9 @@ export default async function handler(req, res) {
 
 // Helper to send text messages
 async function sendMessage(phoneNumberId, to, text) {
-    // Forzado directo del token para evadir problemas de caché de Vercel en la demo
-    const token = process.env.WHATSAPP_API_TOKEN || 'EAAWj2QODFwwBQyCohZBk5RP9MehtyMivglpExhX4AXeKZCnPpzaJKi0OyNLMpftfeipKC3STf5BXZAFF03s2CZBgvzS0ra1n6EZCqJQtcJ1GJ5X5fEVnukQZCcPLuv4l1ABS7sLWf1J9uacNcd3dRnFkOA9j1Ji0S6inYwQorZBNZCSUJz19PweBqgkeVfguYtko4QZDZD';
+    // IGNORANDO VERCEL: Forzado directo del token asíncrono en código puro
+    const token = 'EAAWj2QODFwwBQyCohZBk5RP9MehtyMivglpExhX4AXeKZCnPpzaJKi0OyNLMpftfeipKC3STf5BXZAFF03s2CZBgvzS0ra1n6EZCqJQtcJ1GJ5X5fEVnukQZCcPLuv4l1ABS7sLWf1J9uacNcd3dRnFkOA9j1Ji0S6inYwQorZBNZCSUJz19PweBqgkeVfguYtko4QZDZD';
 
-    if (!token) {
-        console.error("⚠️ ERROR CRÍTICO: No se detectó la variable WHATSAPP_API_TOKEN en Vercel. Asegúrate de su nombre.");
-    }
 
     console.log(`Intentando enviar mensaje a ${to} usando App/Token configurado en env...`);
 
@@ -333,12 +330,9 @@ async function sendWelcomeAndNeeds(phoneNumberId, to) {
 
 // Generic Helper to send Button Messages
 async function sendCustomButtonMessage(phoneNumberId, to, bodyText, buttons) {
-    // Forzado directo del token para evadir problemas de caché de Vercel en la demo
-    const token = process.env.WHATSAPP_API_TOKEN || 'EAAWj2QODFwwBQyCohZBk5RP9MehtyMivglpExhX4AXeKZCnPpzaJKi0OyNLMpftfeipKC3STf5BXZAFF03s2CZBgvzS0ra1n6EZCqJQtcJ1GJ5X5fEVnukQZCcPLuv4l1ABS7sLWf1J9uacNcd3dRnFkOA9j1Ji0S6inYwQorZBNZCSUJz19PweBqgkeVfguYtko4QZDZD';
+    // IGNORANDO VERCEL: Forzado directo del token asíncrono en código puro
+    const token = 'EAAWj2QODFwwBQyCohZBk5RP9MehtyMivglpExhX4AXeKZCnPpzaJKi0OyNLMpftfeipKC3STf5BXZAFF03s2CZBgvzS0ra1n6EZCqJQtcJ1GJ5X5fEVnukQZCcPLuv4l1ABS7sLWf1J9uacNcd3dRnFkOA9j1Ji0S6inYwQorZBNZCSUJz19PweBqgkeVfguYtko4QZDZD';
 
-    if (!token) {
-        console.error("⚠️ ERROR CRÍTICO: No se detectó la variable WHATSAPP_API_TOKEN en Vercel. Asegúrate de su nombre.");
-    }
 
     const messagePayload = {
         messaging_product: "whatsapp",
