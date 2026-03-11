@@ -81,107 +81,174 @@ export default async function handler(req, res) {
                     }
                 }
 
-                console.log(`Message from ${from}: ${msg_body}`);
+                console.log(`Message from ${from} to ${phone_number_id}: ${msg_body}`);
 
-                // KEYWORD / BUTTON LOGIC
+                // ==========================================
+                // ROUTING POR NÚMERO DE TELÉFONO
+                // ==========================================
 
-                // 1. Check for Return to Main Menu (Resets to Needs Assessment)
-                if (msg_body === 'btn_main_menu') {
-                    // Send Needs Assessment (Step 1)
-                    await sendWelcomeAndNeeds(phone_number_id, from);
-                    return res.status(200).send('EVENT_RECEIVED');
-                }
+                const DEMO_CALENDAR_PHONE_ID = '1062960976899570';
 
-                let responseText = '';
-                let nextButtons = null;
+                if (phone_number_id === DEMO_CALENDAR_PHONE_ID) {
+                    // ---------------------------------------------------------
+                    // 📅 LÓGICA DEL NUEVO CHATBOT (Demo Google Calendar + GAS)
+                    // ---------------------------------------------------------
+                    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzVvtXgU2Vq1aSmwnRoAvdfYCQDwXQgl0aRO2ytCDIDy_LHVtVvukCTQsla_9CsEM89/exec";
 
-                // 2. STEP 2 A: Handle Needs Selection -> Send Volume Qualification
-                // Needs: Speed (A), Organization (B), AI (C)
-                if (
-                    msg_body === 'btn_need_speed' || msg_body.includes('rapidez') ||
-                    msg_body === 'btn_need_org' || msg_body.includes('organizar') ||
-                    msg_body === 'btn_need_ai' || msg_body.includes('inteligencia')
-                ) {
-                    const qualText = "¡Excelente meta! Tenemos la tecnología para lograrlo. Solo para asegurarnos de que el sistema soporte tu ritmo de trabajo sin interrupciones, ¿cuántos chats recibes, aproximadamente, por día? 📊";
-                    const qualButtons = [
-                        { type: "reply", reply: { id: "btn_vol_1", title: "Hasta 25 🐣" } },
-                        { type: "reply", reply: { id: "btn_vol_2", title: "25 a 50 📈" } },
-                        { type: "reply", reply: { id: "btn_vol_3", title: "Más de 50 🏢" } }
-                    ];
-                    await sendCustomButtonMessage(phone_number_id, from, qualText, qualButtons);
-                    return res.status(200).send('EVENT_RECEIVED');
-                }
-
-                // 3. STEP 3: Handle Volume Selection -> Send Solution
-                // LEVEL 1: Hasta 25 chats
-                else if (msg_body === 'btn_vol_1' || msg_body.includes('hasta 25')) {
-                    responseText = "¡Perfecto para dar el primer gran paso! Nuestra Solución Entrada está diseñada para que te olvides de las tareas repetitivas y te enfoques en crecer. 🌱\n\n✅ Tus contactos se guardan solos en Google Sheets. 📊\n✅ Tus citas se agendan directo en Google Calendar. 📅\n✅ Resolvemos dudas comunes al instante con FAQ. 💡\n\n💰 Inversión: Desde $3,000 MXN.\n\n¿Te gustaría agendar una breve llamada para ver cómo se vería en tu negocio? 📞";
-                    nextButtons = [
-                        { type: "reply", reply: { id: "btn_schedule", title: "Agendar Llamada 📞" } },
-                        { type: "reply", reply: { id: "btn_main_menu", title: "Menú Principal ⬅️" } }
-                    ];
-                }
-                // LEVEL 2: 25 - 50 chats
-                else if (msg_body === 'btn_vol_2' || msg_body.includes('25 a 50')) {
-                    responseText = "¡Qué buen ritmo lleva tu negocio! El Plan Estándar es el aliado que necesitas para profesionalizar cada interacción. 🚀\n\n✅ Gestión completa de citas: tus clientes agendan, cambian o cancelan solos. ⏳\n✅ Base de datos segura para que nunca pierdas un prospecto. 🔒\n✅ Respuestas rápidas que dan confianza y cierran ventas. 🎯\n\n💰 Inversión: Desde $7,000 MXN.\n\n¿Platicamos en una llamada para explicarte cómo configurarlo? 📞";
-                    nextButtons = [
-                        { type: "reply", reply: { id: "btn_schedule", title: "Agendar Llamada 📞" } },
-                        { type: "reply", reply: { id: "btn_main_menu", title: "Menú Principal ⬅️" } }
-                    ];
-                }
-                // LEVEL 3: 50+ chats
-                else if (msg_body === 'btn_vol_3' || msg_body.includes('más de 50') || msg_body.includes('51')) {
-                    responseText = "¡Increíble volumen! Para un flujo así, necesitas el poder de nuestra Solución Premium con Inteligencia Artificial. 🧠⚡\n\n✅ Un agente de IA entrenado con la voz de tu marca. 🗣️\n✅ Integración total con tu CRM para que todo esté conectado. 🔗\n✅ Seguridad de nivel corporativo para proteger tu información. 🛡️\n\n💰 Inversión: Desde $15,000 MXN.\n\nEste nivel requiere un toque personal. ¿Agendamos una consultoría técnica gratuita? 📞";
-                    nextButtons = [
-                        { type: "reply", reply: { id: "btn_consulting", title: "Consultoría Gratis 🛠️" } },
-                        { type: "reply", reply: { id: "btn_main_menu", title: "Menú Principal ⬅️" } }
-                    ];
-                }
-                // SCHEDULING / CONSULTING (External Link)
-                else if (msg_body === 'btn_schedule' || msg_body === 'btn_consulting' || msg_body.includes('agendar') || msg_body.includes('consultoría')) {
-                    responseText = "¡Excelente decisión! 🎯 El siguiente paso es una breve llamada de diagnóstico para detectar los cuellos de botella en tu proceso y ver cómo Senior Robot los va a eliminar. 🚫🍾\n\nPor favor, elige el horario que mejor te acomode en nuestro calendario oficial: 👉 https://calendar.app.google/1VzMDX3u7EunndcYA 📅\n\nNota: Atendemos de forma personalizada para asegurar la máxima calidad en cada integración. 🦾";
-                }
-                // CONTACT HUMAN (Direct Call)
-                else if (msg_body === 'btn_contact_human' || msg_body.includes('llamar')) {
-                    responseText = "📞 Puedes contactarnos directamente al: +52 312 112 8434\n\nEstamos disponibles para atenderte personalmente. 🤝";
-                }
-
-                // 4. Send Response if matched an option
-                if (responseText) {
                     try {
-                        if (nextButtons) {
-                            await sendCustomButtonMessage(phone_number_id, from, responseText, nextButtons);
+                        if (msg_body.includes('agendar') || msg_body.includes('cita')) {
+                            // Enviar respuesta temporal de espera
+                            await sendMessage(phone_number_id, from, "⏳ Consultando disponibilidad de nuestras 4 sillas de masajes...");
+
+                            // Hacer la petición HTTP a Google Apps Script
+                            const response = await fetch(GAS_WEB_APP_URL, {
+                                method: 'POST',
+                                redirect: 'follow', // Importante para GAS
+                                headers: {
+                                    'Content-Type': 'text/plain;charset=utf-8' // GAS requiere este content type a menudo para evitar errores de CORS/Preflight 
+                                },
+                                body: JSON.stringify({ action: "getAvailability", user_phone: from })
+                            });
+
+                            const data = await response.json();
+
+                            if (data.status === 'success') {
+                                const events = data.data.events;
+                                let msg = `✅ ¡Consulta exitosa!\n\nEncontramos ${data.data.total_busy_events} citas agendadas en total.\n\n`;
+
+                                if (events.length > 0) {
+                                    msg += "Horarios que actualmente están *OCUPADOS*:\n\n";
+                                    events.forEach((ev) => {
+                                        // Formatear fechas desde UTC a horario local México
+                                        const startStr = new Date(ev.startTime).toLocaleString('es-MX', { timeZone: 'America/Mexico_City', hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' });
+                                        const endStr = new Date(ev.endTime).toLocaleString('es-MX', { timeZone: 'America/Mexico_City', hour: '2-digit', minute: '2-digit' });
+
+                                        msg += `🪑 *${ev.silla}*\n`;
+                                        msg += `📅 ${startStr} a ${endStr}\n`;
+                                        msg += `---------------------\n`;
+                                    });
+                                    msg += "\n*(Cualquier otro horario fuera de estos rangos está libre y disponible)*";
+                                } else {
+                                    msg += "¡Todos los horarios de todas las sillas están completamente LIBRES y disponibles en estos momentos diarios! 🎉";
+                                }
+
+                                await sendMessage(phone_number_id, from, msg);
+                            } else {
+                                await sendMessage(phone_number_id, from, "❌ Lo siento, ocurrió un error interno al consultar los calendarios.");
+                            }
+
                         } else {
-                            await sendMessage(phone_number_id, from, responseText);
+                            // Si no escribe "agendar", le enviamos un saludo estándar
+                            await sendMessage(phone_number_id, from, "👋 ¡Hola! Soy el asistente de la Demo Multi-Calendarios 📅. Para consultar la disponibilidad actual de nuestras 4 sillas, simplemente escribe *'agendar'* o *'cita'*.");
                         }
                     } catch (error) {
-                        console.error('Error sending message:', error);
+                        console.error('Error en Demo Flow consultando a GAS:', error);
+                        await sendMessage(phone_number_id, from, "❌ No pudimos conectar con los calendarios en este momento. Intenta de nuevo más tarde.");
                     }
-                    return res.status(200).send('EVENT_RECEIVED');
-                }
 
-                // 5. GREETING CHECK
-                // Restore explicit check for greetings to trigger the Welcome Flow
-                const greetingKeywords = ['hola', 'hi', 'hello', 'buenos', 'buenas', 'inicio', 'empezar', 'menu'];
-                const isGreeting = greetingKeywords.some(keyword => msg_body.includes(keyword));
+                } else {
+                    // ---------------------------------------------------------
+                    // 🤖 LÓGICA DEL CHATBOT ACTUAL (Senior Robot)
+                    // ---------------------------------------------------------
 
-                try {
-                    if (isGreeting) {
-                        // Triggers the Welcome & Needs Assessment (Step 1)
+                    // 1. Check for Return to Main Menu (Resets to Needs Assessment)
+                    if (msg_body === 'btn_main_menu') {
+                        // Send Needs Assessment (Step 1)
                         await sendWelcomeAndNeeds(phone_number_id, from);
-                    } else {
-                        // 6. FALLBACK: HUMAN HANDOFF / SENIOR ROBOT INTRO
-                        // If it's unknown text (e.g. user writing after flow), offer human contact.
-                        const fallbackText = "Soy Senior Robot, tu Asistente Digital 🤖.\n\nSi deseas hablar con un humano, puedes agendar una cita, llamar directo o volver al menú. 👇";
-                        const fallbackButtons = [
-                            { type: "reply", reply: { id: "btn_schedule", title: "Agendar Cita 📅" } },
-                            { type: "reply", reply: { id: "btn_contact_human", title: "Llamar Ahora 📞" } },
+                        return res.status(200).send('EVENT_RECEIVED');
+                    }
+
+                    let responseText = '';
+                    let nextButtons = null;
+
+                    // 2. STEP 2 A: Handle Needs Selection -> Send Volume Qualification
+                    // Needs: Speed (A), Organization (B), AI (C)
+                    if (
+                        msg_body === 'btn_need_speed' || msg_body.includes('rapidez') ||
+                        msg_body === 'btn_need_org' || msg_body.includes('organizar') ||
+                        msg_body === 'btn_need_ai' || msg_body.includes('inteligencia')
+                    ) {
+                        const qualText = "¡Excelente meta! Tenemos la tecnología para lograrlo. Solo para asegurarnos de que el sistema soporte tu ritmo de trabajo sin interrupciones, ¿cuántos chats recibes, aproximadamente, por día? 📊";
+                        const qualButtons = [
+                            { type: "reply", reply: { id: "btn_vol_1", title: "Hasta 25 🐣" } },
+                            { type: "reply", reply: { id: "btn_vol_2", title: "25 a 50 📈" } },
+                            { type: "reply", reply: { id: "btn_vol_3", title: "Más de 50 🏢" } }
+                        ];
+                        await sendCustomButtonMessage(phone_number_id, from, qualText, qualButtons);
+                        return res.status(200).send('EVENT_RECEIVED');
+                    }
+
+                    // 3. STEP 3: Handle Volume Selection -> Send Solution
+                    // LEVEL 1: Hasta 25 chats
+                    else if (msg_body === 'btn_vol_1' || msg_body.includes('hasta 25')) {
+                        responseText = "¡Perfecto para dar el primer gran paso! Nuestra Solución Entrada está diseñada para que te olvides de las tareas repetitivas y te enfoques en crecer. 🌱\n\n✅ Tus contactos se guardan solos en Google Sheets. 📊\n✅ Tus citas se agendan directo en Google Calendar. 📅\n✅ Resolvemos dudas comunes al instante con FAQ. 💡\n\n💰 Inversión: Desde $3,000 MXN.\n\n¿Te gustaría agendar una breve llamada para ver cómo se vería en tu negocio? 📞";
+                        nextButtons = [
+                            { type: "reply", reply: { id: "btn_schedule", title: "Agendar Llamada 📞" } },
                             { type: "reply", reply: { id: "btn_main_menu", title: "Menú Principal ⬅️" } }
                         ];
-                        await sendCustomButtonMessage(phone_number_id, from, fallbackText, fallbackButtons);
                     }
-                } catch (error) {
-                    console.error('Error sending fallback flow:', error);
+                    // LEVEL 2: 25 - 50 chats
+                    else if (msg_body === 'btn_vol_2' || msg_body.includes('25 a 50')) {
+                        responseText = "¡Qué buen ritmo lleva tu negocio! El Plan Estándar es el aliado que necesitas para profesionalizar cada interacción. 🚀\n\n✅ Gestión completa de citas: tus clientes agendan, cambian o cancelan solos. ⏳\n✅ Base de datos segura para que nunca pierdas un prospecto. 🔒\n✅ Respuestas rápidas que dan confianza y cierran ventas. 🎯\n\n💰 Inversión: Desde $7,000 MXN.\n\n¿Platicamos en una llamada para explicarte cómo configurarlo? 📞";
+                        nextButtons = [
+                            { type: "reply", reply: { id: "btn_schedule", title: "Agendar Llamada 📞" } },
+                            { type: "reply", reply: { id: "btn_main_menu", title: "Menú Principal ⬅️" } }
+                        ];
+                    }
+                    // LEVEL 3: 50+ chats
+                    else if (msg_body === 'btn_vol_3' || msg_body.includes('más de 50') || msg_body.includes('51')) {
+                        responseText = "¡Increíble volumen! Para un flujo así, necesitas el poder de nuestra Solución Premium con Inteligencia Artificial. 🧠⚡\n\n✅ Un agente de IA entrenado con la voz de tu marca. 🗣️\n✅ Integración total con tu CRM para que todo esté conectado. 🔗\n✅ Seguridad de nivel corporativo para proteger tu información. 🛡️\n\n💰 Inversión: Desde $15,000 MXN.\n\nEste nivel requiere un toque personal. ¿Agendamos una consultoría técnica gratuita? 📞";
+                        nextButtons = [
+                            { type: "reply", reply: { id: "btn_consulting", title: "Consultoría Gratis 🛠️" } },
+                            { type: "reply", reply: { id: "btn_main_menu", title: "Menú Principal ⬅️" } }
+                        ];
+                    }
+                    // SCHEDULING / CONSULTING (External Link)
+                    else if (msg_body === 'btn_schedule' || msg_body === 'btn_consulting' || msg_body.includes('agendar') || msg_body.includes('consultoría')) {
+                        responseText = "¡Excelente decisión! 🎯 El siguiente paso es una breve llamada de diagnóstico para detectar los cuellos de botella en tu proceso y ver cómo Senior Robot los va a eliminar. 🚫🍾\n\nPor favor, elige el horario que mejor te acomode en nuestro calendario oficial: 👉 https://calendar.app.google/1VzMDX3u7EunndcYA 📅\n\nNota: Atendemos de forma personalizada para asegurar la máxima calidad en cada integración. 🦾";
+                    }
+                    // CONTACT HUMAN (Direct Call)
+                    else if (msg_body === 'btn_contact_human' || msg_body.includes('llamar')) {
+                        responseText = "📞 Puedes contactarnos directamente al: +52 312 112 8434\n\nEstamos disponibles para atenderte personalmente. 🤝";
+                    }
+
+                    // 4. Send Response if matched an option
+                    if (responseText) {
+                        try {
+                            if (nextButtons) {
+                                await sendCustomButtonMessage(phone_number_id, from, responseText, nextButtons);
+                            } else {
+                                await sendMessage(phone_number_id, from, responseText);
+                            }
+                        } catch (error) {
+                            console.error('Error sending message:', error);
+                        }
+                        return res.status(200).send('EVENT_RECEIVED');
+                    }
+
+                    // 5. GREETING CHECK
+                    // Restore explicit check for greetings to trigger the Welcome Flow
+                    const greetingKeywords = ['hola', 'hi', 'hello', 'buenos', 'buenas', 'inicio', 'empezar', 'menu'];
+                    const isGreeting = greetingKeywords.some(keyword => msg_body.includes(keyword));
+
+                    try {
+                        if (isGreeting) {
+                            // Triggers the Welcome & Needs Assessment (Step 1)
+                            await sendWelcomeAndNeeds(phone_number_id, from);
+                        } else {
+                            // 6. FALLBACK: HUMAN HANDOFF / SENIOR ROBOT INTRO
+                            // If it's unknown text (e.g. user writing after flow), offer human contact.
+                            const fallbackText = "Soy Senior Robot, tu Asistente Digital 🤖.\n\nSi deseas hablar con un humano, puedes agendar una cita, llamar directo o volver al menú. 👇";
+                            const fallbackButtons = [
+                                { type: "reply", reply: { id: "btn_schedule", title: "Agendar Cita 📅" } },
+                                { type: "reply", reply: { id: "btn_contact_human", title: "Llamar Ahora 📞" } },
+                                { type: "reply", reply: { id: "btn_main_menu", title: "Menú Principal ⬅️" } }
+                            ];
+                            await sendCustomButtonMessage(phone_number_id, from, fallbackText, fallbackButtons);
+                        }
+                    } catch (error) {
+                        console.error('Error sending fallback flow:', error);
+                    }
                 }
             }
             return res.status(200).send('EVENT_RECEIVED');
