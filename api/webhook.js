@@ -262,7 +262,9 @@ export default async function handler(req, res) {
 
 // Helper to send text messages
 async function sendMessage(phoneNumberId, to, text) {
-    const token = 'EAAWj2QODFwwBQ9CstPKuZAwLQWEaQi5CRLxkmwT3l0oAzbgZBo5TSSucA0ylLLwUCk7RpeHfqadoAp6i1apO0TgmodMn34CMVo56zEsISCf769A1aJ2B6dHdw11TXv356udEW22lFrtSNs7XNWPwZAZAvNzDWZBRAnq3BmiGgASgjydYDnGjEUT0kw5ZAgsM4vnRFmYXGmOvptKtil0kZAC7d3aNrVfzZCF4iyaKtJYmnCEXzCP48hkScJLkTSmPYTheVinbLo4EN96HhvJigZCSzMMa7oB9Vfzzfm9VHlwZDZD';
+    // Usar la variable de entorno configurada en Vercel, o caer al token 'hardcodeado' anterior
+    const fallbackToken = 'EAAWj2QODFwwBQ9CstPKuZAwLQWEaQi5CRLxkmwT3l0oAzbgZBo5TSSucA0ylLLwUCk7RpeHfqadoAp6i1apO0TgmodMn34CMVo56zEsISCf769A1aJ2B6dHdw11TXv356udEW22lFrtSNs7XNWPwZAZAvNzDWZBRAnq3BmiGgASgjydYDnGjEUT0kw5ZAgsM4vnRFmYXGmOvptKtil0kZAC7d3aNrVfzZCF4iyaKtJYmnCEXzCP48hkScJLkTSmPYTheVinbLo4EN96HhvJigZCSzMMa7oB9Vfzzfm9VHlwZDZD';
+    const token = process.env.WHATSAPP_API_TOKEN || fallbackToken;
 
     const response = await fetch(
         `https://graph.facebook.com/v17.0/${phoneNumberId}/messages`,
@@ -307,13 +309,15 @@ async function sendWelcomeAndNeeds(phoneNumberId, to) {
 
 // Generic Helper to send Button Messages
 async function sendCustomButtonMessage(phoneNumberId, to, bodyText, buttons) {
-    const token = 'EAAWj2QODFwwBQ9CstPKuZAwLQWEaQi5CRLxkmwT3l0oAzbgZBo5TSSucA0ylLLwUCk7RpeHfqadoAp6i1apO0TgmodMn34CMVo56zEsISCf769A1aJ2B6dHdw11TXv356udEW22lFrtSNs7XNWPwZAZAvNzDWZBRAnq3BmiGgASgjydYDnGjEUT0kw5ZAgsM4vnRFmYXGmOvptKtil0kZAC7d3aNrVfzZCF4iyaKtJYmnCEXzCP48hkScJLkTSmPYTheVinbLo4EN96HhvJigZCSzMMa7oB9Vfzzfm9VHlwZDZD';
+    const fallbackToken = 'EAAWj2QODFwwBQ9CstPKuZAwLQWEaQi5CRLxkmwT3l0oAzbgZBo5TSSucA0ylLLwUCk7RpeHfqadoAp6i1apO0TgmodMn34CMVo56zEsISCf769A1aJ2B6dHdw11TXv356udEW22lFrtSNs7XNWPwZAZAvNzDWZBRAnq3BmiGgASgjydYDnGjEUT0kw5ZAgsM4vnRFmYXGmOvptKtil0kZAC7d3aNrVfzZCF4iyaKtJYmnCEXzCP48hkScJLkTSmPYTheVinbLo4EN96HhvJigZCSzMMa7oB9Vfzzfm9VHlwZDZD';
+    const token = process.env.WHATSAPP_API_TOKEN || fallbackToken;
 
     const messagePayload = {
         messaging_product: "whatsapp",
         to: to,
         type: "interactive",
         interactive: {
+            // El tipo siempre es "button" cuando mandamos reply buttons
             type: "button",
             body: {
                 text: bodyText
