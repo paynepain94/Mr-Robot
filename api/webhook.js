@@ -277,9 +277,11 @@ export default async function handler(req, res) {
 
 // Helper to send text messages
 async function sendMessage(phoneNumberId, to, text) {
-    // Usar la variable de entorno configurada en Vercel, o caer al token 'hardcodeado' anterior
-    const fallbackToken = 'EAAWj2QODFwwBQ9CstPKuZAwLQWEaQi5CRLxkmwT3l0oAzbgZBo5TSSucA0ylLLwUCk7RpeHfqadoAp6i1apO0TgmodMn34CMVo56zEsISCf769A1aJ2B6dHdw11TXv356udEW22lFrtSNs7XNWPwZAZAvNzDWZBRAnq3BmiGgASgjydYDnGjEUT0kw5ZAgsM4vnRFmYXGmOvptKtil0kZAC7d3aNrVfzZCF4iyaKtJYmnCEXzCP48hkScJLkTSmPYTheVinbLo4EN96HhvJigZCSzMMa7oB9Vfzzfm9VHlwZDZD';
-    const token = process.env.WHATSAPP_API_TOKEN || fallbackToken;
+    const token = process.env.WHATSAPP_API_TOKEN;
+
+    if (!token) {
+        console.error("⚠️ ERROR CRÍTICO: No se detectó la variable WHATSAPP_API_TOKEN en Vercel. Asegúrate de su nombre.");
+    }
 
     console.log(`Intentando enviar mensaje a ${to} usando App/Token configurado en env...`);
 
@@ -330,8 +332,11 @@ async function sendWelcomeAndNeeds(phoneNumberId, to) {
 
 // Generic Helper to send Button Messages
 async function sendCustomButtonMessage(phoneNumberId, to, bodyText, buttons) {
-    const fallbackToken = 'EAAWj2QODFwwBQ9CstPKuZAwLQWEaQi5CRLxkmwT3l0oAzbgZBo5TSSucA0ylLLwUCk7RpeHfqadoAp6i1apO0TgmodMn34CMVo56zEsISCf769A1aJ2B6dHdw11TXv356udEW22lFrtSNs7XNWPwZAZAvNzDWZBRAnq3BmiGgASgjydYDnGjEUT0kw5ZAgsM4vnRFmYXGmOvptKtil0kZAC7d3aNrVfzZCF4iyaKtJYmnCEXzCP48hkScJLkTSmPYTheVinbLo4EN96HhvJigZCSzMMa7oB9Vfzzfm9VHlwZDZD';
-    const token = process.env.WHATSAPP_API_TOKEN || fallbackToken;
+    const token = process.env.WHATSAPP_API_TOKEN;
+
+    if (!token) {
+        console.error("⚠️ ERROR CRÍTICO: No se detectó la variable WHATSAPP_API_TOKEN en Vercel. Asegúrate de su nombre.");
+    }
 
     const messagePayload = {
         messaging_product: "whatsapp",
