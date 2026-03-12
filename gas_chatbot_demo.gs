@@ -88,6 +88,10 @@ function doPost(e) {
        
        const endTarget = new Date(target.getTime() + durationMinutes * 60 * 1000);
        
+       if (!cal) {
+          return ContentService.createTextOutput(JSON.stringify({ status: 'error', error: 'Calendar is null. Check calendar permissions for ID: ' + calId })).setMimeType(ContentService.MimeType.JSON);
+       }
+       
        // Make reservation
        const title = `💈 Cita: ${data.name} - ${data.service}`;
        const description = `Phone: ${data.phone}\nService: ${data.service}\nBarber: ${data.barber}`;
