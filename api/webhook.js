@@ -512,3 +512,39 @@ async function sendCustomButtonMessage(phoneNumberId, to, bodyText, buttons) {
         throw new Error(`WhatsApp API Error: ${JSON.stringify(errorData)}`);
     }
 }
+
+// Generic Helper to send List Messages
+async function sendListMessage(phoneNumberId, to, bodyText, buttonText, sections) {
+    const token = 'EAAWj2QODFwwBQyCohZBk5RP9MehtyMivglpExhX4AXeKZCnPpzaJKi0OyNLMpftfeipKC3STf5BXZAFF03s2CZBgvzS0ra1n6EZCqJQtcJ1GJ5X5fEVnukQZCcPLuv4l1ABS7sLWf1J9uacNcd3dRnFkOA9j1Ji0S6inYwQorZBNZCSUJz19PweBqgkeVfguYtko4QZDZD';
+
+    const messagePayload = {
+        messaging_product: "whatsapp",
+        to: to,
+        type: "interactive",
+        interactive: {
+            type: "list",
+            body: { text: bodyText },
+            action: {
+                button: buttonText,
+                sections: sections
+            }
+        }
+    };
+
+    const response = await fetch(
+        `https://graph.facebook.com/v17.0/${phoneNumberId}/messages`,
+        {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(messagePayload),
+        }
+    );
+    if (!response.ok) {
+        const errorData = await response.json();
+        console.error("WhatsApp API Error (List):", JSON.stringify(errorData));
+        throw new Error(`WhatsApp API Error: ${JSON.stringify(errorData)}`);
+    }
+}
