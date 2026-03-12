@@ -201,6 +201,18 @@ export default async function handler(req, res) {
                                 const dateStr = parts[2];
                                 const brb = parts[3];
                                 const srv = parts[4];
+                                const btns = [
+                                    { type: "reply", reply: { id: `btn_bloque_manana_${dateStr}_${brb}_${srv}`, title: "Mañana (9am-1pm)" } },
+                                    { type: "reply", reply: { id: `btn_bloque_tarde_${dateStr}_${brb}_${srv}`, title: "Tarde (1pm-6pm)" } },
+                                    { type: "reply", reply: { id: `btn_bloque_noche_${dateStr}_${brb}_${srv}`, title: "Noche (6pm-9pm)" } }
+                                ];
+                                await sendCustomButtonMessage(phone_number_id, from, "Para ver todos los horarios, ¿en qué momento te gustaría agendar?", btns);
+                            }
+                            else if (parts[1] === 'bloque') {
+                                const bloque = parts[2];
+                                const dateStr = parts[3];
+                                const brb = parts[4];
+                                const srv = parts[5];
 
                                 await sendMessage(phone_number_id, from, "⏳ Consultando disponibilidad en la barbería...");
 
@@ -211,15 +223,36 @@ export default async function handler(req, res) {
                                 const data = await response.json();
 
                                 if (data.status === 'success' && data.available_slots && data.available_slots.length > 0) {
-                                    const slots = data.available_slots.slice(0, 10);
-                                    const sections = [{
-                                        title: "Horarios disponibles",
-                                        rows: slots.map(slot => {
-                                            const safeTime = slot.replace(/ /g, '').replace(/:/g, ''); 
-                                            return { id: `btn_time_${safeTime}_${dateStr}_${brb}_${srv}`, title: slot };
-                                        })
-                                    }];
-                                    await sendListMessage(phone_number_id, from, `Estos son los turnos disponibles:`, "Ver horarios", sections);
+                                    let filtered = [];
+                                    for (let slot of data.available_slots) {
+                                        let isPM = slot.includes('PM');
+                                        let partsSlot = slot.split(':');
+                                        let h = parseInt(partsSlot[0], 10);
+                                        if (isPM && h !== 12) h += 12;
+                                        if (!isPM && h === 12) h = 0;
+                                        
+                                        if (bloque === 'manana' && h >= 9 && h < 13) filtered.push(slot);
+                                        if (bloque === 'tarde' && h >= 13 && h < 18) filtered.push(slot);
+                                        if (bloque === 'noche' && h >= 18 && h <= 21) filtered.push(slot);
+                                    }
+
+                                    if (filtered.length > 0) {
+                                        const slots = filtered.slice(0, 10);
+                                        const sections = [{
+                                            title: `Horarios (${bloque})`,
+                                            rows: slots.map(slot => {
+                                                const safeTime = slot.replace(/ /g, '').replace(/:/g, ''); 
+                                                return { id: `btn_time_${safeTime}_${dateStr}_${brb}_${srv}`, title: slot };
+                                            })
+                                        }];
+                                        await sendListMessage(phone_number_id, from, `Estos son los turnos disponibles:`, "Ver horarios", sections);
+                                    } else {
+                                        const btns = [
+                                            { type: "reply", reply: { id: `btn_day_${dateStr}_${brb}_${srv}`, title: "Ver otro horario" } },
+                                            { type: "reply", reply: { id: `btn_conf_main`, title: "Menú Principal" } }
+                                        ];
+                                        await sendCustomButtonMessage(phone_number_id, from, "Lo siento, para ese momento del día estamos a tope 💈. ¿Te gustaría intentar otro horario?", btns);
+                                    }
                                 } else {
                                     const btns = [
                                         { type: "reply", reply: { id: `btn_conf_main`, title: "Menú Principal" } }
@@ -235,13 +268,19 @@ export default async function handler(req, res) {
 
                                 global.bookingCache[from] = { time, dateStr, brb, srv, ts: Date.now() };
 
-                                await sendMessage(phone_number_id, from, "¡Casi listo! Por favor, dime tu nombre para registrar la cita. ✍️");
+                                await sendMessage(phone_number_id, from, "¡Casi listo! Por favor, dime tu nombre y apellido para registrar la cita. ✍️");
                             }
 
                         } else {
                             if (global.bookingCache && global.bookingCache[from]) {
                                 const booking = global.bookingCache[from];
                                 const userName = msg_body.trim() === '' ? 'Cliente' : msg_body.trim();
+                                
+                                if (userName !== 'Cliente' && userName.split(' ').length < 2) {
+                                    await sendMessage(phone_number_id, from, "✍️ Por favor ayúdanos escribiendo tu *nombre y apellido* juntos para que el barbero te identifique correctamente.");
+                                    return res.status(200).send('EVENT_RECEIVED');
+                                }
+                                
                                 delete global.bookingCache[from];
 
                                 await sendMessage(phone_number_id, from, `⏳ Agendando tu cita, ${userName}...`);
