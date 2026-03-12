@@ -126,13 +126,43 @@ export default async function handler(req, res) {
                                     }];
                                     await sendListMessage(phone_number_id, from, "Por favor, selecciona qué servicio deseas agendar:", "Ver servicios", sections);
                                 } else if (parts[2] === 'reagendar') {
-                                    await sendMessage(phone_number_id, from, "Próximamente");
+                                    await sendMessage(phone_number_id, from, "⏳ Buscando tu cita actual...");
+                                    const response = await fetch(GAS_WEB_APP_URL, {
+                                        method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                        body: JSON.stringify({ action: "checkUserAppointment", phone: from })
+                                    });
+                                    const data = await response.json();
+                                    
+                                    if (data.hasAppointment) {
+                                        global.bookingCache[from] = { isReagendar: true, ts: Date.now() };
+                                        const sections = [{
+                                            title: "Catálogo de Servicios",
+                                            rows: [
+                                                { id: "btn_srv_corte", title: "Corte de cabello", description: "40 min | $230" },
+                                                { id: "btn_srv_ninos", title: "Corte niños (1-10 años)", description: "40 min | $190" },
+                                                { id: "btn_srv_barba", title: "Afeitado de barba", description: "30 min | $230" },
+                                                { id: "btn_srv_combo", title: "Corte y Barba", description: "1 hr | $390" },
+                                                { id: "btn_srv_recortes", title: "Recortes", description: "20 min | $150" },
+                                                { id: "btn_srv_mascarilla", title: "Mascarilla y exfoliación", description: "30 min | $200" }
+                                            ]
+                                        }];
+                                        await sendListMessage(phone_number_id, from, `Encontramos tu cita agendada para ${data.appointmentTime}. Selecciona qué servicio deseas agendar ahora:`, "Ver servicios", sections);
+                                    } else {
+                                        const btns = [
+                                            { type: "reply", reply: { id: "btn_action_agendar", title: "Agendar Corte" } },
+                                            { type: "reply", reply: { id: `btn_conf_main`, title: "Menú Principal" } }
+                                        ];
+                                        await sendCustomButtonMessage(phone_number_id, from, "No encontramos ninguna cita pendiente a tu nombre. ¿Deseas agendar un nuevo corte?", btns);
+                                    }
                                 } else if (parts[2] === 'ubicacion') {
                                     await sendMessage(phone_number_id, from, "📍 Dirección: Calle Ignacio Manuel Altamirano 1117, Colima, México.\n🔗 Maps: https://www.google.com/maps/search/?api=1&query=Calle%20Ignacio%20Manuel%20Altamirano%201117,%20Colima,%20,%20M%C3%A9xico");
                                 }
                             }
                             else if (parts[1] === 'srv') {
                                 const srv = parts[2];
+                                if (global.bookingCache && global.bookingCache[from] && global.bookingCache[from].isReagendar) {
+                                    global.bookingCache[from].srv = srv;
+                                }
                                 const btns = [
                                     { type: "reply", reply: { id: `btn_conf_agendar_${srv}`, title: "Agendar Cita" } },
                                     { type: "reply", reply: { id: "btn_conf_human", title: "Hablar con Humano" } },
@@ -265,8 +295,13 @@ export default async function handler(req, res) {
                                 const dateStr = parts[3];
                                 const brb = parts[4];
                                 const srv = parts[5];
+                                
+                                let isReagendar = false;
+                                if (global.bookingCache && global.bookingCache[from] && global.bookingCache[from].isReagendar) {
+                                    isReagendar = true;
+                                }
 
-                                global.bookingCache[from] = { time, dateStr, brb, srv, ts: Date.now() };
+                                global.bookingCache[from] = { time, dateStr, brb, srv, isReagendar, ts: Date.now() };
 
                                 await sendMessage(phone_number_id, from, "¡Casi listo! Por favor, dime tu nombre y apellido para registrar la cita. ✍️");
                             }
@@ -287,12 +322,15 @@ export default async function handler(req, res) {
 
                                 const response = await fetch(GAS_WEB_APP_URL, {
                                     method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                                    body: JSON.stringify({ action: "bookAppointment", phone: from, name: userName, service: booking.srv, barber: booking.brb, dateStr: booking.dateStr, time: booking.time })
+                                    body: JSON.stringify({ action: "bookAppointment", phone: from, name: userName, service: booking.srv, barber: booking.brb, dateStr: booking.dateStr, time: booking.time, isReagendar: booking.isReagendar })
                                 });
                                 const data = await response.json();
 
                                 if (data.status === 'success') {
-                                    const msg = `¡Listo! Tu espacio está reservado en Peluquería Carlos Escobar. Tu barbero tendrá todo limpio y listo para recibirte. 💈✨\n\n📅 Fecha: ${booking.dateStr.substr(6,2)}/${booking.dateStr.substr(4,2)}/${booking.dateStr.substr(0,4)}\n⏰ Hora: ${data.appointmentTime}\n💈 Servicio: ${booking.srv}\n📍 Lugar: ${data.silla}\n\nEstá es la ubicacion de la peluquería:\nhttps://www.google.com/maps/search/?api=1&query=Calle%20Ignacio%20Manuel%20Altamirano%201117,%20Colima,%20,%20M%C3%A9xico`;
+                                    let msg = `¡Listo! Tu espacio está reservado en Peluquería Carlos Escobar. Tu barbero tendrá todo limpio y listo para recibirte. 💈✨\n\n📅 Fecha: ${booking.dateStr.substr(6,2)}/${booking.dateStr.substr(4,2)}/${booking.dateStr.substr(0,4)}\n⏰ Hora: ${data.appointmentTime}\n💈 Servicio: ${booking.srv}\n📍 Lugar: ${data.silla}\n\nEstá es la ubicacion de la peluquería:\nhttps://www.google.com/maps/search/?api=1&query=Calle%20Ignacio%20Manuel%20Altamirano%201117,%20Colima,%20,%20M%C3%A9xico`;
+                                    if (booking.isReagendar) {
+                                        msg = `¡Listo! Hemos **re-agendado** exitosamente tu cita anterior por esta nueva. Tu nuevo espacio está reservado en Peluquería Carlos Escobar. 💈✨\n\n📅 Nueva Fecha: ${booking.dateStr.substr(6,2)}/${booking.dateStr.substr(4,2)}/${booking.dateStr.substr(0,4)}\n⏰ Nueva Hora: ${data.appointmentTime}\n💈 Servicio: ${booking.srv}\n📍 Lugar: ${data.silla}\n\nUbicación:\nhttps://www.google.com/maps/search/?api=1&query=Calle%20Ignacio%20Manuel%20Altamirano%201117,%20Colima,%20,%20M%C3%A9xico`;
+                                    }
                                     await sendMessage(phone_number_id, from, msg);
                                 } else {
                                     await sendMessage(phone_number_id, from, "❌ Hubo un problema al intentar apartar tu lugar. Por favor intenta de nuevo.");

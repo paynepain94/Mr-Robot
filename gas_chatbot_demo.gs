@@ -167,6 +167,13 @@ function doPost(e) {
            return ContentService.createTextOutput(JSON.stringify({ status: 'error', error: 'Calendar not found' })).setMimeType(ContentService.MimeType.JSON);
         }
         
+        if (data.isReagendar) {
+             const oldEvents = checkPhoneInEvents(data.phone);
+             for (let ev of oldEvents) {
+                  ev.deleteEvent();
+             }
+        }
+        
         const title = `💈 Cita: ${data.name}`;
         const description = `Phone: ${data.phone}\nService: ${data.service}\nBarber: ${data.barber}`;
         cal.createEvent(title, target, endTarget, { description: description });
