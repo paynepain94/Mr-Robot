@@ -102,63 +102,146 @@ export default async function handler(req, res) {
 
                 if (phone_number_id === DEMO_CALENDAR_PHONE_ID) {
                     // ---------------------------------------------------------
-                    // 📅 LÓGICA DEL NUEVO CHATBOT (Demo Google Calendar + GAS)
+                    // ✂️ LÓGICA DEL NUEVO CHATBOT (Barber Shop Demo + GAS)
                     // ---------------------------------------------------------
+                    global.bookingCache = global.bookingCache || {};
                     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzVvtXgU2Vq1aSmwnRoAvdfYCQDwXQgl0aRO2ytCDIDy_LHVtVvukCTQsla_9CsEM89/exec";
 
                     try {
-                        if (msg_body.includes('agendar') || msg_body.includes('cita')) {
-                            // Enviar respuesta temporal de espera
-                            await sendMessage(phone_number_id, from, "⏳ Consultando disponibilidad de nuestras 4 sillas de masajes...");
+                        if (msg_body.startsWith('btn_')) {
+                            const parts = msg_body.split('_'); // ej: btn_srv_corte, btn_brb_juan_corte, btn_day_hoy_juan_corte, btn_time_1000_hoy_juan_corte
 
-                            // Hacer la petición HTTP a Google Apps Script
-                            const response = await fetch(GAS_WEB_APP_URL, {
-                                method: 'POST',
-                                redirect: 'follow', // Importante para GAS
-                                headers: {
-                                    'Content-Type': 'text/plain;charset=utf-8' // GAS requiere este content type a menudo para evitar errores de CORS/Preflight 
-                                },
-                                body: JSON.stringify({ action: "getAvailability", user_phone: from })
-                            });
+                            if (parts[1] === 'srv') {
+                                const srv = parts[2];
+                                await sendMessage(phone_number_id, from, "Excelente elección. ¿Tienes algún barbero de preferencia o buscamos el primer espacio disponible?");
+                                const btns = [
+                                    { type: "reply", reply: { id: `btn_brb_any_${srv}`, title: "Cualquiera (Rápido)" } },
+                                    { type: "reply", reply: { id: `btn_brb_juan_${srv}`, title: "Barbero Juan" } },
+                                    { type: "reply", reply: { id: `btn_brb_alex_${srv}`, title: "Barbero Alex" } }
+                                ];
+                                await sendCustomButtonMessage(phone_number_id, from, "👉 Elige tu preferencia:", btns);
+                            }
+                            else if (parts[1] === 'brb') {
+                                const brb = parts[2];
+                                const srv = parts[3];
+                                const btns = [
+                                    { type: "reply", reply: { id: `btn_day_hoy_${brb}_${srv}`, title: "Hoy" } },
+                                    { type: "reply", reply: { id: `btn_day_man_${brb}_${srv}`, title: "Mañana" } },
+                                    { type: "reply", reply: { id: `btn_day_otro_${brb}_${srv}`, title: "Otro día" } }
+                                ];
+                                await sendCustomButtonMessage(phone_number_id, from, "¿Para qué día te gustaría tu cita? 📅", btns);
+                            }
+                            else if (parts[1] === 'day') {
+                                const day = parts[2];
+                                const brb = parts[3];
+                                const srv = parts[4];
 
-                            const data = await response.json();
+                                // Condición Fuera de Horario (demo check for 9 PM MX)
+                                const mxTime = new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" });
+                                const currentHour = new Date(mxTime).getHours();
 
-                            if (data.status === 'success') {
-                                const events = data.data.events;
-                                let msg = `✅ ¡Consulta exitosa!\n\nEncontramos ${data.data.total_busy_events} citas agendadas en total.\n\n`;
-
-                                if (events.length > 0) {
-                                    msg += "Horarios que actualmente están *OCUPADOS*:\n\n";
-                                    events.forEach((ev) => {
-                                        // Formatear fechas desde UTC a horario local México
-                                        const startStr = new Date(ev.startTime).toLocaleString('es-MX', { timeZone: 'America/Mexico_City', hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' });
-                                        const endStr = new Date(ev.endTime).toLocaleString('es-MX', { timeZone: 'America/Mexico_City', hour: '2-digit', minute: '2-digit' });
-
-                                        msg += `🪑 *${ev.silla}*\n`;
-                                        msg += `📅 ${startStr} a ${endStr}\n`;
-                                        msg += `---------------------\n`;
-                                    });
-                                    msg += "\n*(Cualquier otro horario fuera de estos rangos está libre y disponible)*";
-                                } else {
-                                    msg += "¡Todos los horarios de todas las sillas están completamente LIBRES y disponibles en estos momentos diarios! 🎉";
+                                if (day === 'hoy' && currentHour >= 21) {
+                                    const btns = [
+                                        { type: "reply", reply: { id: `btn_day_man_${brb}_${srv}`, title: "Ver Mañana" } }
+                                    ];
+                                    await sendCustomButtonMessage(phone_number_id, from, "🌙 Ya cerramos por hoy, pero no te quedes sin tu corte. Aquí tienes los horarios para mañana temprano.", btns);
+                                    return res.status(200).send('EVENT_RECEIVED');
                                 }
 
-                                await sendMessage(phone_number_id, from, msg);
-                            } else {
-                                await sendMessage(phone_number_id, from, "❌ Lo siento, ocurrió un error interno al consultar los calendarios.");
+                                await sendMessage(phone_number_id, from, "⏳ Consultando disponibilidad de nuestras sillas...");
+
+                                // Petición a GAS
+                                const response = await fetch(GAS_WEB_APP_URL, {
+                                    method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                    body: JSON.stringify({ action: "getAvailability", date: day, barber: brb })
+                                });
+                                const data = await response.json();
+
+                                if (data.status === 'success' && data.available_slots && data.available_slots.length > 0) {
+                                    const slots = data.available_slots.slice(0, 3);
+                                    const btns = slots.map(slot => {
+                                        const safeTime = slot.replace(/ AM| PM|:/g, ''); // "1000", "0200"
+                                        return { type: "reply", reply: { id: `btn_time_${safeTime}_${day}_${brb}_${srv}`, title: slot } };
+                                    });
+                                    await sendCustomButtonMessage(phone_number_id, from, `Estos son los turnos disponibles para ${day === 'hoy' ? 'hoy' : (day === 'man' ? 'mañana' : 'ese día')}:`, btns);
+                                } else {
+                                    const btns = [
+                                        { type: "reply", reply: { id: `btn_day_man_${brb}_${srv}`, title: "Ver mañana" } }
+                                    ];
+                                    await sendCustomButtonMessage(phone_number_id, from, "Lo siento, para ese día estamos a tope 💈. ¿Te gustaría intentar con el día siguiente?", btns);
+                                }
+                            }
+                            else if (parts[1] === 'time') {
+                                const time = parts[2];
+                                const day = parts[3];
+                                const brb = parts[4];
+                                const srv = parts[5];
+
+                                global.bookingCache[from] = { time, day, brb, srv, ts: Date.now() };
+
+                                await sendMessage(phone_number_id, from, "¡Casi listo! Por favor, dime tu nombre para registrar la cita. ✍️");
+                            }
+                            else if (parts[1] === 'action') {
+                                if (parts[2] === 'mantener') {
+                                    await sendMessage(phone_number_id, from, "Perfecto, tu cita se mantiene sin cambios. ¡Te esperamos! 💈");
+                                } else if (parts[2] === 'reagendar') {
+                                    const btns = [
+                                        { type: "reply", reply: { id: "btn_srv_corte", title: "Corte / Haircut" } },
+                                        { type: "reply", reply: { id: "btn_srv_combo", title: "Corte + Barba" } },
+                                        { type: "reply", reply: { id: "btn_srv_perfilado", title: "Solo Barba" } }
+                                    ];
+                                    await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Bienvenido a Mr. Robot Barber 💈. Selecciona tu servicio para reagendar:", "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=600&auto=format&fit=crop", btns);
+                                }
                             }
 
                         } else {
-                            // Si no escribe "agendar", le enviamos un saludo estándar
-                            await sendMessage(phone_number_id, from, "👋 ¡Hola! Soy el asistente de la Demo Multi-Calendarios 📅. Para consultar la disponibilidad actual de nuestras 4 sillas, simplemente escribe *'agendar'* o *'cita'*.");
+                            // Flujo de texto libre
+                            if (global.bookingCache && global.bookingCache[from]) {
+                                const booking = global.bookingCache[from];
+                                const userName = msg_body.trim() === '' ? 'Cliente' : msg_body.trim();
+                                delete global.bookingCache[from];
+
+                                await sendMessage(phone_number_id, from, `⏳ Agendando tu cita, ${userName}...`);
+
+                                const response = await fetch(GAS_WEB_APP_URL, {
+                                    method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                    body: JSON.stringify({ action: "bookAppointment", phone: from, name: userName, service: booking.srv, barber: booking.brb, day: booking.day, time: booking.time })
+                                });
+                                const data = await response.json();
+
+                                if (data.status === 'success') {
+                                    const msg = `¡Listo, ${userName}! Tu cita quedó agendada exitosamente: 🎉\n\n📅 Día: ${booking.day.toUpperCase()}\n⏰ Hora: ${data.appointmentTime}\n💈 Servicio: ${booking.srv}\n📍 Lugar: ${data.silla}`;
+                                    await sendMessage(phone_number_id, from, msg);
+                                } else {
+                                    await sendMessage(phone_number_id, from, "❌ Hubo un problema al intentar apartar tu lugar. Por favor intenta de nuevo.");
+                                }
+                            } else {
+                                // Checking for an existing appointment directly on first message
+                                const response = await fetch(GAS_WEB_APP_URL, {
+                                    method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                    body: JSON.stringify({ action: "checkUserAppointment", phone: from })
+                                });
+                                const data = await response.json();
+
+                                if (data.hasAppointment) {
+                                    const btns = [
+                                        { type: "reply", reply: { id: "btn_action_reagendar", title: "Reagendar" } },
+                                        { type: "reply", reply: { id: "btn_action_mantener", title: "Mantener cita" } }
+                                    ];
+                                    await sendCustomButtonMessage(phone_number_id, from, `Veo que ya tienes una cita agendada para mañana temprano (${data.appointmentTime}). ¿Deseas cancelarla o reagendarla?`, btns);
+                                } else {
+                                    const btns = [
+                                        { type: "reply", reply: { id: "btn_srv_corte", title: "Corte de Cabello ($)" } },
+                                        { type: "reply", reply: { id: "btn_srv_combo", title: "Corte + Barba ($$)" } },
+                                        { type: "reply", reply: { id: "btn_srv_perfilado", title: "Perfilado ($)" } }
+                                    ];
+                                    await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Bienvenido a Mr. Robot Barber Shop 💈. Soy tu asistente virtual. ¿Qué servicio te gustaría agendar hoy?", "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=600&q=80", btns);
+                                }
+                            }
                         }
                     } catch (error) {
-                        console.error('Error en Demo Flow consultando a GAS:', error);
-                        try {
-                            await sendMessage(phone_number_id, from, "❌ No pudimos conectar con los calendarios en este momento. Intenta de nuevo más tarde.");
-                        } catch (sendError) {
-                            console.error('Failed to send fallback message in Demo Flow:', sendError);
-                        }
+                        console.error('Error en Barber Flow:', error);
+                        try { await sendMessage(phone_number_id, from, "❌ Lo siento, hubo un error de conexión con nuestros sistemas."); } catch (e) { }
                     }
 
                 } else {
@@ -273,6 +356,40 @@ export default async function handler(req, res) {
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
+}
+
+// Generic Helper to send Button Messages with Header Image
+async function sendHeaderImageMessage(phoneNumberId, to, bodyText, imageUrl, buttons) {
+    // IGNORANDO VERCEL: Forzado directo del token asíncrono en código puro
+    const token = 'EAAWj2QODFwwBQyCohZBk5RP9MehtyMivglpExhX4AXeKZCnPpzaJKi0OyNLMpftfeipKC3STf5BXZAFF03s2CZBgvzS0ra1n6EZCqJQtcJ1GJ5X5fEVnukQZCcPLuv4l1ABS7sLWf1J9uacNcd3dRnFkOA9j1Ji0S6inYwQorZBNZCSUJz19PweBqgkeVfguYtko4QZDZD';
+
+    const messagePayload = {
+        messaging_product: "whatsapp",
+        to: to,
+        type: "interactive",
+        interactive: {
+            type: "button",
+            header: {
+                type: "image",
+                image: { link: imageUrl }
+            },
+            body: { text: bodyText },
+            action: { buttons: buttons }
+        }
+    };
+
+    const response = await fetch(
+        `https://graph.facebook.com/v17.0/${phoneNumberId}/messages`,
+        {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(messagePayload),
+        }
+    );
+    if (!response.ok) {
+        const errorData = await response.json();
+        console.error("WhatsApp API Error (Image Button):", JSON.stringify(errorData));
+    }
 }
 
 // Helper to send text messages
