@@ -109,93 +109,136 @@ export default async function handler(req, res) {
 
                     try {
                         if (msg_body.startsWith('btn_')) {
-                            const parts = msg_body.split('_'); // ej: btn_srv_corte, btn_brb_juan_corte, btn_day_hoy_juan_corte, btn_time_1000_hoy_juan_corte
+                            const parts = msg_body.split('_');
 
-                            if (parts[1] === 'srv') {
+                            if (parts[1] === 'action') {
+                                if (parts[2] === 'agendar') {
+                                    const sections = [{
+                                        title: "Catálogo de Servicios",
+                                        rows: [
+                                            { id: "btn_srv_corte", title: "Corte de cabello", description: "40 min | $230" },
+                                            { id: "btn_srv_ninos", title: "Corte niños (1-10 años)", description: "40 min | $190" },
+                                            { id: "btn_srv_barba", title: "Afeitado de barba", description: "30 min | $230" },
+                                            { id: "btn_srv_combo", title: "Corte y Barba", description: "1 hr | $390" },
+                                            { id: "btn_srv_recortes", title: "Recortes", description: "20 min | $150" },
+                                            { id: "btn_srv_mascarilla", title: "Mascarilla y exfoliación", description: "30 min | $200" }
+                                        ]
+                                    }];
+                                    await sendListMessage(phone_number_id, from, "Por favor, selecciona qué servicio deseas agendar:", "Ver servicios", sections);
+                                } else if (parts[2] === 'reagendar') {
+                                    await sendMessage(phone_number_id, from, "Próximamente");
+                                } else if (parts[2] === 'ubicacion') {
+                                    await sendMessage(phone_number_id, from, "📍 Dirección: Calle Ignacio Manuel Altamirano 1117, Colima, México.\n🔗 Maps: https://www.google.com/maps/search/?api=1&query=Calle%20Ignacio%20Manuel%20Altamirano%201117,%20Colima,%20,%20M%C3%A9xico");
+                                }
+                            }
+                            else if (parts[1] === 'srv') {
                                 const srv = parts[2];
-                                await sendMessage(phone_number_id, from, "Excelente elección. ¿Tienes algún barbero de preferencia o buscamos el primer espacio disponible?");
                                 const btns = [
-                                    { type: "reply", reply: { id: `btn_brb_any_${srv}`, title: "Cualquiera (Rápido)" } },
-                                    { type: "reply", reply: { id: `btn_brb_juan_${srv}`, title: "Barbero Juan" } },
-                                    { type: "reply", reply: { id: `btn_brb_alex_${srv}`, title: "Barbero Alex" } }
+                                    { type: "reply", reply: { id: `btn_conf_agendar_${srv}`, title: "Agendar Cita" } },
+                                    { type: "reply", reply: { id: "btn_conf_human", title: "Hablar con Humano" } },
+                                    { type: "reply", reply: { id: "btn_conf_main", title: "Menú Principal" } }
                                 ];
-                                await sendCustomButtonMessage(phone_number_id, from, "👉 Elige tu preferencia:", btns);
+                                await sendCustomButtonMessage(phone_number_id, from, "Has seleccionado un servicio. ¿Qué deseas hacer con el servicio?", btns);
+                            }
+                            else if (parts[1] === 'conf') {
+                                if (parts[2] === 'main') {
+                                    const btns = [
+                                        { type: "reply", reply: { id: "btn_action_agendar", title: "Agendar Corte" } },
+                                        { type: "reply", reply: { id: "btn_action_reagendar", title: "Re-agendar" } },
+                                        { type: "reply", reply: { id: "btn_action_ubicacion", title: "Ubicación" } }
+                                    ];
+                                    await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Bienvenido a Peluquería Carlos Escobar. ¿En qué podemos ayudarte hoy?", "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=600&q=80", btns);
+                                } else if (parts[2] === 'human') {
+                                    await sendMessage(phone_number_id, from, "En un momento uno de nuestros asesores te atenderá personalmente.");
+                                } else if (parts[2] === 'agendar') {
+                                    const srv = parts[3];
+                                    const sections = [{
+                                        title: "Sillas / Barberos",
+                                        rows: [
+                                            { id: `btn_brb_any_${srv}`, title: "Cualquiera (Rápido)" },
+                                            { id: `btn_brb_alberto_${srv}`, title: "Silla 1 Alberto" },
+                                            { id: `btn_brb_jotzan_${srv}`, title: "Silla 2 Jotzan" },
+                                            { id: `btn_brb_juan_${srv}`, title: "Silla 3 Juan" },
+                                            { id: `btn_brb_carlos_${srv}`, title: "Silla 4 Carlos" },
+                                            { id: `btn_conf_main`, title: "Menú Principal" }
+                                        ]
+                                    }];
+                                    await sendListMessage(phone_number_id, from, "¿Con quién te gustaría agendar tu servicio?", "Ver opciones", sections);
+                                }
                             }
                             else if (parts[1] === 'brb') {
                                 const brb = parts[2];
                                 const srv = parts[3];
-                                const btns = [
-                                    { type: "reply", reply: { id: `btn_day_hoy_${brb}_${srv}`, title: "Hoy" } },
-                                    { type: "reply", reply: { id: `btn_day_man_${brb}_${srv}`, title: "Mañana" } },
-                                    { type: "reply", reply: { id: `btn_day_otro_${brb}_${srv}`, title: "Otro día" } }
-                                ];
-                                await sendCustomButtonMessage(phone_number_id, from, "¿Para qué día te gustaría tu cita? 📅", btns);
+                                const sections = [{
+                                    title: "Días Disponibles",
+                                    rows: []
+                                }];
+                                
+                                let nowStr = new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" });
+                                let now = new Date(nowStr);
+                                let validDays = 0;
+                                let dayOffset = 0;
+                                while(validDays < 5) {
+                                    let d = new Date(nowStr);
+                                    d.setDate(d.getDate() + dayOffset);
+                                    if (d.getDay() !== 0) {
+                                        let dateStr = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+                                        let dayName = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"][d.getDay()];
+                                        sections[0].rows.push({
+                                            id: `btn_day_${dateStr}_${brb}_${srv}`, 
+                                            title: `${dayName} ${d.getDate()}`
+                                        });
+                                        validDays++;
+                                    }
+                                    dayOffset++;
+                                    if(dayOffset > 10) break;
+                                }
+                                sections[0].rows.push({ id: "btn_conf_human", title: "Hablar con Humano" });
+                                
+                                await sendListMessage(phone_number_id, from, "¿Para qué día te gustaría agendar?📅", "Ver Días", sections);
                             }
                             else if (parts[1] === 'day') {
-                                const day = parts[2];
+                                const dateStr = parts[2];
                                 const brb = parts[3];
                                 const srv = parts[4];
 
-                                // Condición Fuera de Horario (demo check for 9 PM MX)
-                                const mxTime = new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" });
-                                const currentHour = new Date(mxTime).getHours();
+                                await sendMessage(phone_number_id, from, "⏳ Consultando disponibilidad en la barbería...");
 
-                                if (day === 'hoy' && currentHour >= 21) {
-                                    const btns = [
-                                        { type: "reply", reply: { id: `btn_day_man_${brb}_${srv}`, title: "Ver Mañana" } }
-                                    ];
-                                    await sendCustomButtonMessage(phone_number_id, from, "🌙 Ya cerramos por hoy, pero no te quedes sin tu corte. Aquí tienes los horarios para mañana temprano.", btns);
-                                    return res.status(200).send('EVENT_RECEIVED');
-                                }
-
-                                await sendMessage(phone_number_id, from, "⏳ Consultando disponibilidad de nuestras sillas...");
-
-                                // Petición a GAS
                                 const response = await fetch(GAS_WEB_APP_URL, {
                                     method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                                    body: JSON.stringify({ action: "getAvailability", date: day, barber: brb })
+                                    body: JSON.stringify({ action: "getAvailability", dateStr, barber: brb, service: srv })
                                 });
                                 const data = await response.json();
 
                                 if (data.status === 'success' && data.available_slots && data.available_slots.length > 0) {
-                                    const slots = data.available_slots.slice(0, 3);
-                                    const btns = slots.map(slot => {
-                                        const safeTime = slot.replace(/ AM| PM|:/g, ''); // "1000", "0200"
-                                        return { type: "reply", reply: { id: `btn_time_${safeTime}_${day}_${brb}_${srv}`, title: slot } };
-                                    });
-                                    await sendCustomButtonMessage(phone_number_id, from, `Estos son los turnos disponibles para ${day === 'hoy' ? 'hoy' : (day === 'man' ? 'mañana' : 'ese día')}:`, btns);
+                                    const slots = data.available_slots.slice(0, 10);
+                                    const sections = [{
+                                        title: "Horarios disponibles",
+                                        rows: slots.map(slot => {
+                                            const safeTime = slot.replace(/ /g, '').replace(/:/g, ''); 
+                                            return { id: `btn_time_${safeTime}_${dateStr}_${brb}_${srv}`, title: slot };
+                                        })
+                                    }];
+                                    await sendListMessage(phone_number_id, from, `Estos son los turnos disponibles:`, "Ver horarios", sections);
                                 } else {
                                     const btns = [
-                                        { type: "reply", reply: { id: `btn_day_man_${brb}_${srv}`, title: "Ver mañana" } }
+                                        { type: "reply", reply: { id: `btn_conf_main`, title: "Menú Principal" } }
                                     ];
-                                    await sendCustomButtonMessage(phone_number_id, from, "Lo siento, para ese día estamos a tope 💈. ¿Te gustaría intentar con el día siguiente?", btns);
+                                    await sendCustomButtonMessage(phone_number_id, from, "Lo siento, para ese día y ese barbero estamos a tope 💈 o ya terminamos turnos. Por favor intenta otro día.", btns);
                                 }
                             }
                             else if (parts[1] === 'time') {
                                 const time = parts[2];
-                                const day = parts[3];
+                                const dateStr = parts[3];
                                 const brb = parts[4];
                                 const srv = parts[5];
 
-                                global.bookingCache[from] = { time, day, brb, srv, ts: Date.now() };
+                                global.bookingCache[from] = { time, dateStr, brb, srv, ts: Date.now() };
 
                                 await sendMessage(phone_number_id, from, "¡Casi listo! Por favor, dime tu nombre para registrar la cita. ✍️");
                             }
-                            else if (parts[1] === 'action') {
-                                if (parts[2] === 'mantener') {
-                                    await sendMessage(phone_number_id, from, "Perfecto, tu cita se mantiene sin cambios. ¡Te esperamos! 💈");
-                                } else if (parts[2] === 'reagendar') {
-                                    const btns = [
-                                        { type: "reply", reply: { id: "btn_srv_corte", title: "Corte / Haircut" } },
-                                        { type: "reply", reply: { id: "btn_srv_combo", title: "Corte + Barba" } },
-                                        { type: "reply", reply: { id: "btn_srv_perfilado", title: "Solo Barba" } }
-                                    ];
-                                    await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Bienvenido a Mr. Robot Barber 💈. Selecciona tu servicio para reagendar:", "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=600&auto=format&fit=crop", btns);
-                                }
-                            }
 
                         } else {
-                            // Flujo de texto libre
                             if (global.bookingCache && global.bookingCache[from]) {
                                 const booking = global.bookingCache[from];
                                 const userName = msg_body.trim() === '' ? 'Cliente' : msg_body.trim();
@@ -205,38 +248,23 @@ export default async function handler(req, res) {
 
                                 const response = await fetch(GAS_WEB_APP_URL, {
                                     method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                                    body: JSON.stringify({ action: "bookAppointment", phone: from, name: userName, service: booking.srv, barber: booking.brb, day: booking.day, time: booking.time })
+                                    body: JSON.stringify({ action: "bookAppointment", phone: from, name: userName, service: booking.srv, barber: booking.brb, dateStr: booking.dateStr, time: booking.time })
                                 });
                                 const data = await response.json();
 
                                 if (data.status === 'success') {
-                                    const msg = `¡Listo, ${userName}! Tu cita quedó agendada exitosamente: 🎉\n\n📅 Día: ${booking.day.toUpperCase()}\n⏰ Hora: ${data.appointmentTime}\n💈 Servicio: ${booking.srv}\n📍 Lugar: ${data.silla}`;
+                                    const msg = `¡Listo! Tu espacio está reservado en Peluquería Carlos Escobar. Tu barbero tendrá todo limpio y listo para recibirte. 💈✨\n\n📅 Fecha: ${booking.dateStr.substr(6,2)}/${booking.dateStr.substr(4,2)}/${booking.dateStr.substr(0,4)}\n⏰ Hora: ${data.appointmentTime}\n💈 Servicio: ${booking.srv}\n📍 Lugar: ${data.silla}\n\nEstá es la ubicacion de la peluquería:\nhttps://www.google.com/maps/search/?api=1&query=Calle%20Ignacio%20Manuel%20Altamirano%201117,%20Colima,%20,%20M%C3%A9xico`;
                                     await sendMessage(phone_number_id, from, msg);
                                 } else {
                                     await sendMessage(phone_number_id, from, "❌ Hubo un problema al intentar apartar tu lugar. Por favor intenta de nuevo.");
                                 }
                             } else {
-                                // Checking for an existing appointment directly on first message
-                                const response = await fetch(GAS_WEB_APP_URL, {
-                                    method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                                    body: JSON.stringify({ action: "checkUserAppointment", phone: from })
-                                });
-                                const data = await response.json();
-
-                                if (data.hasAppointment) {
-                                    const btns = [
-                                        { type: "reply", reply: { id: "btn_action_reagendar", title: "Reagendar" } },
-                                        { type: "reply", reply: { id: "btn_action_mantener", title: "Mantener cita" } }
-                                    ];
-                                    await sendCustomButtonMessage(phone_number_id, from, `Veo que ya tienes una cita agendada para mañana temprano (${data.appointmentTime}). ¿Deseas cancelarla o reagendarla?`, btns);
-                                } else {
-                                    const btns = [
-                                        { type: "reply", reply: { id: "btn_srv_corte", title: "Corte de Cabello ($)" } },
-                                        { type: "reply", reply: { id: "btn_srv_combo", title: "Corte + Barba ($$)" } },
-                                        { type: "reply", reply: { id: "btn_srv_perfilado", title: "Perfilado ($)" } }
-                                    ];
-                                    await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Bienvenido a Mr. Robot Barber Shop 💈. Soy tu asistente virtual. ¿Qué servicio te gustaría agendar hoy?", "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=600&q=80", btns);
-                                }
+                                const btns = [
+                                    { type: "reply", reply: { id: "btn_action_agendar", title: "Agendar Corte" } },
+                                    { type: "reply", reply: { id: "btn_action_reagendar", title: "Re-agendar" } },
+                                    { type: "reply", reply: { id: "btn_action_ubicacion", title: "Ubicación" } }
+                                ];
+                                await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Bienvenido a Peluquería Carlos Escobar. ¿En qué podemos ayudarte hoy?", "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=600&q=80", btns);
                             }
                         }
                     } catch (error) {
