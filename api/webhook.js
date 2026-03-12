@@ -105,7 +105,7 @@ export default async function handler(req, res) {
                     // ✂️ LÓGICA DEL NUEVO CHATBOT (Barber Shop Demo + GAS)
                     // ---------------------------------------------------------
                     global.bookingCache = global.bookingCache || {};
-                    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzVvtXgU2Vq1aSmwnRoAvdfYCQDwXQgl0aRO2ytCDIDy_LHVtVvukCTQsla_9CsEM89/exec";
+                    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby7aar-5FgFpBcR8yUZJ49_zJEqDt55T8q2_az4rUEJtrETR_RIxOJdFFJ-gtrBHHsm/exec";
 
                     try {
                         if (msg_body.startsWith('btn_')) {
