@@ -1,102 +1,128 @@
-// ==========================================
-// GOOGLE APPS SCRIPT - AGENDA MULTI-SILLAS (DEMO)
-// Archivo: gas_chatbot_demo.gs
-// ==========================================
-
 const CALENDAR_IDS = [
-  "5e2a55b220a56c1a9b69fd0c3d28b7fcdd729e7df59309289ae0898980a8a9e9@group.calendar.google.com", // Silla 1
-  "f9b1dd278e911351832a47492482e13b59fcdf1a12d649897eb034925708f5d5@group.calendar.google.com", // Silla 2
-  "1fb9703965a7d644f7ad2fdb9a0bd77253d3bc8242eb18b812e96f66a90ba88f@group.calendar.google.com", // Silla 3
-  "9a762467214f82e50c14754cc091bac4129a57091dfad3ba1ce937b682c9e45d@group.calendar.google.com"  // Silla 4
+  '5e2a55b220a56c1a9b69fd0c3d28b7fcdd729e7df59309289ae0898980a8a9e9@group.calendar.google.com', // Silla 1 (Any / General)
+  'f9b1dd278e911351832a47492482e13b59fcdf1a12d649897eb034925708f5d5@group.calendar.google.com', // Silla 2 (Juan)
+  '1fb9703965a7d644f7ad2fdb9a0bd77253d3bc8242eb18b812e96f66a90ba88f@group.calendar.google.com', // Silla 3 (Alex)
+  '9a762467214f82e50c14754cc091bac4129a57091dfad3ba1ce937b682c9e45d@group.calendar.google.com'  // Silla 4 (Extra / Backup)
 ];
 
-// Función principal que recibe las peticiones (POST) desde Node.js (Webhook)
 function doPost(e) {
   try {
-    const postData = JSON.parse(e.postData.contents);
-    const action = postData.action;
-    const userPhone = postData.user_phone;
+    const data = JSON.parse(e.postData.contents);
     
-    // 1. Acción: Consultar Disponibilidad
-    if (action === "getAvailability") {
-      const availabilityInfo = checkCalendarsForNextDays(2); // Buscar en los próximos 2 días
-      
-      return ContentService.createTextOutput(JSON.stringify({
-        status: "success",
-        action_received: action,
-        phone: userPhone,
-        data: availabilityInfo,
-        message: "Consulta a calendarios realizada desde Apps Script."
-      })).setMimeType(ContentService.MimeType.JSON);
+    // 1. GET AVAILABILITY
+    if (data.action === 'getAvailability') {
+       // Mock response logic for the demo 
+       // We can return a static array of available hours based on demo constraints.
+       let slots = ["10:00 AM", "02:00 PM", "04:00 PM"];
+       if (data.date === 'man') slots = ["09:00 AM", "11:00 AM", "01:00 PM"];
+       if (data.date === 'otro') slots = ["12:00 PM", "03:00 PM", "05:00 PM"];
+       
+       return ContentService.createTextOutput(JSON.stringify({
+          status: 'success',
+          available_slots: slots
+       })).setMimeType(ContentService.MimeType.JSON);
+    } 
+    
+    // 2. CHECK USER APPOINTMENT
+    else if (data.action === 'checkUserAppointment') {
+       const events = checkPhoneInEvents(data.phone);
+       if (events && events.length > 0) {
+          // Format date for the demo
+          const startDate = events[0].getStartTime();
+          const dayName = startDate.getDay() === new Date().getDay() ? "Hoy" : "Mañana";
+          const timeStr = startDate.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit', hour12: true});
+          
+          return ContentService.createTextOutput(JSON.stringify({
+              hasAppointment: true,
+              appointmentTime: `${dayName} a las ${timeStr}`
+          })).setMimeType(ContentService.MimeType.JSON);
+       }
+       
+       return ContentService.createTextOutput(JSON.stringify({
+          hasAppointment: false
+       })).setMimeType(ContentService.MimeType.JSON);
     }
     
-    // 2. Acción: Agendar Cita (Ejemplo a expandir después)
-    if (action === "bookAppointment") {
-      // Aquí irá la lógica para crear el evento
-      return ContentService.createTextOutput(JSON.stringify({
-        status: "success",
-        message: "Función de agendar todavía en construcción."
-      })).setMimeType(ContentService.MimeType.JSON);
+    // 3. BOOK APPOINTMENT
+    else if (data.action === 'bookAppointment') {
+       let calId = CALENDAR_IDS[0]; // any
+       let sillaName = "Silla Principal";
+       
+       // Asignar recursos por barbero
+       if (data.barber === 'juan') {
+           calId = CALENDAR_IDS[1];
+           sillaName = "Silla 2 (Juan)";
+       } else if (data.barber === 'alex') {
+           calId = CALENDAR_IDS[2];
+           sillaName = "Silla 3 (Alex)";
+       }
+       
+       const cal = CalendarApp.getCalendarById(calId);
+       
+       // Calculate date
+       const target = new Date();
+       if (data.day === 'man') {
+          target.setDate(target.getDate() + 1);
+       } else if (data.day === 'otro') {
+          target.setDate(target.getDate() + 2);
+       }
+       
+       // Format "1000", "0200" into hours (assuming PM for demo purposes if < 0900)
+       let num = data.time.substring(0,2);
+       let isPM = data.time.includes('PM');
+       if (!data.time.includes('PM') && !data.time.includes('AM')) {
+           // Fallback from safeTime (e.g. "1000" instead of "10:00 AM")
+           let intHour = parseInt(num);
+           if (intHour >= 1 && intHour <= 6) isPM = true; // 1, 2, 3, 4, 5, 6 is PM generally in these contexts
+       }
+       
+       let hour = parseInt(num);
+       if (isPM && hour !== 12) hour += 12;
+       if (!isPM && hour === 12) hour = 0;
+       
+       target.setHours(hour, 0, 0, 0);
+       
+       let durationMinutes = 60; // default (Combo)
+       if (data.service === 'corte') durationMinutes = 45;
+       if (data.service === 'perfilado') durationMinutes = 30;
+       
+       const endTarget = new Date(target.getTime() + durationMinutes * 60 * 1000);
+       
+       // Make reservation
+       const title = `💈 Cita: ${data.name} - ${data.service}`;
+       const description = `Phone: ${data.phone}\nService: ${data.service}\nBarber: ${data.barber}`;
+       const event = cal.createEvent(title, target, endTarget, { description: description });
+       
+       const prettyTime = target.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit', hour12: true});
+
+       return ContentService.createTextOutput(JSON.stringify({
+          status: 'success',
+          silla: sillaName,
+          appointmentTime: prettyTime
+       })).setMimeType(ContentService.MimeType.JSON);
     }
-    
-    // Si la acción no hace match
-    return ContentService.createTextOutput(JSON.stringify({
-      status: "error",
-      message: "Acción no reconocida."
-    })).setMimeType(ContentService.MimeType.JSON);
-    
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({
-      status: "error",
-      message: error.toString()
-    })).setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({ status: 'error', error: err.toString() })).setMimeType(ContentService.MimeType.JSON);
   }
 }
 
-// Función auxiliar para leer los calendarios
-function checkCalendarsForNextDays(daysAhead) {
-  const now = new Date();
-  
-  // Expandir a la tarde/noche para obtener todo del día actual y X días adelante
-  const endDate = new Date();
-  endDate.setDate(now.getDate() + daysAhead);
-  endDate.setHours(23, 59, 59);
-
-  let busyEvents = [];
-  
-  // Recorremos cada silla (calendario)
-  CALENDAR_IDS.forEach((calId, index) => {
-    try {
-      const cal = CalendarApp.getCalendarById(calId);
-      if (cal) {
-        const events = cal.getEvents(now, endDate);
-        
-        events.forEach(ev => {
-           busyEvents.push({
-             silla: `Silla ${index + 1}`,
-             title: ev.getTitle(),
-             startTime: ev.getStartTime().toISOString(),
-             endTime: ev.getEndTime().toISOString()
-           });
-        });
-      }
-    } catch (err) {
-      // Ignorar si un ID falla temporalmente
-      Logger.log("Error leyendo el calendario " + calId + ": " + err);
+// Function to search upcoming 7 days for the user's phone
+function checkPhoneInEvents(phone) {
+    const now = new Date();
+    const end = new Date();
+    end.setDate(end.getDate() + 7);
+    
+    for (let c of CALENDAR_IDS) {
+       const cal = CalendarApp.getCalendarById(c);
+       if (!cal) continue;
+       
+       const events = cal.getEvents(now, end);
+       for (let ev of events) {
+          const desc = ev.getDescription() || '';
+          if (desc.indexOf(phone) !== -1) {
+             return [ev];
+          }
+       }
     }
-  });
-  
-  return {
-    search_start: now.toISOString(),
-    search_end: endDate.toISOString(),
-    total_busy_events: busyEvents.length,
-    events: busyEvents 
-  };
-}
-
-// ==========================================
-// Función de prueba manual desde el editor de Apps Script
-function testCheckCalendars() {
-  const data = checkCalendarsForNextDays(2);
-  Logger.log(data);
+    return [];
 }
