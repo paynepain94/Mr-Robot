@@ -98,9 +98,18 @@ function doPost(e) {
           const dayName = startDate.getDay() === new Date().getDay() ? "Hoy" : "Mañana";
           const timeStr = startDate.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit', hour12: true});
           
+          let title = events[0].getTitle() || "";
+          let desc = events[0].getDescription() || "";
+          let oldName = title.replace("💈 Cita: ", "").trim();
+          let oldService = "corte";
+          let match = desc.match(/Service:\s*(.+)/);
+          if (match) oldService = match[1].trim();
+          
           return ContentService.createTextOutput(JSON.stringify({
               hasAppointment: true,
-              appointmentTime: `${dayName} a las ${timeStr}`
+              appointmentTime: `${dayName} a las ${timeStr}`,
+              oldName: oldName,
+              oldService: oldService
           })).setMimeType(ContentService.MimeType.JSON);
        }
        

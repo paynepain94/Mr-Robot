@@ -134,19 +134,23 @@ export default async function handler(req, res) {
                                     const data = await response.json();
                                     
                                     if (data.hasAppointment) {
-                                        global.bookingCache[from] = { isReagendar: true, ts: Date.now() };
+                                        let oldService = data.oldService || "corte";
+                                        let oldName = data.oldName || "Cliente";
+                                        
+                                        global.bookingCache[from] = { isReagendar: true, srv: oldService, oldName: oldName, ts: Date.now() };
+                                        
                                         const sections = [{
-                                            title: "Catálogo de Servicios",
+                                            title: "Sillas / Barberos",
                                             rows: [
-                                                { id: "btn_srv_corte", title: "Corte de cabello", description: "40 min | $230" },
-                                                { id: "btn_srv_ninos", title: "Corte niños (1-10 años)", description: "40 min | $190" },
-                                                { id: "btn_srv_barba", title: "Afeitado de barba", description: "30 min | $230" },
-                                                { id: "btn_srv_combo", title: "Corte y Barba", description: "1 hr | $390" },
-                                                { id: "btn_srv_recortes", title: "Recortes", description: "20 min | $150" },
-                                                { id: "btn_srv_mascarilla", title: "Mascarilla y exfoliación", description: "30 min | $200" }
+                                                { id: `btn_brb_any_${oldService}`, title: "Cualquiera (Rápido)" },
+                                                { id: `btn_brb_alberto_${oldService}`, title: "Silla 1 Alberto" },
+                                                { id: `btn_brb_jotzan_${oldService}`, title: "Silla 2 Jotzan" },
+                                                { id: `btn_brb_juan_${oldService}`, title: "Silla 3 Juan" },
+                                                { id: `btn_brb_carlos_${oldService}`, title: "Silla 4 Carlos" },
+                                                { id: `btn_conf_main`, title: "Menú Principal" }
                                             ]
                                         }];
-                                        await sendListMessage(phone_number_id, from, `Encontramos tu cita agendada para ${data.appointmentTime}. Selecciona qué servicio deseas agendar ahora:`, "Ver servicios", sections);
+                                        await sendListMessage(phone_number_id, from, `Encontramos tu cita agendada para ${data.appointmentTime}.\n\nReagendaremos tu servicio registrado de *${oldService}* a nombre de *${oldName}*.\n\n¿Con quién te gustaría agendar ahora?`, "Ver opciones", sections);
                                     } else {
                                         const btns = [
                                             { type: "reply", reply: { id: "btn_action_agendar", title: "Agendar Corte" } },
@@ -297,13 +301,32 @@ export default async function handler(req, res) {
                                 const srv = parts[5];
                                 
                                 let isReagendar = false;
+                                let oldName = null;
                                 if (global.bookingCache && global.bookingCache[from] && global.bookingCache[from].isReagendar) {
                                     isReagendar = true;
+                                    oldName = global.bookingCache[from].oldName;
                                 }
 
-                                global.bookingCache[from] = { time, dateStr, brb, srv, isReagendar, ts: Date.now() };
+                                if (isReagendar && oldName && oldName !== 'Cliente') {
+                                    delete global.bookingCache[from];
+                                    await sendMessage(phone_number_id, from, `⏳ Re-agendando tu cita a nombre de ${oldName}...`);
 
-                                await sendMessage(phone_number_id, from, "¡Casi listo! Por favor, dime tu nombre y apellido para registrar la cita. ✍️");
+                                    const response = await fetch(GAS_WEB_APP_URL, {
+                                        method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                        body: JSON.stringify({ action: "bookAppointment", phone: from, name: oldName, service: srv, barber: brb, dateStr: dateStr, time: time, isReagendar: true })
+                                    });
+                                    const data = await response.json();
+
+                                    if (data.status === 'success') {
+                                        let msg = `¡Listo! Hemos **re-agendado** exitosamente tu cita anterior por esta nueva. Tu nuevo espacio está reservado en Peluquería Carlos Escobar. 💈✨\n\n📅 Nueva Fecha: ${dateStr.substr(6,2)}/${dateStr.substr(4,2)}/${dateStr.substr(0,4)}\n⏰ Nueva Hora: ${data.appointmentTime}\n💈 Servicio: ${srv}\n📍 Lugar: ${data.silla}\n\nUbicación:\nhttps://www.google.com/maps/search/?api=1&query=Calle%20Ignacio%20Manuel%20Altamirano%201117,%20Colima,%20,%20M%C3%A9xico`;
+                                        await sendMessage(phone_number_id, from, msg);
+                                    } else {
+                                        await sendMessage(phone_number_id, from, "❌ Hubo un problema al intentar apartar tu lugar. Por favor intenta de nuevo.");
+                                    }
+                                } else {
+                                    global.bookingCache[from] = { time, dateStr, brb, srv, isReagendar, oldName, ts: Date.now() };
+                                    await sendMessage(phone_number_id, from, "¡Casi listo! Por favor, dime tu nombre y apellido para registrar la cita. ✍️");
+                                }
                             }
 
                         } else {
