@@ -227,9 +227,11 @@ export default async function handler(req, res) {
                                 await sendCustomButtonMessage(phone_number_id, from, "Opción Incorrecta. ¿Deseas agendar un nuevo corte o regresar al menú principal?", btns);
                                 return res.status(200).send('EVENT_RECEIVED');
                             }
-                            
-                            // Bloqueo estricto del último menú enviado
-                            if (global.stateCache[from] && global.stateCache[from].validIds) {
+                            // Bloqueo estricto del último menú enviado (si existe la sesión)
+                            const knownPrefixes = ['btn_srv_', 'btn_brb_', 'btn_day_', 'btn_bloque_', 'btn_time_'];
+                            const isRecoverable = knownPrefixes.some(p => msg_body.startsWith(p));
+
+                            if (global.stateCache[from] && global.stateCache[from].validIds && !isRecoverable) {
                                 if (!global.stateCache[from].validIds.includes(msg_body)) {
                                     const btns = [
                                         { type: "reply", reply: { id: "btn_conf_main", title: "Menú Principal" } },
@@ -238,13 +240,26 @@ export default async function handler(req, res) {
                                     await sendCustomButtonMessage(phone_number_id, from, "🚫 La opción seleccionada pertenece a un paso anterior y ya no es válida. Por favor, elige una opción de tu pantalla actual o vuelve al inicio.", btns);
                                     return res.status(200).send('EVENT_RECEIVED');
                                 }
-                            } else if (!global.stateCache[from] && !['btn_conf_main', 'btn_action_agendar', 'btn_action_reagendar', 'btn_action_ubicacion'].includes(msg_body)) {
-                                // Expiró sesión o nunca interactuó y usó botón antiguo intermedio
-                                const btns = [
-                                    { type: "reply", reply: { id: "btn_conf_main", title: "Menú Principal" } }
-                                ];
-                                await sendCustomButtonMessage(phone_number_id, from, "🚫 Tu sesión caducó o elegiste una opción muy antigua. Por favor, vuelve al Menú Principal.", btns);
-                                return res.status(200).send('EVENT_RECEIVED');
+                            } else if (!global.stateCache[from]) {
+                                // Si no hay sesión (Vercel reinició), pero el botón es descriptivo, permitimos el paso
+                                if (!isRecoverable && !['btn_conf_main', 'btn_action_agendar', 'btn_action_reagendar', 'btn_action_ubicacion', 'btn_bloque_manana', 'btn_bloque_tarde', 'btn_bloque_noche'].includes(msg_body.split('_').slice(0,3).join('_'))) {
+                                    const btns = [
+                                        { type: "reply", reply: { id: "btn_conf_main", title: "Menú Principal" } }
+                                    ];
+                                    await sendCustomButtonMessage(phone_number_id, from, "🚫 Tu sesión caducó o el servidor se reinició. Por favor, vuelve al Menú Principal para continuar.", btns);
+                                    return res.status(200).send('EVENT_RECEIVED');
+                                }
+                                // Re-inicializamos mínimamente la sesión para evitar bloqueos posteriores
+                                global.stateCache[from] = { ts: Date.now(), errors: 0 };
+                            }
+                            
+                            // Re-inicializamos bookingCache si es un botón recuperable
+                            if (isRecoverable) {
+                                const parts = msg_body.split('_');
+                                if (parts[1] === 'day' || parts[1] === 'bloque' || parts[1] === 'time') {
+                                    // Aseguramos que bookingCache exista si el botón tiene datos
+                                    global.bookingCache[from] = global.bookingCache[from] || {};
+                                }
                             }
                             
                             // Invalidar validIds temporalmente para evitar que haga doble click (Double Tap Prevention)
