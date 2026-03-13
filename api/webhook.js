@@ -324,15 +324,15 @@ export default async function handler(req, res) {
                                 while(validDays < 5) {
                                     let d = new Date(nowStr);
                                     d.setDate(d.getDate() + dayOffset);
-                                    if (d.getDay() !== 0) {
-                                        let dateStr = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
-                                        let dayName = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"][d.getDay()];
-                                        sections[0].rows.push({
-                                            id: `btn_day_${dateStr}_${brb}_${srv}`, 
-                                            title: `${dayName} ${d.getDate()}`
-                                        });
-                                        validDays++;
-                                    }
+                                    
+                                    let dateStr = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+                                    let dayName = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"][d.getDay()];
+                                    sections[0].rows.push({
+                                        id: `btn_day_${dateStr}_${brb}_${srv}`, 
+                                        title: `${dayName} ${d.getDate()}`
+                                    });
+                                    validDays++;
+                                    
                                     dayOffset++;
                                     if(dayOffset > 10) break;
                                 }
@@ -346,8 +346,8 @@ export default async function handler(req, res) {
                                 const srv = parts[4];
                                 const btns = [
                                     { type: "reply", reply: { id: `btn_bloque_manana_${dateStr}_${brb}_${srv}`, title: "Mañana (hasta 1pm)" } },
-                                    { type: "reply", reply: { id: `btn_bloque_tarde_${dateStr}_${brb}_${srv}`, title: "Tarde (1pm a cierre)" } },
-                                    { type: "reply", reply: { id: `btn_brb_${brb}_${srv}`, title: "Menú Anterior" } }
+                                    { type: "reply", reply: { id: `btn_bloque_tarde_${dateStr}_${brb}_${srv}`, title: "Tarde (1pm - 6pm)" } },
+                                    { type: "reply", reply: { id: `btn_bloque_noche_${dateStr}_${brb}_${srv}`, title: "Noche (6pm a cierre)" } }
                                 ];
                                 await sendCustomButtonMessage(phone_number_id, from, "Para ver todos los horarios, ¿en qué momento te gustaría agendar?", btns);
                             }
@@ -375,7 +375,8 @@ export default async function handler(req, res) {
                                         if (!isPM && h === 12) h = 0;
                                         
                                         if (bloque === 'manana' && h >= 6 && h < 13) filtered.push(slot);
-                                        if (bloque === 'tarde' && h >= 13 && h <= 23) filtered.push(slot);
+                                        if (bloque === 'tarde' && h >= 13 && h < 18) filtered.push(slot);
+                                        if (bloque === 'noche' && h >= 18 && h <= 23) filtered.push(slot);
                                     }
 
                                     if (filtered.length > 0) {
