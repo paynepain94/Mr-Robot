@@ -463,7 +463,7 @@ export default async function handler(req, res) {
                                     { type: "reply", reply: { id: "btn_action_reagendar", title: "Re-agendar" } },
                                     { type: "reply", reply: { id: "btn_action_ubicacion", title: "Ubicación" } }
                                 ];
-                                await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Qué gusto saludarte. Bienvenido a Peluquería Carlos Escobar 💈. Nos encantaría atenderte, ¿en qué podemos ayudarte el día de hoy?\n\n👆 *Por favor, toca la opción deseada*", "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=600&q=80", btns);
+                                await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Qué gusto saludarte. Bienvenido a Peluquería Carlos Escobar 💈. Nos encantaría atenderte, ¿en qué podemos ayudarte el día de hoy?\n\n👆 *Por favor, toca la opción deseada*", "https://drive.google.com/uc?export=view&id=1pSxGMedHKUtxdOvhK9ZkbaDlNsO9nTmD", btns);
                             }
                         }
                     } catch (error) {
