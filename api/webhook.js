@@ -77,6 +77,18 @@ export default async function handler(req, res) {
                 const phone_number_id = body.entry[0].changes[0].value.metadata.phone_number_id;
                 const message = body.entry[0].changes[0].value.messages[0];
                 const from = message.from;
+                const msgId = message.id;
+
+                // Meta sends retries if the server takes > 3s or crashes.
+                // This cache prevents the bot from answering the exact same message two or three times.
+                global.processedMessageIds = global.processedMessageIds || new Set();
+                if (global.processedMessageIds.has(msgId)) {
+                    console.log(`Duplicate message ignored: ${msgId}`);
+                    return res.status(200).send('EVENT_RECEIVED');
+                }
+                global.processedMessageIds.add(msgId);
+                // Keep set small to prevent memory leaks over time
+                if (global.processedMessageIds.size > 2000) global.processedMessageIds.clear();
 
                 // Handle various message types (text, interactive)
                 let msg_body = '';
@@ -111,6 +123,12 @@ export default async function handler(req, res) {
                     try {
                         // Natural typing delay
                         await new Promise(r => setTimeout(r, 800));
+
+                        // Clears any previous pending reminder because they just interacted
+                        if (global.stateCache[from]?.reminderTimeout) {
+                            clearTimeout(global.stateCache[from].reminderTimeout);
+                            global.stateCache[from].reminderTimeout = null;
+                        }
 
                         // Check keywords if bot is finished
                         if (global.stateCache[from]?.isFinished && !msg_body.startsWith('btn_')) {
