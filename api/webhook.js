@@ -120,6 +120,20 @@ export default async function handler(req, res) {
                                 await sendMessage(phone_number_id, from, "Si desea saber más información de este sistema, contacte a www.Senior-Robot.com Celular: +52 3121128434");
                                 return res.status(200).send('EVENT_RECEIVED');
                             }
+                            
+                            const gratitudeKeywords = ['gracia', 'gracias', 'excelente', 'perfecto', 'muy amable', 'te lo agradezco', 'buenisimo', 'listo', 'ok'];
+                            const hasGratitude = gratitudeKeywords.some(kw => msg_body.includes(kw));
+                            if (hasGratitude && !global.stateCache[from].thanked) {
+                                global.stateCache[from].thanked = true; // prevent unlimited spamming
+                                const phrases = [
+                                    "¡De nada! Recuerda que en Peluquería Carlos Escobar tu estilo es nuestra prioridad. 💈✨ Aprovecho para contarte que tenemos un sistema de lealtad: ¡al acumular 5 cortes, el 6to es totalmente GRATIS!",
+                                    "¡Un placer atenderte! Te esperamos pronto en Peluquería Carlos Escobar. ✂️ Por cierto, no olvides solicitar tu registro en nuestro sistema de lealtad: al sumar 5 cortes, te regalamos el 6to.",
+                                    "¡Gracias a ti por tu preferencia! Estás en buenas manos con nuestros barberos. 🙌 Te recordamos que contamos con sistema de lealtad: en tu 5to corte acumulado, ¡el 6to va por nuestra cuenta!"
+                                ];
+                                const randomResponse = phrases[Math.floor(Math.random() * phrases.length)];
+                                await sendMessage(phone_number_id, from, randomResponse);
+                                return res.status(200).send('EVENT_RECEIVED');
+                            }
                         }
 
                         // Anti-hallucination / invalid text handler
