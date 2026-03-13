@@ -390,11 +390,23 @@ export default async function handler(req, res) {
                                         }];
                                         await sendListMessage(phone_number_id, from, `Estos son los turnos disponibles:`, "Ver horarios", sections);
                                     } else {
+                                        let isOffHours = false;
+                                        let targetDateObj = new Date(parseInt(dateStr.substr(0,4)), parseInt(dateStr.substr(4,2))-1, parseInt(dateStr.substr(6,2)));
+                                        let dayW = targetDateObj.getDay();
+                                        
+                                        // Sábado cierra 17:00, Domingo cierra 14:00. Por lo tanto 'noche' (18+) está fuera de horario siempre.
+                                        if ((dayW === 0 || dayW === 6) && bloque === 'noche') isOffHours = true;
+
                                         const btns = [
                                             { type: "reply", reply: { id: `btn_day_${dateStr}_${brb}_${srv}`, title: "Ver otro horario" } },
                                             { type: "reply", reply: { id: `btn_conf_main`, title: "Menú Principal" } }
                                         ];
-                                        await sendCustomButtonMessage(phone_number_id, from, "Lo siento, para ese momento del día estamos a tope 💈. ¿Te gustaría intentar otro horario?", btns);
+
+                                        if (isOffHours) {
+                                            await sendCustomButtonMessage(phone_number_id, from, "Lo sentimos, ese horario se encuentra fuera de nuestra jornada laboral. 📅 ¿Te gustaría consultar nuestras horas disponibles?", btns);
+                                        } else {
+                                            await sendCustomButtonMessage(phone_number_id, from, "Lo siento, para ese momento del día estamos a tope 💈. ¿Te gustaría intentar otro horario?", btns);
+                                        }
                                     }
                                 } else {
                                     // Si no hay turnos disponibles en todo el día para ese barbero
