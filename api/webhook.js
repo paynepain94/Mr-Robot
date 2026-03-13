@@ -105,10 +105,69 @@ export default async function handler(req, res) {
                     // ✂️ LÓGICA DEL NUEVO CHATBOT (Barber Shop Demo + GAS)
                     // ---------------------------------------------------------
                     global.bookingCache = global.bookingCache || {};
+                    global.stateCache = global.stateCache || {};
                     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby7aar-5FgFpBcR8yUZJ49_zJEqDt55T8q2_az4rUEJtrETR_RIxOJdFFJ-gtrBHHsm/exec";
 
                     try {
+                        // Natural typing delay
+                        await new Promise(r => setTimeout(r, 800));
+
+                        // Check keywords if bot is finished
+                        if (global.stateCache[from]?.isFinished && !msg_body.startsWith('btn_')) {
+                            const botKeywords = ['bot', 'chatbot', 'robot', 'automatizacion', 'automatización', 'sistema', 'ia', 'inteligencia'];
+                            const hasBotKeyword = botKeywords.some(kw => msg_body.includes(kw));
+                            if (hasBotKeyword) {
+                                await sendMessage(phone_number_id, from, "Si desea saber más información de este sistema, contacte a www.Senior-Robot.com Celular: +52 3121128434");
+                                return res.status(200).send('EVENT_RECEIVED');
+                            }
+                        }
+
+                        // Anti-hallucination / invalid text handler
+                        if (!msg_body.startsWith('btn_') && !global.bookingCache[from]) {
+                            if (msg_body.length > 50) {
+                                const btns = [
+                                    { type: "reply", reply: { id: "btn_conf_main", title: "Menú Principal" } }
+                                ];
+                                await sendCustomButtonMessage(phone_number_id, from, "Parece que has escrito algo extenso. Para poder ayudarte mejor, por favor utiliza las opciones del menú. ¿Deseas volver al inicio?", btns);
+                                return res.status(200).send('EVENT_RECEIVED');
+                            }
+                            
+                            if (global.stateCache[from] && !global.stateCache[from].isFinished) {
+                                const state = global.stateCache[from];
+                                state.errors = (state.errors || 0) + 1;
+                                
+                                if (state.errors >= 2) {
+                                    const btns = [
+                                        { type: "reply", reply: { id: "btn_conf_human", title: "Hablar con Humano" } },
+                                        { type: "reply", reply: { id: "btn_conf_main", title: "Menú Principal" } }
+                                    ];
+                                    await sendCustomButtonMessage(phone_number_id, from, "Parece que necesitas ayuda. ¿Deseas hablar con un humano o regresar al menú principal?", btns);
+                                } else {
+                                    await sendMessage(phone_number_id, from, "Opción incorrecta, elija una opción disponible. 👇");
+                                    await new Promise(r => setTimeout(r, 800));
+                                    if (state.menuType === 'customButton') {
+                                        await sendCustomButtonMessage(phone_number_id, from, state.payload.text, state.payload.buttons);
+                                    } else if (state.menuType === 'list') {
+                                        await sendListMessage(phone_number_id, from, state.payload.text, state.payload.buttonText, state.payload.sections);
+                                    } else if (state.menuType === 'headerImage') {
+                                        await sendHeaderImageMessage(phone_number_id, from, state.payload.text, state.payload.imageUrl, state.payload.buttons);
+                                    }
+                                }
+                                return res.status(200).send('EVENT_RECEIVED');
+                            }
+                        }
+
                         if (msg_body.startsWith('btn_')) {
+                            // Block old menus if finished
+                            if (global.stateCache[from]?.isFinished && msg_body !== 'btn_conf_main' && msg_body !== 'btn_action_agendar') {
+                                const btns = [
+                                    { type: "reply", reply: { id: "btn_conf_main", title: "Menú Principal" } }
+                                ];
+                                await sendCustomButtonMessage(phone_number_id, from, "Flujo cerrado. Seleccione regresar al menú actual.", btns);
+                                return res.status(200).send('EVENT_RECEIVED');
+                            }
+                            
+                            delete global.bookingCache[from];
                             const parts = msg_body.split('_');
 
                             if (parts[1] === 'action') {
@@ -142,7 +201,7 @@ export default async function handler(req, res) {
                                         const sections = [{
                                             title: "Sillas / Barberos",
                                             rows: [
-                                                { id: `btn_brb_any_${oldService}`, title: "Cualquiera (Rápido)" },
+                                                { id: `btn_brb_any_${oldService}`, title: "Ninguna en especial", description: "(No tengo una preferencia particular)" },
                                                 { id: `btn_brb_alberto_${oldService}`, title: "Silla 1 Alberto" },
                                                 { id: `btn_brb_jotzan_${oldService}`, title: "Silla 2 Jotzan" },
                                                 { id: `btn_brb_juan_${oldService}`, title: "Silla 3 Juan" },
@@ -181,7 +240,7 @@ export default async function handler(req, res) {
                                         { type: "reply", reply: { id: "btn_action_reagendar", title: "Re-agendar" } },
                                         { type: "reply", reply: { id: "btn_action_ubicacion", title: "Ubicación" } }
                                     ];
-                                    await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Bienvenido a Peluquería Carlos Escobar. ¿En qué podemos ayudarte hoy?", "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=600&q=80", btns);
+                                    await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Bienvenido a Peluquería Carlos Escobar. ¿En qué podemos ayudarte hoy?\n\n👆 *Toque la opción deseada*", "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=600&q=80", btns);
                                 } else if (parts[2] === 'human') {
                                     await sendMessage(phone_number_id, from, "En un momento uno de nuestros asesores te atenderá personalmente.");
                                 } else if (parts[2] === 'agendar') {
@@ -189,7 +248,7 @@ export default async function handler(req, res) {
                                     const sections = [{
                                         title: "Sillas / Barberos",
                                         rows: [
-                                            { id: `btn_brb_any_${srv}`, title: "Cualquiera (Rápido)" },
+                                            { id: `btn_brb_any_${srv}`, title: "Ninguna en especial", description: "(No tengo una preferencia particular)" },
                                             { id: `btn_brb_alberto_${srv}`, title: "Silla 1 Alberto" },
                                             { id: `btn_brb_jotzan_${srv}`, title: "Silla 2 Jotzan" },
                                             { id: `btn_brb_juan_${srv}`, title: "Silla 3 Juan" },
@@ -318,6 +377,7 @@ export default async function handler(req, res) {
                                     const data = await response.json();
 
                                     if (data.status === 'success') {
+                                        if (global.stateCache) global.stateCache[from] = { isFinished: true };
                                         let msg = `¡Listo! Hemos **re-agendado** exitosamente tu cita anterior por esta nueva. Tu nuevo espacio está reservado en Peluquería Carlos Escobar. 💈✨\n\n📅 Nueva Fecha: ${dateStr.substr(6,2)}/${dateStr.substr(4,2)}/${dateStr.substr(0,4)}\n⏰ Nueva Hora: ${data.appointmentTime}\n💈 Servicio: ${srv}\n📍 Lugar: ${data.silla}\n\nUbicación:\nhttps://www.google.com/maps/search/?api=1&query=Calle%20Ignacio%20Manuel%20Altamirano%201117,%20Colima,%20,%20M%C3%A9xico`;
                                         await sendMessage(phone_number_id, from, msg);
                                     } else {
@@ -332,7 +392,9 @@ export default async function handler(req, res) {
                         } else {
                             if (global.bookingCache && global.bookingCache[from]) {
                                 const booking = global.bookingCache[from];
-                                const userName = msg_body.trim() === '' ? 'Cliente' : msg_body.trim();
+                                const rawName = msg_body.trim() === '' ? 'Cliente' : msg_body.trim();
+                                const formatName = (n) => n.split(' ').map(w => w.charAt(0).toUpperCase() + w.substring(1).toLowerCase()).join(' ');
+                                const userName = formatName(rawName);
                                 
                                 if (userName !== 'Cliente' && userName.split(' ').length < 2) {
                                     await sendMessage(phone_number_id, from, "✍️ Por favor ayúdanos escribiendo tu *nombre y apellido* juntos para que el barbero te identifique correctamente.");
@@ -341,7 +403,7 @@ export default async function handler(req, res) {
                                 
                                 delete global.bookingCache[from];
 
-                                await sendMessage(phone_number_id, from, `⏳ Agendando tu cita, ${userName}...`);
+                                await sendMessage(phone_number_id, from, `⏳ Agendando tu cita, *${userName}*...`);
 
                                 const response = await fetch(GAS_WEB_APP_URL, {
                                     method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -350,6 +412,7 @@ export default async function handler(req, res) {
                                 const data = await response.json();
 
                                 if (data.status === 'success') {
+                                    if (global.stateCache) global.stateCache[from] = { isFinished: true };
                                     let msg = `¡Listo! Tu espacio está reservado en Peluquería Carlos Escobar. Tu barbero tendrá todo limpio y listo para recibirte. 💈✨\n\n📅 Fecha: ${booking.dateStr.substr(6,2)}/${booking.dateStr.substr(4,2)}/${booking.dateStr.substr(0,4)}\n⏰ Hora: ${data.appointmentTime}\n💈 Servicio: ${booking.srv}\n📍 Lugar: ${data.silla}\n\nEstá es la ubicacion de la peluquería:\nhttps://www.google.com/maps/search/?api=1&query=Calle%20Ignacio%20Manuel%20Altamirano%201117,%20Colima,%20,%20M%C3%A9xico`;
                                     if (booking.isReagendar) {
                                         msg = `¡Listo! Hemos **re-agendado** exitosamente tu cita anterior por esta nueva. Tu nuevo espacio está reservado en Peluquería Carlos Escobar. 💈✨\n\n📅 Nueva Fecha: ${booking.dateStr.substr(6,2)}/${booking.dateStr.substr(4,2)}/${booking.dateStr.substr(0,4)}\n⏰ Nueva Hora: ${data.appointmentTime}\n💈 Servicio: ${booking.srv}\n📍 Lugar: ${data.silla}\n\nUbicación:\nhttps://www.google.com/maps/search/?api=1&query=Calle%20Ignacio%20Manuel%20Altamirano%201117,%20Colima,%20,%20M%C3%A9xico`;
@@ -358,13 +421,13 @@ export default async function handler(req, res) {
                                 } else {
                                     await sendMessage(phone_number_id, from, "❌ Hubo un problema al intentar apartar tu lugar. Por favor intenta de nuevo.");
                                 }
-                            } else {
+                            } else if (!global.stateCache[from] || !global.stateCache[from].isFinished) {
                                 const btns = [
                                     { type: "reply", reply: { id: "btn_action_agendar", title: "Agendar Corte" } },
                                     { type: "reply", reply: { id: "btn_action_reagendar", title: "Re-agendar" } },
                                     { type: "reply", reply: { id: "btn_action_ubicacion", title: "Ubicación" } }
                                 ];
-                                await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Bienvenido a Peluquería Carlos Escobar. ¿En qué podemos ayudarte hoy?", "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=600&q=80", btns);
+                                await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Bienvenido a Peluquería Carlos Escobar. ¿En qué podemos ayudarte hoy?\n\n👆 *Toque la opción deseada*", "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=600&q=80", btns);
                             }
                         }
                     } catch (error) {
@@ -517,6 +580,9 @@ async function sendHeaderImageMessage(phoneNumberId, to, bodyText, imageUrl, but
     if (!response.ok) {
         const errorData = await response.json();
         console.error("WhatsApp API Error (Image Button):", JSON.stringify(errorData));
+    } else {
+        global.stateCache = global.stateCache || {};
+        global.stateCache[to] = { isFinished: false, menuType: 'headerImage', payload: { text: bodyText, imageUrl, buttons }, errors: 0 };
     }
 }
 
@@ -610,6 +676,9 @@ async function sendCustomButtonMessage(phoneNumberId, to, bodyText, buttons) {
         const errorData = await response.json();
         console.error("WhatsApp API Error (Buttons):", JSON.stringify(errorData));
         throw new Error(`WhatsApp API Error: ${JSON.stringify(errorData)}`);
+    } else {
+        global.stateCache = global.stateCache || {};
+        global.stateCache[to] = { isFinished: false, menuType: 'customButton', payload: { text: bodyText, buttons }, errors: 0 };
     }
 }
 
@@ -646,5 +715,8 @@ async function sendListMessage(phoneNumberId, to, bodyText, buttonText, sections
         const errorData = await response.json();
         console.error("WhatsApp API Error (List):", JSON.stringify(errorData));
         throw new Error(`WhatsApp API Error: ${JSON.stringify(errorData)}`);
+    } else {
+        global.stateCache = global.stateCache || {};
+        global.stateCache[to] = { isFinished: false, menuType: 'list', payload: { text: bodyText, buttonText, sections }, errors: 0 };
     }
 }
