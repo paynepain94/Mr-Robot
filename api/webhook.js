@@ -175,9 +175,10 @@ export default async function handler(req, res) {
                             // Block old menus if finished
                             if (global.stateCache[from]?.isFinished && msg_body !== 'btn_conf_main' && msg_body !== 'btn_action_agendar') {
                                 const btns = [
+                                    { type: "reply", reply: { id: "btn_action_agendar", title: "Agendar Corte" } },
                                     { type: "reply", reply: { id: "btn_conf_main", title: "Menú Principal" } }
                                 ];
-                                await sendCustomButtonMessage(phone_number_id, from, "Flujo cerrado. Seleccione regresar al menú actual.", btns);
+                                await sendCustomButtonMessage(phone_number_id, from, "Opción Incorrecta. ¿Deseas agendar un nuevo corte o regresar al menú principal?", btns);
                                 return res.status(200).send('EVENT_RECEIVED');
                             }
                             
