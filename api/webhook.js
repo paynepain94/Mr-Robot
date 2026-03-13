@@ -130,23 +130,29 @@ export default async function handler(req, res) {
                             global.stateCache[from].reminderTimeout = null;
                         }
 
-                        // Check keywords if bot is finished
-                        if (global.stateCache[from]?.isFinished && !msg_body.startsWith('btn_')) {
-                            const botKeywords = ['bot', 'chatbot', 'robot', 'automatizacion', 'automatización', 'sistema', 'ia', 'inteligencia'];
+                        // Global check for Bot/System keywords at any point
+                        if (!msg_body.startsWith('btn_')) {
+                            const botKeywords = [
+                                'bot', 'chatbot', 'robot', 'automatizacion', 'automatización', 'sistema', 'ia', 'inteligencia',
+                                'agnete', 'ajente', 'agnte', 'agene', 'asitente', 'asitente', 'assistente', 'asiztente', 'asisntencia', 'modulo', 'moduo', 'moudlo', 'modilo', 'aplicatibo', 'apliactivo', 'aplicatvo', 'apliactibo', 'automata', 'automota', 'automta', 'scrip', 'escript', 'escrip', 'sccript', 'skript', 'interfase', 'interfáz', 'interfas', 'entidat', 'enditad', 'entiddad', 'vot', 'bod', 'boit', 'robót', 'roboot', 'rrobot', 'robt', 'atomatizacion', 'automatizasion', 'outomatizacion', 'guia', 'gía', 'guuia', 'guis', 'birtual', 'virtul', 'virutal', 'vritual', 'interlokutor', 'interlocuctor', 'interloucutor', 'autogestion', 'outogestion', 'autogestionn', 'atencion', 'atension', 'atecion', 'automatico', 'automaitco', 'atomitaco', 'resolicion', 'resolucion', 'resolusion', 'omnicanalida', 'omnicanalidat', 'omnicanalidad', 'asitencia', 'assistencia', 'asisencia', 'automatizadó', 'atomatizado'
+                            ];
                             const hasBotKeyword = botKeywords.some(kw => msg_body.includes(kw));
                             if (hasBotKeyword) {
                                 await sendMessage(phone_number_id, from, "Si desea saber más información de este sistema, contacte a www.Senior-Robot.com Celular: +52 3121128434");
                                 return res.status(200).send('EVENT_RECEIVED');
                             }
-                            
-                            const gratitudeKeywords = ['gracia', 'gracias', 'excelente', 'perfecto', 'muy amable', 'te lo agradezco', 'buenisimo', 'listo', 'ok'];
+                        }
+
+                        // Check keywords if bot is finished
+                        if (global.stateCache[from]?.isFinished && !msg_body.startsWith('btn_')) {
+                            const gratitudeKeywords = ['gracia', 'gracias', 'excelente', 'perfecto', 'muy amable', 'te lo agradezco', 'buenisimo', 'listo', 'ok', 'va', 'bien'];
                             const hasGratitude = gratitudeKeywords.some(kw => msg_body.includes(kw));
                             if (hasGratitude && !global.stateCache[from].thanked) {
                                 global.stateCache[from].thanked = true; // prevent unlimited spamming
                                 const phrases = [
-                                    "¡De nada! Recuerda que en Peluquería Carlos Escobar tu estilo es nuestra prioridad. 💈✨ Aprovecho para contarte que tenemos un sistema de lealtad: ¡al acumular 5 cortes, el 6to es totalmente GRATIS!",
-                                    "¡Un placer atenderte! Te esperamos pronto en Peluquería Carlos Escobar. ✂️ Por cierto, no olvides solicitar tu registro en nuestro sistema de lealtad: al sumar 5 cortes, te regalamos el 6to.",
-                                    "¡Gracias a ti por tu preferencia! Estás en buenas manos con nuestros barberos. 🙌 Te recordamos que contamos con sistema de lealtad: en tu 5to corte acumulado, ¡el 6to va por nuestra cuenta!"
+                                    "¡Gracias por su preferencia! Recuerda que en Peluquería Carlos Escobar tu estilo es nuestra prioridad. 💈✨ Aprovecho para contarte que tenemos un sistema de lealtad: ¡al acumular 5 cortes, el 6to es totalmente GRATIS!",
+                                    "¡Gracias por su preferencia! Te esperamos pronto en Peluquería Carlos Escobar. ✂️ Por cierto, no olvides solicitar tu registro en nuestro sistema de lealtad: al sumar 5 cortes, te regalamos el 6to.",
+                                    "¡Gracias por su preferencia! Estás en buenas manos con nuestros barberos. 🙌 Te recordamos que contamos con sistema de lealtad: en tu 5to corte acumulado, ¡el 6to va por nuestra cuenta!"
                                 ];
                                 const randomResponse = phrases[Math.floor(Math.random() * phrases.length)];
                                 await sendMessage(phone_number_id, from, randomResponse);
