@@ -124,6 +124,17 @@ export default async function handler(req, res) {
                         // Natural typing delay
                         await new Promise(r => setTimeout(r, 800));
 
+                        // 15-minute inactivity session expiration check
+                        if (global.stateCache[from] && !global.stateCache[from].isFinished && global.stateCache[from].ts) {
+                            const timeElapsed = Date.now() - global.stateCache[from].ts;
+                            if (timeElapsed > 15 * 60 * 1000) { // 15 minutes
+                                delete global.stateCache[from];
+                                delete global.bookingCache[from];
+                                await sendMessage(phone_number_id, from, "🚫 Tu sesión ha expirado por inactividad (15 minutos). Por favor, envía la palabra *Hola* o toca alguna opción del menú principal para volver a comenzar.");
+                                return res.status(200).send('EVENT_RECEIVED');
+                            }
+                        }
+
                         // Clears any previous pending reminder because they just interacted
                         if (global.stateCache[from]?.reminderTimeout) {
                             clearTimeout(global.stateCache[from].reminderTimeout);
@@ -737,7 +748,7 @@ async function sendHeaderImageMessage(phoneNumberId, to, bodyText, imageUrl, but
     } else {
         global.stateCache = global.stateCache || {};
         const validIds = buttons.map(b => b.reply.id);
-        global.stateCache[to] = { isFinished: false, menuType: 'headerImage', payload: { text: bodyText, imageUrl, buttons }, errors: 0, validIds };
+        global.stateCache[to] = { isFinished: false, menuType: 'headerImage', payload: { text: bodyText, imageUrl, buttons }, errors: 0, validIds, ts: Date.now() };
     }
 }
 
@@ -834,7 +845,7 @@ async function sendCustomButtonMessage(phoneNumberId, to, bodyText, buttons) {
     } else {
         global.stateCache = global.stateCache || {};
         const validIds = buttons.map(b => b.reply.id);
-        global.stateCache[to] = { isFinished: false, menuType: 'customButton', payload: { text: bodyText, buttons }, errors: 0, validIds };
+        global.stateCache[to] = { isFinished: false, menuType: 'customButton', payload: { text: bodyText, buttons }, errors: 0, validIds, ts: Date.now() };
     }
 }
 
@@ -874,6 +885,6 @@ async function sendListMessage(phoneNumberId, to, bodyText, buttonText, sections
     } else {
         global.stateCache = global.stateCache || {};
         const validIds = sections.flatMap(s => s.rows.map(r => r.id));
-        global.stateCache[to] = { isFinished: false, menuType: 'list', payload: { text: bodyText, buttonText, sections }, errors: 0, validIds };
+        global.stateCache[to] = { isFinished: false, menuType: 'list', payload: { text: bodyText, buttonText, sections }, errors: 0, validIds, ts: Date.now() };
     }
 }
