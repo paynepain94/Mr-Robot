@@ -217,6 +217,30 @@ export default async function handler(req, res) {
                                 return res.status(200).send('EVENT_RECEIVED');
                             }
                             
+                            // Bloqueo estricto del último menú enviado
+                            if (global.stateCache[from] && global.stateCache[from].validIds) {
+                                if (!global.stateCache[from].validIds.includes(msg_body)) {
+                                    const btns = [
+                                        { type: "reply", reply: { id: "btn_conf_main", title: "Menú Principal" } },
+                                        { type: "reply", reply: { id: "btn_conf_human", title: "Hablar con Humano" } }
+                                    ];
+                                    await sendCustomButtonMessage(phone_number_id, from, "🚫 La opción seleccionada pertenece a un paso anterior y ya no es válida. Por favor, elige una opción de tu pantalla actual o vuelve al inicio.", btns);
+                                    return res.status(200).send('EVENT_RECEIVED');
+                                }
+                            } else if (!global.stateCache[from] && !['btn_conf_main', 'btn_action_agendar', 'btn_action_reagendar', 'btn_action_ubicacion'].includes(msg_body)) {
+                                // Expiró sesión o nunca interactuó y usó botón antiguo intermedio
+                                const btns = [
+                                    { type: "reply", reply: { id: "btn_conf_main", title: "Menú Principal" } }
+                                ];
+                                await sendCustomButtonMessage(phone_number_id, from, "🚫 Tu sesión caducó o elegiste una opción muy antigua. Por favor, vuelve al Menú Principal.", btns);
+                                return res.status(200).send('EVENT_RECEIVED');
+                            }
+                            
+                            // Invalidar validIds temporalmente para evitar que haga doble click (Double Tap Prevention)
+                            if (global.stateCache[from]) {
+                                global.stateCache[from].validIds = null;
+                            }
+                            
                             delete global.bookingCache[from];
                             const parts = msg_body.split('_');
 
@@ -695,7 +719,8 @@ async function sendHeaderImageMessage(phoneNumberId, to, bodyText, imageUrl, but
         console.error("WhatsApp API Error (Image Button):", JSON.stringify(errorData));
     } else {
         global.stateCache = global.stateCache || {};
-        global.stateCache[to] = { isFinished: false, menuType: 'headerImage', payload: { text: bodyText, imageUrl, buttons }, errors: 0 };
+        const validIds = buttons.map(b => b.reply.id);
+        global.stateCache[to] = { isFinished: false, menuType: 'headerImage', payload: { text: bodyText, imageUrl, buttons }, errors: 0, validIds };
     }
 }
 
@@ -791,7 +816,8 @@ async function sendCustomButtonMessage(phoneNumberId, to, bodyText, buttons) {
         throw new Error(`WhatsApp API Error: ${JSON.stringify(errorData)}`);
     } else {
         global.stateCache = global.stateCache || {};
-        global.stateCache[to] = { isFinished: false, menuType: 'customButton', payload: { text: bodyText, buttons }, errors: 0 };
+        const validIds = buttons.map(b => b.reply.id);
+        global.stateCache[to] = { isFinished: false, menuType: 'customButton', payload: { text: bodyText, buttons }, errors: 0, validIds };
     }
 }
 
@@ -830,6 +856,7 @@ async function sendListMessage(phoneNumberId, to, bodyText, buttonText, sections
         throw new Error(`WhatsApp API Error: ${JSON.stringify(errorData)}`);
     } else {
         global.stateCache = global.stateCache || {};
-        global.stateCache[to] = { isFinished: false, menuType: 'list', payload: { text: bodyText, buttonText, sections }, errors: 0 };
+        const validIds = sections.flatMap(s => s.rows.map(r => r.id));
+        global.stateCache[to] = { isFinished: false, menuType: 'list', payload: { text: bodyText, buttonText, sections }, errors: 0, validIds };
     }
 }
