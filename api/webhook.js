@@ -566,9 +566,15 @@ export default async function handler(req, res) {
                                 const formatName = (n) => n.split(' ').map(w => w.charAt(0).toUpperCase() + w.substring(1).toLowerCase()).join(' ');
                                 const userName = formatName(rawName);
                                 
-                                if (userName !== 'Cliente' && userName.split(' ').length < 2) {
-                                    await sendMessage(phone_number_id, from, "✍️ Por favor ayúdanos escribiendo tu *nombre y apellido* juntos para que el barbero te identifique correctamente.");
-                                    return res.status(200).send('EVENT_RECEIVED');
+                                if (userName !== 'Cliente') {
+                                    const wordCount = userName.split(' ').length;
+                                    if (wordCount < 2) {
+                                        await sendMessage(phone_number_id, from, "✍️ Por favor ayúdanos escribiendo tu *nombre y apellido* juntos para que el barbero te identifique correctamente.");
+                                        return res.status(200).send('EVENT_RECEIVED');
+                                    } else if (wordCount > 5) {
+                                        await sendMessage(phone_number_id, from, "✍️ Ese nombre parece ser demasiado largo. Por favor ingresa un nombre y apellido válido corto.");
+                                        return res.status(200).send('EVENT_RECEIVED');
+                                    }
                                 }
                                 
                                 delete global.bookingCache[from];
