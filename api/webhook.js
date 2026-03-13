@@ -398,9 +398,14 @@ export default async function handler(req, res) {
                                 const srv = parts[4];
                                 const btns = [
                                     { type: "reply", reply: { id: `btn_bloque_manana_${dateStr}_${brb}_${srv}`, title: "Mañana (hasta 1pm)" } },
-                                    { type: "reply", reply: { id: `btn_bloque_tarde_${dateStr}_${brb}_${srv}`, title: "Tarde (1pm - 6pm)" } },
-                                    { type: "reply", reply: { id: `btn_bloque_noche_${dateStr}_${brb}_${srv}`, title: "Noche (6pm a cierre)" } }
+                                    { type: "reply", reply: { id: `btn_bloque_tarde_${dateStr}_${brb}_${srv}`, title: "Tarde (1pm - 6pm)" } }
                                 ];
+                                
+                                let targetDateObj = new Date(parseInt(dateStr.substr(0,4)), parseInt(dateStr.substr(4,2))-1, parseInt(dateStr.substr(6,2)));
+                                if (targetDateObj.getDay() !== 0) { // No Noche on Sundays
+                                    btns.push({ type: "reply", reply: { id: `btn_bloque_noche_${dateStr}_${brb}_${srv}`, title: "Noche (6pm a cierre)" } });
+                                }
+                                
                                 await sendCustomButtonMessage(phone_number_id, from, "Para ver todos los horarios, ¿en qué turno te gustaría agendar?", btns);
                             }
                             else if (parts[1] === 'bloque') {
