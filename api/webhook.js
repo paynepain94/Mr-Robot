@@ -272,18 +272,35 @@ export default async function handler(req, res) {
                                         
                                         global.bookingCache[from] = { isReagendar: true, srv: oldService, oldName: oldName, ts: Date.now() };
                                         
+                                        const brb = "any";
+                                        const srv = oldService;
                                         const sections = [{
-                                            title: "Sillas / Barberos",
-                                            rows: [
-                                                { id: `btn_brb_any_${oldService}`, title: "Ninguna en especial", description: "(No tengo una preferencia particular)" },
-                                                { id: `btn_brb_alberto_${oldService}`, title: "Silla 1 Alberto" },
-                                                { id: `btn_brb_jotzan_${oldService}`, title: "Silla 2 Jotzan" },
-                                                { id: `btn_brb_juan_${oldService}`, title: "Silla 3 Juan" },
-                                                { id: `btn_brb_carlos_${oldService}`, title: "Silla 4 Carlos" },
-                                                { id: `btn_conf_main`, title: "Menú Principal" }
-                                            ]
+                                            title: "Días Disponibles",
+                                            rows: []
                                         }];
-                                        await sendListMessage(phone_number_id, from, `Encontramos tu cita agendada para ${data.appointmentTime}.\n\nReagendaremos tu servicio registrado de *${oldService}* a nombre de *${oldName}*.\n\n¿Con quién te gustaría agendar ahora?`, "Ver opciones", sections);
+                                        
+                                        let nowStr = new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" });
+                                        let now = new Date(nowStr);
+                                        let validDays = 0;
+                                        let dayOffset = 0;
+                                        while(validDays < 5) {
+                                            let d = new Date(nowStr);
+                                            d.setDate(d.getDate() + dayOffset);
+                                            
+                                            let dateStr = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+                                            let dayName = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"][d.getDay()];
+                                            sections[0].rows.push({
+                                                id: `btn_day_${dateStr}_${brb}_${srv}`, 
+                                                title: `${dayName} ${d.getDate()}`
+                                            });
+                                            validDays++;
+                                            
+                                            dayOffset++;
+                                            if(dayOffset > 10) break;
+                                        }
+                                        sections[0].rows.push({ id: "btn_conf_human", title: "Hablar con Humano" });
+                                        
+                                        await sendListMessage(phone_number_id, from, `Encontramos tu cita agendada para ${data.appointmentTime}.\n\nReagendaremos tu servicio registrado de *${oldService}* a nombre de *${oldName}*.\n\n¿Para qué día te gustaría agendar?📅`, "Ver Días", sections);
                                     } else {
                                         const btns = [
                                             { type: "reply", reply: { id: "btn_action_agendar", title: "Agendar Corte" } },
@@ -373,7 +390,7 @@ export default async function handler(req, res) {
                                     { type: "reply", reply: { id: `btn_bloque_tarde_${dateStr}_${brb}_${srv}`, title: "Tarde (1pm - 6pm)" } },
                                     { type: "reply", reply: { id: `btn_bloque_noche_${dateStr}_${brb}_${srv}`, title: "Noche (6pm a cierre)" } }
                                 ];
-                                await sendCustomButtonMessage(phone_number_id, from, "Para ver todos los horarios, ¿en qué momento te gustaría agendar?", btns);
+                                await sendCustomButtonMessage(phone_number_id, from, "Para ver todos los horarios, ¿en qué turno te gustaría agendar?", btns);
                             }
                             else if (parts[1] === 'bloque') {
                                 const bloque = parts[2];
