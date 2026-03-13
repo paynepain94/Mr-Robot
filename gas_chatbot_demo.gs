@@ -14,9 +14,11 @@ function doPost(e) {
         const rawDate = data.dateStr; // "20260312"
         const parsedTargetDate = new Date(parseInt(rawDate.substr(0,4)), parseInt(rawDate.substr(4,2))-1, parseInt(rawDate.substr(6,2)));
         
-        const startHour = 9;
-        const endHour = 21;
-        const intervalMinutes = 30; 
+        let dayOfWeek = parsedTargetDate.getDay();
+        let openHour = 8; let closeHour = 19; let closeMin = 40;
+        if (dayOfWeek === 6) { openHour = 7; closeHour = 17; closeMin = 0; }
+        else if (dayOfWeek === 0) { openHour = 10; closeHour = 14; closeMin = 0; }
+        const intervalMinutes = 30;
         
         let duracion = 30;
         if (data.service === 'corte' || data.service === 'ninos') duracion = 40;
@@ -51,14 +53,13 @@ function doPost(e) {
         
         let now = new Date();
         
-        for (let h = startHour; h < endHour; h++) {
+        for (let h = openHour; h <= closeHour; h++) {
             for (let m = 0; m < 60; m += intervalMinutes) {
                 let slotStart = new Date(startOfDay);
                 slotStart.setHours(h, m, 0, 0);
-                
-                let slotEnd = new Date(slotStart.getTime() + duracion * 60000); 
-                if (slotEnd.getHours() > endHour || (slotEnd.getHours() === endHour && slotEnd.getMinutes() > 0)) {
-                    continue; // Goes past 9 PM
+                let slotEnd = new Date(slotStart.getTime() + duracion * 60000);
+                if (slotEnd.getHours() > closeHour || (slotEnd.getHours() === closeHour && slotEnd.getMinutes() > closeMin)) {
+                    continue;
                 }
                 if (slotStart < now) continue;
                 
@@ -184,8 +185,19 @@ function doPost(e) {
         }
         
         const title = `💈 Cita: ${data.name}`;
-        const description = `Phone: ${data.phone}\nService: ${data.service}\nBarber: ${data.barber}`;
-        cal.createEvent(title, target, endTarget, { description: description });
+        // Solo incluimos servicio y barbero en la descripción, para ocultar el número
+        const description = `Service: ${data.service}\nBarber: ${data.barber}`;
+        const event = cal.createEvent(title, target, endTarget, { description: description });
+        
+        // Guardamos el número en un tag oculto ("extended property") para que el bot siga reconociendo al usuario
+        event.setTag('phone', String(data.phone));
+        
+        // Registrar en la mini base de datos
+        try {
+            updateClientDatabase(data.name, String(data.phone), target);
+        } catch(e) {
+            console.error("Error al actualizar bbdd: " + e.toString());
+        }
         
         const prettyTime = target.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit', hour12: true});
 
@@ -212,11 +224,69 @@ function checkPhoneInEvents(phone) {
        
        const events = cal.getEvents(now, end);
        for (let ev of events) {
+          const tagPhone = ev.getTag('phone'); // Buscar en el tag oculto
           const desc = ev.getDescription() || '';
-          if (desc.indexOf(phone) !== -1) {
+          // Retornamos si coincide el tag o si es una cita vieja que todavia tiene el descripcion
+          if (tagPhone === String(phone) || desc.indexOf(phone) !== -1) {
              return [ev];
           }
        }
     }
     return [];
+}
+
+// --- BASE DE DATOS DE CLIENTES EN GOOGLE SHEETS ---
+
+// Obtiene o crea automáticamente el archivo "Base_Datos_Clientes"
+function getOrCreateDatabase() {
+  const fileName = "Base_Datos_Clientes";
+  const files = DriveApp.getFilesByName(fileName);
+  if (files.hasNext()) {
+    return SpreadsheetApp.open(files.next());
+  } else {
+    // Si no existe, lo crea
+    const ss = SpreadsheetApp.create(fileName);
+    const sheet = ss.getActiveSheet();
+    sheet.appendRow(["Nombre", "Número", "Primera Cita", "Antigüedad", "Frecuencia", "Última Cita"]);
+    sheet.getRange("A1:F1").setFontWeight("bold"); // Negritas en encabezados
+    return ss;
+  }
+}
+
+// Actualiza los datos del cliente
+function updateClientDatabase(name, phone, date) {
+  const ss = getOrCreateDatabase();
+  const sheet = ss.getActiveSheet();
+  const data = sheet.getDataRange().getValues();
+  
+  let found = false;
+  // data[0] son los encabezados, empezamos en 1
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][1]) === String(phone)) {
+      found = true;
+      let frequency = Number(data[i][4]) || 1;
+      frequency++;
+      
+      const tz = Session.getScriptTimeZone();
+      const formattedDate = Utilities.formatDate(date, tz, "dd/MM/yyyy HH:mm");
+      
+      // Actualizar nombre (por si cambió)
+      sheet.getRange(i + 1, 1).setValue(name);
+      
+      // Actualizar Frecuencia
+      sheet.getRange(i + 1, 5).setValue(frequency);
+      
+      // Actualizar Última Cita
+      sheet.getRange(i + 1, 6).setValue(formattedDate);
+      break;
+    }
+  }
+  
+  if (!found) {
+    const tz = Session.getScriptTimeZone();
+    const formattedDate = Utilities.formatDate(date, tz, "dd/MM/yyyy HH:mm");
+    
+    // Cliente nuevo: Primera Cita, Antigüedad y Última Cita son iguales inicialmente, Frecuencia = 1
+    sheet.appendRow([name, phone, formattedDate, formattedDate, 1, formattedDate]);
+  }
 }

@@ -225,12 +225,12 @@ export default async function handler(req, res) {
                                     const sections = [{
                                         title: "Catálogo de Servicios",
                                         rows: [
-                                            { id: "btn_srv_corte", title: "Corte de cabello", description: "40 min | $230" },
-                                            { id: "btn_srv_ninos", title: "Corte niños (1-10 años)", description: "40 min | $190" },
-                                            { id: "btn_srv_barba", title: "Afeitado de barba", description: "30 min | $230" },
-                                            { id: "btn_srv_combo", title: "Corte y Barba", description: "1 hr | $390" },
-                                            { id: "btn_srv_recortes", title: "Recortes", description: "20 min | $150" },
-                                            { id: "btn_srv_mascarilla", title: "Mascarilla y exfoliación", description: "30 min | $200" }
+                                            { id: "btn_srv_corte", title: "Corte de cabello", description: "40 min | $230 | Tijera o máquina. Incluye asesoría según tu rostro." },
+                                            { id: "btn_srv_ninos", title: "Corte niños (1-10 años)", description: "40 min | $190 | Corte (tijera/máquina) adaptado para los más pequeños." },
+                                            { id: "btn_srv_barba", title: "Afeitado de barba", description: "30 min | $230 | Toalla caliente, navaja profesional y cuidado facial." },
+                                            { id: "btn_srv_combo", title: "Corte y Barba", description: "1 h | $390 | Servicio integral corte y barba. Incluye toalla caliente." },
+                                            { id: "btn_srv_recortes", title: "Recortes", description: "20 min | $150 | Definición contornos y retoque para un look impecable." },
+                                            { id: "btn_srv_mascarilla", title: "Mascarilla y exfoliación", description: "30 min | $200 | Purifica tu piel: carbón activado, exfoliación y relax." }
                                         ]
                                     }];
                                     await sendListMessage(phone_number_id, from, "Por favor, selecciona qué servicio deseas agendar:", "Ver servicios", sections);
@@ -345,9 +345,9 @@ export default async function handler(req, res) {
                                 const brb = parts[3];
                                 const srv = parts[4];
                                 const btns = [
-                                    { type: "reply", reply: { id: `btn_bloque_manana_${dateStr}_${brb}_${srv}`, title: "Mañana (9am-1pm)" } },
-                                    { type: "reply", reply: { id: `btn_bloque_tarde_${dateStr}_${brb}_${srv}`, title: "Tarde (1pm-6pm)" } },
-                                    { type: "reply", reply: { id: `btn_bloque_noche_${dateStr}_${brb}_${srv}`, title: "Noche (6pm-9pm)" } }
+                                    { type: "reply", reply: { id: `btn_bloque_manana_${dateStr}_${brb}_${srv}`, title: "Mañana (hasta 1pm)" } },
+                                    { type: "reply", reply: { id: `btn_bloque_tarde_${dateStr}_${brb}_${srv}`, title: "Tarde (1pm a cierre)" } },
+                                    { type: "reply", reply: { id: `btn_brb_${brb}_${srv}`, title: "Menú Anterior" } }
                                 ];
                                 await sendCustomButtonMessage(phone_number_id, from, "Para ver todos los horarios, ¿en qué momento te gustaría agendar?", btns);
                             }
@@ -374,9 +374,8 @@ export default async function handler(req, res) {
                                         if (isPM && h !== 12) h += 12;
                                         if (!isPM && h === 12) h = 0;
                                         
-                                        if (bloque === 'manana' && h >= 9 && h < 13) filtered.push(slot);
-                                        if (bloque === 'tarde' && h >= 13 && h < 18) filtered.push(slot);
-                                        if (bloque === 'noche' && h >= 18 && h <= 21) filtered.push(slot);
+                                        if (bloque === 'manana' && h >= 6 && h < 13) filtered.push(slot);
+                                        if (bloque === 'tarde' && h >= 13 && h <= 23) filtered.push(slot);
                                     }
 
                                     if (filtered.length > 0) {
@@ -397,10 +396,43 @@ export default async function handler(req, res) {
                                         await sendCustomButtonMessage(phone_number_id, from, "Lo siento, para ese momento del día estamos a tope 💈. ¿Te gustaría intentar otro horario?", btns);
                                     }
                                 } else {
-                                    const btns = [
-                                        { type: "reply", reply: { id: `btn_conf_main`, title: "Menú Principal" } }
-                                    ];
-                                    await sendCustomButtonMessage(phone_number_id, from, "Lo siento, para ese día y ese barbero estamos a tope 💈 o ya terminamos turnos. Por favor intenta otro día.", btns);
+                                    // Si no hay turnos disponibles en todo el día para ese barbero
+                                    if (brb === 'any') {
+                                        const btns = [
+                                            { type: "reply", reply: { id: `btn_conf_main`, title: "Menú Principal" } }
+                                        ];
+                                        await sendCustomButtonMessage(phone_number_id, from, "Lo sentimos, todas nuestras sillas están ocupadas para este día o turno. Por favor intenta otro día.", btns);
+                                    } else {
+                                        await sendMessage(phone_number_id, from, "Por el momento, la agenda de este barbero para el día seleccionado ya está completa. Nos encantaría atenderte, ¿te gustaría intentar con otra fecha o consultar la disponibilidad de nuestros otros barberos?");
+                                        await new Promise(r => setTimeout(r, 800));
+
+                                        let allBarbers = [
+                                            { id: `btn_brb_any_${srv}`, title: "Ninguna en especial", description: "(No tengo una preferencia particular)" },
+                                            { id: `btn_brb_alberto_${srv}`, title: "Silla 1 Alberto" },
+                                            { id: `btn_brb_jotzan_${srv}`, title: "Silla 2 Jotzan" },
+                                            { id: `btn_brb_juan_${srv}`, title: "Silla 3 Juan" },
+                                            { id: `btn_brb_carlos_${srv}`, title: "Silla 4 Carlos" }
+                                        ];
+                                        
+                                        // Excluir al barbero actual
+                                        let availableBarbers = allBarbers.filter(b => !b.id.includes(`_${brb}_`));
+                                        
+                                        const sections = [
+                                            {
+                                                title: "Consultar otro barbero",
+                                                rows: availableBarbers
+                                            },
+                                            {
+                                                title: "Otras opciones",
+                                                rows: [
+                                                    { id: `btn_brb_${brb}_${srv}`, title: "Probar otra fecha", description: "Con el mismo barbero" },
+                                                    { id: `btn_conf_main`, title: "Menú Principal" }
+                                                ]
+                                            }
+                                        ];
+                                        
+                                        await sendListMessage(phone_number_id, from, "Por favor, selecciona una opción para continuar:", "Ver opciones", sections);
+                                    }
                                 }
                             }
                             else if (parts[1] === 'time') {
