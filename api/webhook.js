@@ -151,7 +151,7 @@ export default async function handler(req, res) {
                             
                             if (hasGratitude && !global.stateCache[from].thanked) {
                                 global.stateCache[from].thanked = true; // prevent unlimited spamming
-                                const responseMsg = "¡Gracias por su preferencia! Te esperamos pronto en Peluquería Carlos Escobar. Obten un 50% de descuento al mostraros en tu primer corte nos sigues en Instagram <Cuenta>.";
+                                const responseMsg = "¡Gracias por su preferencia! Te esperamos pronto en Peluquería Carlos Escobar. Obten un 50% de descuento al mostraros en tu primer corte, que nos sigues en Instagram <Cuenta>.";
                                 await sendMessage(phone_number_id, from, responseMsg);
                                 return res.status(200).send('EVENT_RECEIVED');
                             }
@@ -463,7 +463,7 @@ export default async function handler(req, res) {
                                     { type: "reply", reply: { id: "btn_action_reagendar", title: "Re-agendar" } },
                                     { type: "reply", reply: { id: "btn_action_ubicacion", title: "Ubicación" } }
                                 ];
-                                await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Bienvenido a Peluquería Carlos Escobar. ¿En qué podemos ayudarte hoy?\n\n👆 *Toque la opción deseada*", "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=600&q=80", btns);
+                                await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Qué gusto saludarte. Bienvenido a Peluquería Carlos Escobar 💈. Nos encantaría atenderte, ¿en qué podemos ayudarte el día de hoy?\n\n👆 *Por favor, toca la opción deseada*", "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=600&q=80", btns);
                             }
                         }
                     } catch (error) {
