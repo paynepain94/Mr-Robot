@@ -134,6 +134,7 @@ export default async function handler(req, res) {
                         if (!msg_body.startsWith('btn_')) {
                             const cleanedTokens = msg_body.replace(/[¡!.,¿?()"]/g, ' ').split(/\s+/);
                             const botKeywords = [
+                                'agente', 'bot', 'robot', 'aplicativo', 'asistente',
                                 'agnete', 'ajente', 'agnte', 'agene', 'asitente', 'assistente', 'asiztente', 'asisntencia', 'modulo', 'moduo', 'moudlo', 'modilo', 'aplicatibo', 'apliactivo', 'aplicatvo', 'apliactibo', 'automata', 'automota', 'automta', 'scrip', 'escript', 'escrip', 'sccript', 'skript', 'interfase', 'interfáz', 'interfas', 'entidat', 'enditad', 'entiddad', 'vot', 'bod', 'boit', 'robót', 'roboot', 'rrobot', 'robt', 'automatizacion', 'atomatizacion', 'automatizasion', 'outomatizacion', 'guia', 'gía', 'guuia', 'guis', 'birtual', 'virtul', 'virutal', 'vritual', 'interlokutor', 'interlocuctor', 'interloucutor', 'autogestion', 'outogestion', 'autogestionn', 'atencion', 'atension', 'atecion', 'automatico', 'automaitco', 'atomitaco', 'resolicion', 'resolucion', 'resolusion', 'omnicanalida', 'omnicanalidat', 'omnicanalidad', 'asitencia', 'assistencia', 'asisencia', 'automatizadó', 'atomatizado'
                             ];
                             const hasBotKeyword = botKeywords.some(kw => cleanedTokens.includes(kw));
