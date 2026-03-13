@@ -146,13 +146,25 @@ export default async function handler(req, res) {
                         // Check keywords if bot is finished
                         if (global.stateCache[from]?.isFinished && !msg_body.startsWith('btn_')) {
                             const cleanedTokens = msg_body.replace(/[¡!.,¿?()"]/g, ' ').split(/\s+/);
-                            const gratitudeKeywords = ['gracias', 'ok', 'va', 'vale', 'bien', 'listo'];
-                            const hasGratitude = gratitudeKeywords.some(kw => cleanedTokens.includes(kw));
+                            const yesKeywords = ['si', 'sí', 'yes', 'claro', 'va', 'vale', 'ok', 'okay'];
                             
-                            if (hasGratitude && !global.stateCache[from].thanked) {
-                                global.stateCache[from].thanked = true; // prevent unlimited spamming
-                                const responseMsg = "¡Gracias por su preferencia! Te esperamos pronto en Peluquería Carlos Escobar. Obten un 50% de descuento al mostraros en tu primer corte, que nos sigues en Instagram <Cuenta>.";
-                                await sendMessage(phone_number_id, from, responseMsg);
+                            if (yesKeywords.some(kw => cleanedTokens.includes(kw))) {
+                                msg_body = 'btn_post_ayuda_si';
+                            } else {
+                                const gratitudeKeywords = ['gracias', 'bien', 'listo'];
+                                const hasGratitude = gratitudeKeywords.some(kw => cleanedTokens.includes(kw));
+                                
+                                if (hasGratitude && !global.stateCache[from].thanked) {
+                                    global.stateCache[from].thanked = true; // prevent unlimited spamming
+                                    const responseMsg = "¡Gracias por su preferencia! Te esperamos pronto en Peluquería Carlos Escobar. Obten un 50% de descuento al mostraros en tu primer corte, que nos sigues en Instagram <Cuenta>.";
+                                    await sendMessage(phone_number_id, from, responseMsg);
+                                }
+                                
+                                const btnsHelp = [
+                                    { type: "reply", reply: { id: "btn_post_ayuda_si", title: "Sí, por favor" } },
+                                    { type: "reply", reply: { id: "btn_conf_main", title: "No, gracias" } }
+                                ];
+                                await sendCustomButtonMessage(phone_number_id, from, "¿Te podemos ayudar con algo más?", btnsHelp);
                                 return res.status(200).send('EVENT_RECEIVED');
                             }
                         }
@@ -194,7 +206,8 @@ export default async function handler(req, res) {
 
                         if (msg_body.startsWith('btn_')) {
                             // Block old menus if finished
-                            if (global.stateCache[from]?.isFinished && msg_body !== 'btn_conf_main' && msg_body !== 'btn_action_agendar') {
+                            const allowedPostBtns = ['btn_conf_main', 'btn_action_agendar', 'btn_action_reagendar', 'btn_post_ayuda_si', 'btn_post_pagos', 'btn_conf_human', 'btn_post_menu_anterior'];
+                            if (global.stateCache[from]?.isFinished && !allowedPostBtns.includes(msg_body)) {
                                 const btns = [
                                     { type: "reply", reply: { id: "btn_action_agendar", title: "Agendar Corte" } },
                                     { type: "reply", reply: { id: "btn_conf_main", title: "Menú Principal" } }
@@ -422,6 +435,24 @@ export default async function handler(req, res) {
                                 } else {
                                     global.bookingCache[from] = { time, dateStr, brb, srv, isReagendar, oldName, ts: Date.now() };
                                     await sendMessage(phone_number_id, from, "¡Casi listo! Por favor, dime tu nombre y apellido para registrar la cita. ✍️");
+                                }
+                            }
+                            else if (parts[1] === 'post') {
+                                if (parts[2] === 'ayuda' || parts[2] === 'menu') {
+                                    const btns = [
+                                        { type: "reply", reply: { id: "btn_action_reagendar", title: "Reagendar" } },
+                                        { type: "reply", reply: { id: "btn_post_pagos", title: "Métodos de Pago" } },
+                                        { type: "reply", reply: { id: "btn_conf_human", title: "Hablar con Humano" } }
+                                    ];
+                                    await sendCustomButtonMessage(phone_number_id, from, "¿En qué más te puedo ayudar?", btns);
+                                } else if (parts[2] === 'pagos') {
+                                    await sendMessage(phone_number_id, from, "✅ Pago con efectivo\n✅ Pago con tarjeta\n✅ Transferencia Bancaria");
+                                    const btns = [
+                                        { type: "reply", reply: { id: "btn_conf_main", title: "Menú Principal" } },
+                                        { type: "reply", reply: { id: "btn_action_reagendar", title: "Reagendar" } },
+                                        { type: "reply", reply: { id: "btn_post_menu_anterior", title: "Menú Anterior" } }
+                                    ];
+                                    await sendCustomButtonMessage(phone_number_id, from, "¿Deseas hacer algo más?", btns);
                                 }
                             }
 
