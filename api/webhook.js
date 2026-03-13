@@ -320,7 +320,7 @@ export default async function handler(req, res) {
                                         await sendCustomButtonMessage(phone_number_id, from, "No encontramos ninguna cita pendiente a tu nombre. ¿Deseas agendar un nuevo corte?", btns);
                                     }
                                 } else if (parts[2] === 'ubicacion') {
-                                    await sendMessage(phone_number_id, from, "📍 Dirección: Calle Ignacio Manuel Altamirano 1117, Colima, México.\n⭐ Calificación: 4.9/5 en Google Reviews\n🔗 Maps: https://www.google.com/maps/search/?api=1&query=Calle%20Ignacio%20Manuel%20Altamirano%201117,%20Colima,%20,%20M%C3%A9xico");
+                                    await sendMessage(phone_number_id, from, "📍 Dirección: Calle Ignacio Manuel Altamirano 1117, Colima, México.\n⭐ Calificación: 5.0 (66) en Google Reviews\n🔗 Maps: https://maps.app.goo.gl/CtQJ5HgNM2oDNGfP6");
                                 }
                             }
                             else if (parts[1] === 'srv') {
