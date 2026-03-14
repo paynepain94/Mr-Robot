@@ -207,6 +207,29 @@ function doPost(e) {
             appointmentTime: prettyTime
         })).setMimeType(ContentService.MimeType.JSON);
     }
+
+    else if (data.action === 'logDeauthorize') {
+        const fileName = "Meta_Deauthorize_Log";
+        const files = DriveApp.getFilesByName(fileName);
+        let sheet;
+        if (files.hasNext()) {
+            sheet = SpreadsheetApp.open(files.next()).getActiveSheet();
+        } else {
+            const newSS = SpreadsheetApp.create(fileName);
+            sheet = newSS.getActiveSheet();
+            sheet.appendRow(["event_type", "user_id", "issued_at", "status", "is_valid_signature", "timestamp"]);
+            sheet.getRange("A1:F1").setFontWeight("bold");
+        }
+        
+        sheet.appendRow(["deauthorize", data.user_id, data.issued_at, "RECEIVED", data.isValid, new Date()]);
+        
+        const subject = data.isValid ? "Solicitud de eliminación de datos entrante 🚫" : "Solicitud de eliminación de datos fallida";
+        const emailBody = "Se recibió una solicitud para desautorización en la app.\n\nuser_id: " + data.user_id + "\nissued at: " + data.issued_at + "\nis_valid_signature: " + data.isValid;
+        
+        MailApp.sendEmail("kevinrivm@gmail.com", subject, emailBody);
+        
+        return ContentService.createTextOutput(JSON.stringify({ status: 'ok' })).setMimeType(ContentService.MimeType.JSON);
+    }
   } catch(err) {
     return ContentService.createTextOutput(JSON.stringify({ status: 'error', error: err.toString() })).setMimeType(ContentService.MimeType.JSON);
   }
