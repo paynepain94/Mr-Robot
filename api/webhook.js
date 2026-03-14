@@ -157,21 +157,31 @@ export default async function handler(req, res) {
 
                         // Check keywords if bot is finished
                         if (global.stateCache[from]?.isFinished && !msg_body.startsWith('btn_')) {
-                            const cleanedTokens = msg_body.replace(/[¡!.,¿?()"]/g, ' ').split(/\s+/);
-                            const yesKeywords = ['si', 'sí', 'yes', 'claro', 'va', 'vale', 'ok', 'okay'];
+                            const rawLower = msg_body.toLowerCase().replace(/[¡!.,¿?()"]/g, '').trim();
+                            const cleanedTokens = msg_body.replace(/[¡!.,¿?()"]/g, ' ').toLowerCase().split(/\s+/);
                             
+                            const specificKeywords = ['ok', 'va', 'vale', 'sale', 'saz', 'zaz', 'gracias', 'bien', 'listo', 'okay'];
+                            const isConfirmation = specificKeywords.some(kw => cleanedTokens.includes(kw));
+                            
+                            if (isConfirmation && !global.stateCache[from].thanked) {
+                                global.stateCache[from].thanked = true; // prevent unlimited spamming
+                                const responseMsg = "¡Gracias por su preferencia! Te esperamos pronto en Peluquería Carlos Escobar. Obten un 50% de descuento al mostrarnos en tu primer corte que nos sigues en Instagram <Cuenta>.";
+                                await sendMessage(phone_number_id, from, responseMsg);
+                                
+                                // Also show the help menu after gratitude to be helpful
+                                const btnsHelp = [
+                                    { type: "reply", reply: { id: "btn_post_ayuda_si", title: "Sí, por favor" } },
+                                    { type: "reply", reply: { id: "btn_conf_main", title: "No, gracias" } }
+                                ];
+                                await new Promise(r => setTimeout(r, 1000));
+                                await sendCustomButtonMessage(phone_number_id, from, "¿Te podemos ayudar con algo más?", btnsHelp);
+                                return res.status(200).send('EVENT_RECEIVED');
+                            }
+                            
+                            const yesKeywords = ['si', 'sí', 'yes', 'claro'];
                             if (yesKeywords.some(kw => cleanedTokens.includes(kw))) {
                                 msg_body = 'btn_post_ayuda_si';
                             } else {
-                                const gratitudeKeywords = ['gracias', 'bien', 'listo'];
-                                const hasGratitude = gratitudeKeywords.some(kw => cleanedTokens.includes(kw));
-                                
-                                if (hasGratitude && !global.stateCache[from].thanked) {
-                                    global.stateCache[from].thanked = true; // prevent unlimited spamming
-                                    const responseMsg = "¡Gracias por su preferencia! Te esperamos pronto en Peluquería Carlos Escobar. Obten un 50% de descuento al mostraros en tu primer corte, que nos sigues en Instagram <Cuenta>.";
-                                    await sendMessage(phone_number_id, from, responseMsg);
-                                }
-                                
                                 const btnsHelp = [
                                     { type: "reply", reply: { id: "btn_post_ayuda_si", title: "Sí, por favor" } },
                                     { type: "reply", reply: { id: "btn_conf_main", title: "No, gracias" } }
