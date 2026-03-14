@@ -226,7 +226,7 @@ function doPost(e) {
         const subject = data.isValid ? "Solicitud de eliminación de datos entrante 🚫" : "Solicitud de eliminación de datos fallida";
         const emailBody = "Se recibió una solicitud para desautorización en la app.\n\nuser_id: " + data.user_id + "\nissued at: " + data.issued_at + "\nis_valid_signature: " + data.isValid;
         
-        MailApp.sendEmail("kevinrivm@gmail.com", subject, emailBody);
+        MailApp.sendEmail("mrodani94@gmail.com", subject, emailBody);
         
         return ContentService.createTextOutput(JSON.stringify({ status: 'ok' })).setMimeType(ContentService.MimeType.JSON);
     }

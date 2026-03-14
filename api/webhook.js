@@ -487,7 +487,7 @@ export default async function handler(req, res) {
                                         if (isOffHours) {
                                             await sendCustomButtonMessage(phone_number_id, from, "Lo sentimos, ese horario se encuentra fuera de nuestra jornada laboral. 📅 ¿Te gustaría consultar nuestras horas disponibles?", btns);
                                         } else {
-                                            await sendCustomButtonMessage(phone_number_id, from, "Lo siento, para ese momento del día estamos a tope 💈. ¿Te gustaría intentar otro horario?", btns);
+                                            await sendCustomButtonMessage(phone_number_id, from, "Agenda llena a esa hora. ¡Intenta con un horario libre! 📅", btns);
                                         }
                                     }
                                 } else {
