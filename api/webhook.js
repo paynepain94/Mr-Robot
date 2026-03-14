@@ -367,7 +367,7 @@ export default async function handler(req, res) {
                                         { type: "reply", reply: { id: "btn_action_reagendar", title: "Re-agendar" } },
                                         { type: "reply", reply: { id: "btn_action_ubicacion", title: "Ubicación" } }
                                     ];
-                                    await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Bienvenido a Peluquería Carlos Escobar. ¿En qué podemos ayudarte hoy?\n\n👆 *Toque la opción deseada*", "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=600&q=80", btns);
+                                    await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Bienvenido a Peluquería Carlos Escobar. ¿En qué podemos ayudarte hoy?\n\n👆 *Toque la opción deseada*", "https://drive.google.com/uc?export=view&id=1pSxGMedHKUtxdOvhK9ZkbaDlNsO9nTmD", btns);
                                 } else if (parts[2] === 'human') {
                                     await sendMessage(phone_number_id, from, "En un momento uno de nuestros asesores te atenderá personalmente.");
                                 } else if (parts[2] === 'agendar') {
@@ -734,7 +734,7 @@ export default async function handler(req, res) {
                                 { type: "reply", reply: { id: "btn_contact_human", title: "Llamar Ahora 📞" } },
                                 { type: "reply", reply: { id: "btn_main_menu", title: "Menú Principal ⬅️" } }
                             ];
-                            await sendCustomButtonMessage(phone_number_id, from, fallbackText, fallbackButtons);
+                            await sendHeaderImageMessage(phone_number_id, from, fallbackText, "https://drive.google.com/uc?export=view&id=1pSxGMedHKUtxdOvhK9ZkbaDlNsO9nTmD", fallbackButtons);
                         }
                     } catch (error) {
                         console.error('Error sending fallback flow:', error);
@@ -822,23 +822,16 @@ async function sendMessage(phoneNumberId, to, text) {
     }
 }
 
-// Helper to send Welcome Message & Needs Assessment Buttons
+// Helper to send Welcome Message & Needs Assessment with Header Image
 async function sendWelcomeAndNeeds(phoneNumberId, to) {
-    const welcomeText = "¡Hola! Qué gusto saludarte. Soy el asistente inteligente de Senior Robot 🤖.\n\nSabemos que detrás de cada chat hay un cliente esperando y un negocio con metas grandes. Mi objetivo es ayudarte a que tu equipo sea más productivo y tus clientes reciban atención de primer nivel, las 24 horas. 🌟\n\nPara empezar, ¿cuál es el impulso que tu negocio necesita hoy? 👇\n\nA) Dejar de perder clientes por falta de respuesta rápida ⚡\nB) Organizar mis citas y datos de forma automática 📅\nC) Implementar Inteligencia Artificial para ventas complejas 🧠";
+    const welcomeText = "¡Hola! Qué gusto saludarte. Soy el asistente inteligente de Senior Robot 🤖.\n\nSabemos que detrás de cada chat hay un cliente esperando y un negocio con metas grandes. Mi objetivo es ayudarte a que tu equipo sea más productivo y tus clientes reciban atención de primer nivel, las 24 horas. 🌟\n\nPara empezar, ¿cuál es el impulso que tu negocio necesita hoy? 👇";
 
-    // Send text first
-    await sendMessage(phoneNumberId, to, welcomeText);
-
-    // Short delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    // Send Buttons
     const buttons = [
         { type: "reply", reply: { id: "btn_need_speed", title: "Respuesta Rápida ⚡" } },
         { type: "reply", reply: { id: "btn_need_org", title: "Organizar Citas 📅" } },
         { type: "reply", reply: { id: "btn_need_ai", title: "Implementar IA 🧠" } }
     ];
-    await sendCustomButtonMessage(phoneNumberId, to, "Selecciona tu prioridad:", buttons);
+    await sendHeaderImageMessage(phoneNumberId, to, welcomeText, "https://drive.google.com/uc?export=view&id=1pSxGMedHKUtxdOvhK9ZkbaDlNsO9nTmD", buttons);
 }
 
 // Generic Helper to send Button Messages
