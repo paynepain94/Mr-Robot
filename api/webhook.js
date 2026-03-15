@@ -241,7 +241,9 @@ export default async function handler(req, res) {
                             const knownPrefixes = ['btn_srv_', 'btn_brb_', 'btn_day_', 'btn_bloque_', 'btn_time_'];
                             const isRecoverable = knownPrefixes.some(p => msg_body.startsWith(p));
 
-                            if (global.stateCache[from] && global.stateCache[from].validIds && !isRecoverable) {
+                            const safeNavButtons = ['btn_conf_main', 'btn_action_agendar', 'btn_action_reagendar', 'btn_action_ubicacion', 'btn_conf_human', 'btn_post_pagos', 'btn_post_ayuda_si'];
+
+                            if (global.stateCache[from] && global.stateCache[from].validIds && !isRecoverable && !safeNavButtons.includes(msg_body)) {
                                 if (!global.stateCache[from].validIds.includes(msg_body)) {
                                     const btns = [
                                         { type: "reply", reply: { id: "btn_conf_main", title: "Menú Principal" } },
@@ -270,6 +272,9 @@ export default async function handler(req, res) {
                                     // Aseguramos que bookingCache exista si el botón tiene datos
                                     global.bookingCache[from] = global.bookingCache[from] || {};
                                 }
+                            } else {
+                                // Limpia el estado de reserva solo si el usuario sale del flujo explícitamente
+                                delete global.bookingCache[from];
                             }
                             
                             // Invalidar validIds temporalmente para evitar que haga doble click (Double Tap Prevention)
@@ -277,7 +282,6 @@ export default async function handler(req, res) {
                                 global.stateCache[from].validIds = null;
                             }
                             
-                            delete global.bookingCache[from];
                             const parts = msg_body.split('_');
 
                             if (parts[1] === 'action') {
