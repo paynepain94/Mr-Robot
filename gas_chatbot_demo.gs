@@ -264,6 +264,63 @@ function doPost(e) {
         
         return ContentService.createTextOutput(JSON.stringify({ status: 'ok' })).setMimeType(ContentService.MimeType.JSON);
     }
+
+    else if (data.action === 'logOnboarding') {
+        const fileName = "Meta_Onboarding_Log";
+        const files = DriveApp.getFilesByName(fileName);
+        let sheet;
+        const now = new Date();
+        
+        if (files.hasNext()) {
+            sheet = SpreadsheetApp.open(files.next()).getActiveSheet();
+        } else {
+            const newSS = SpreadsheetApp.create(fileName);
+            sheet = newSS.getActiveSheet();
+            sheet.appendRow(["id", "event_type", "client", "phone_number_id", "waba_id", "business_id", "error_message", "status", "timestamp"]);
+            sheet.getRange("A1:I1").setFontWeight("bold");
+        }
+        
+        const lastRow = sheet.getLastRow();
+        const nextId = lastRow === 1 ? 1 : parseInt(sheet.getRange(lastRow, 1).getValue()) + 1;
+        
+        sheet.appendRow([nextId, "wa_embedded_signup", data.client, data.phone_number_id || "", data.waba_id || "", data.business_id || "", data.error || "", data.status, now]);
+
+        const subject = data.status === "SUCCESS" ? "🌟 Nuevo registro exitoso en Senior Robot" : "⚠️ Error en registro de Onboarding";
+        const emailBody = "Evento: Onboarding\nEstado: " + data.status + "\nCliente: " + data.client + "\n\nError (si lo hubo): " + (data.error || "Ninguno") + "\n\nTeléfono ID: " + (data.phone_number_id || "N/A") + "\nWABA ID: " + (data.waba_id || "N/A") + "\nBusiness ID: " + (data.business_id || "N/A");
+        
+        MailApp.sendEmail("mrodani94@gmail.com", subject, emailBody);
+        
+        return ContentService.createTextOutput(JSON.stringify({ status: 'ok' })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    else if (data.action === 'logAuthCode') {
+        const fileName = "Meta_Onboarding_Log";
+        const files = DriveApp.getFilesByName(fileName);
+        let sheet;
+        const now = new Date();
+        
+        // Asume que la hoja existe si logOnboarding corrió primero
+        if (files.hasNext()) {
+            sheet = SpreadsheetApp.open(files.next()).getActiveSheet();
+        } else {
+            const newSS = SpreadsheetApp.create(fileName);
+            sheet = newSS.getActiveSheet();
+            sheet.appendRow(["id", "event_type", "client", "auth_code", "error_message", "status", "timestamp"]);
+            sheet.getRange("A1:G1").setFontWeight("bold");
+        }
+        
+        const lastRow = sheet.getLastRow();
+        const nextId = lastRow === 1 ? 1 : parseInt(sheet.getRange(lastRow, 1).getValue()) + 1;
+        
+        sheet.appendRow([nextId, "auth_code_received", data.client, data.auth_code || "", data.error || "", data.status, now]);
+
+        const subject = data.status === "SUCCESS" ? "🔑 Código de Auth Recibido" : "❌ Error Obteniendo Auth Code";
+        const emailBody = "Evento: Recepción de Auth Code OAuth\nCliente: " + data.client + "\nEstado: " + data.status + "\n\nCódigo Recibido:\n" + (data.auth_code || "N/A") + "\n\nError (si lo hubo):\n" + (data.error || "Ninguno");
+        
+        MailApp.sendEmail("mrodani94@gmail.com", subject, emailBody);
+        
+        return ContentService.createTextOutput(JSON.stringify({ status: 'ok' })).setMimeType(ContentService.MimeType.JSON);
+    }
   } catch(err) {
     return ContentService.createTextOutput(JSON.stringify({ status: 'error', error: err.toString() })).setMimeType(ContentService.MimeType.JSON);
   }
