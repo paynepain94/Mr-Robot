@@ -5,7 +5,7 @@ const Certificacion = () => {
     // ======== CONFIGURACIÓN ========
     const APP_ID = import.meta.env.VITE_FB_APP_ID || "1587527345706764";
     const GRAPH_VERSION = import.meta.env.VITE_FB_GRAPH_VERSION || "v22.0";
-    const CONFIG_ID = import.meta.env.VITE_FB_CONFIG_ID || "971734715527532";
+    const CONFIG_ID = import.meta.env.VITE_FB_CONFIG_ID || "1153020273511065";
 
     // URLs de los webhooks de Vercel
     const API_ONBOARDING_URL = import.meta.env.VITE_API_ONBOARDING_URL || "/api/onboarding";
