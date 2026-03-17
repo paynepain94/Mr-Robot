@@ -3,9 +3,9 @@ import DynamicBackground from './DynamicBackground';
 
 const Certificacion = () => {
     // ======== CONFIGURACIÓN ========
-    const APP_ID = import.meta.env.VITE_FB_APP_ID || "<TU_APP_ID_AQUI>";
-    const GRAPH_VERSION = import.meta.env.VITE_FB_GRAPH_VERSION || "v24.0";
-    const CONFIG_ID = import.meta.env.VITE_FB_CONFIG_ID || "<TU_CONFIG_ID_AQUI>";
+    const APP_ID = import.meta.env.VITE_FB_APP_ID || "1587527345706764";
+    const GRAPH_VERSION = import.meta.env.VITE_FB_GRAPH_VERSION || "v22.0";
+    const CONFIG_ID = import.meta.env.VITE_FB_CONFIG_ID || "971734715527532";
 
     // URLs de los webhooks en n8n
     const N8N_ONBOARDING_WEBHOOK = import.meta.env.VITE_N8N_ONBOARDING_WEBHOOK || "<URL_WEBHOOK_WHATSAPP_ONBOARDING>";
@@ -42,16 +42,31 @@ const Certificacion = () => {
             if (!event.origin.endsWith("facebook.com")) return;
             const client = getClientParam();
 
+            let data;
             try {
-                const data = JSON.parse(event.data);
-                if (data.type === "WA_EMBEDDED_SIGNUP") {
-                    await postToN8n(N8N_ONBOARDING_WEBHOOK, {
-                        client,
-                        embedded_event: data,
-                        received_at: new Date().toISOString()
-                    });
+                data = JSON.parse(event.data);
+            } catch (err) {
+                console.log('message event parse error: ', event.data);
+                return;
+            }
+
+            if (data.type === "WA_EMBEDDED_SIGNUP") {
+                console.log('Mensaje WA_EMBEDDED_SIGNUP recibido:', data);
+
+                if (data.event === "CANCEL") {
+                    // El usuario cerró a la mitad o hubo un error
+                    console.log("Proceso abandonado o fallido:", data.data);
+                } else {
+                    // Flujo terminado con éxito (e.g., event === 'FINISH' o similar)
+                    console.log("Onboarding exitoso. IDs recibidos:", data.data);
                 }
-            } catch {}
+
+                await postToN8n(N8N_ONBOARDING_WEBHOOK, {
+                    client,
+                    embedded_event: data,
+                    received_at: new Date().toISOString()
+                });
+            }
         };
 
         window.addEventListener("message", handleMessage);
@@ -100,7 +115,7 @@ const Certificacion = () => {
         }
     };
 
-    // 🔥 LA CLAVE PARA COEXISTENCE
+    // Launch method and callback registration
     const launchWhatsAppSignup = () => {
         if (!window.FB) {
             console.error("Facebook SDK no está cargado todavía.");
@@ -112,9 +127,7 @@ const Certificacion = () => {
             response_type: "code",
             override_default_response_type: true,
             extras: {
-                setup: {},
-                featureType: "whatsapp_business_app_onboarding",
-                sessionInfoVersion: "3"
+                setup: {}
             }
         });
     };
