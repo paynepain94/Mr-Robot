@@ -230,6 +230,30 @@ function doPost(e) {
         
         return ContentService.createTextOutput(JSON.stringify({ status: 'ok' })).setMimeType(ContentService.MimeType.JSON);
     }
+    
+    else if (data.action === 'logDataDeletion') {
+        const fileName = "Meta_Deauthorize_Log"; // Aprovechamos la misma hoja o creamos una si no existe
+        const files = DriveApp.getFilesByName(fileName);
+        let sheet;
+        if (files.hasNext()) {
+            sheet = SpreadsheetApp.open(files.next()).getActiveSheet();
+        } else {
+            const newSS = SpreadsheetApp.create(fileName);
+            sheet = newSS.getActiveSheet();
+            sheet.appendRow(["event_type", "user_id", "issued_at", "status", "is_valid_signature", "timestamp"]);
+            sheet.getRange("A1:F1").setFontWeight("bold");
+        }
+        
+        // El status lo ponemos como RECEIVED en la base de datos (según n8n)
+        sheet.appendRow(["data-deletion", data.user_id, data.issued_at, "RECEIVED", data.isValid, new Date()]);
+
+        const subject = data.isValid ? "Solicitud de eliminación de datos entrante 🚫" : "Solicitud de eliminación de datos fallida";
+        const emailBody = "Se recibió una solicitud para eliminación de datos en la app Aishia Agency Automation.\n\nuser_id: " + data.user_id + "\nissued at: " + data.issued_at + "\ncódigo_generado: " + data.code;
+        
+        MailApp.sendEmail("mrodani94@gmail.com", subject, emailBody);
+        
+        return ContentService.createTextOutput(JSON.stringify({ status: 'ok' })).setMimeType(ContentService.MimeType.JSON);
+    }
   } catch(err) {
     return ContentService.createTextOutput(JSON.stringify({ status: 'error', error: err.toString() })).setMimeType(ContentService.MimeType.JSON);
   }
