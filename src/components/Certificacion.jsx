@@ -7,13 +7,13 @@ const Certificacion = () => {
     const GRAPH_VERSION = import.meta.env.VITE_FB_GRAPH_VERSION || "v22.0";
     const CONFIG_ID = import.meta.env.VITE_FB_CONFIG_ID || "971734715527532";
 
-    // URLs de los webhooks en n8n
-    const N8N_ONBOARDING_WEBHOOK = import.meta.env.VITE_N8N_ONBOARDING_WEBHOOK || "<URL_WEBHOOK_WHATSAPP_ONBOARDING>";
-    const N8N_CODE_WEBHOOK = import.meta.env.VITE_N8N_CODE_WEBHOOK || "<URL_WEBHOOK_WHATSAPP_LOGIN_CODE>";
+    // URLs de los webhooks de Vercel
+    const API_ONBOARDING_URL = import.meta.env.VITE_API_ONBOARDING_URL || "/api/onboarding";
+    const API_CODE_URL = import.meta.env.VITE_API_CODE_URL || "/api/auth-code";
 
-    // Header Auth para los webhooks
-    const WEBHOOK_HEADER_NAME = import.meta.env.VITE_WEBHOOK_HEADER_NAME || "x-tuempresa-secret";
-    const WEBHOOK_HEADER_VALUE = import.meta.env.VITE_WEBHOOK_HEADER_VALUE || "<TOKEN_SECRETO_N8N>";
+    // Header Auth para seguridad (opcional)
+    const API_HEADER_NAME = import.meta.env.VITE_API_HEADER_NAME || "authorization";
+    const API_HEADER_VALUE = import.meta.env.VITE_API_HEADER_VALUE || `Bearer ${import.meta.env.VITE_INTERNAL_AUTH_TOKEN || "SECRETO_INTERNO"}`;
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -61,7 +61,7 @@ const Certificacion = () => {
                     console.log("Onboarding exitoso. IDs recibidos:", data.data);
                 }
 
-                await postToN8n(N8N_ONBOARDING_WEBHOOK, {
+                await postToApi(API_ONBOARDING_URL, {
                     client,
                     embedded_event: data,
                     received_at: new Date().toISOString()
@@ -80,18 +80,18 @@ const Certificacion = () => {
         return new URLSearchParams(window.location.search).get("client");
     };
 
-    const postToN8n = async (url, payload) => {
+    const postToApi = async (url, payload) => {
         try {
             await fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    [WEBHOOK_HEADER_NAME]: WEBHOOK_HEADER_VALUE
+                    [API_HEADER_NAME]: API_HEADER_VALUE
                 },
                 body: JSON.stringify(payload)
             });
         } catch (err) {
-            console.error("Error enviando a n8n:", err);
+            console.error("Error enviando datos a la API en Vercel:", err);
         }
     };
 
@@ -101,13 +101,13 @@ const Certificacion = () => {
         if (response.authResponse) {
             const code = response.authResponse.code;
 
-            await postToN8n(N8N_CODE_WEBHOOK, {
+            await postToApi(API_CODE_URL, {
                 client,
                 code,
                 received_at: new Date().toISOString()
             });
         } else {
-            await postToN8n(N8N_CODE_WEBHOOK, {
+            await postToApi(API_CODE_URL, {
                 client,
                 error: response,
                 received_at: new Date().toISOString()
