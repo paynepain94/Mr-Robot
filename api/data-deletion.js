@@ -46,8 +46,8 @@ export default async function handler(req, res) {
         const userId = data.user_id || "unknown";
         const confirmationCode = `REQ-${userId}-${timestamp}`;
 
-        // Registrar en Google Apps Script en segundo plano
-        fetch(GAS_WEB_APP_URL, {
+        // Registrar en Google Apps Script
+        await fetch(GAS_WEB_APP_URL, {
              method: 'POST', 
              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
              body: JSON.stringify({ 
