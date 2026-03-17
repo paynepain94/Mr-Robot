@@ -248,7 +248,7 @@ function doPost(e) {
         sheet.appendRow(["data-deletion", data.user_id, data.issued_at, "RECEIVED", data.isValid, new Date()]);
 
         const subject = data.isValid ? "Solicitud de eliminación de datos entrante 🚫" : "Solicitud de eliminación de datos fallida";
-        const emailBody = "Se recibió una solicitud para eliminación de datos en la app Aishia Agency Automation.\n\nuser_id: " + data.user_id + "\nissued at: " + data.issued_at + "\ncódigo_generado: " + data.code;
+        const emailBody = "Se recibió una solicitud para eliminación de datos en la app Senior Robot.\n\nuser_id: " + data.user_id + "\nissued at: " + data.issued_at + "\ncódigo_generado: " + data.code;
         
         MailApp.sendEmail("mrodani94@gmail.com", subject, emailBody);
         

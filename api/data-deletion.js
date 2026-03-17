@@ -59,7 +59,7 @@ export default async function handler(req, res) {
 
         // 3. Devolver la respuesta a Meta en el formato que exigen
         return res.status(200).json({ 
-            url: `https://aishiagency.tech/eliminacion-datos?id=${confirmationCode}`,
+            url: `https://senior-robot.com/eliminacion-datos?id=${confirmationCode}`,
             confirmation_code: confirmationCode,
             status: "success"
         });
