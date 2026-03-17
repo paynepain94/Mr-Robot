@@ -21,13 +21,15 @@ export default async function handler(req, res) {
         try {
             // Decodificar Base64Url
             if (encoded_sig && payload) {
-                const sig = Buffer.from(encoded_sig.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('hex');
+                const sigBuffer = Buffer.from(encoded_sig.replace(/-/g, '+').replace(/_/g, '/'), 'base64');
                 data = JSON.parse(Buffer.from(payload.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8'));
 
                 // Verificar firma solo si tenemos el APP_SECRET configurado
                 if (secret) {
-                    const expected_sig = crypto.createHmac('sha256', secret).update(payload).digest('hex');
-                    if (sig === expected_sig) {
+                    const expectedSigBuffer = crypto.createHmac('sha256', secret).update(payload).digest();
+                    
+                    // Verificación segura contra ataques de tiempo (Timing Safe)
+                    if (sigBuffer.length === expectedSigBuffer.length && crypto.timingSafeEqual(sigBuffer, expectedSigBuffer)) {
                         isValid = true;
                     }
                 } else {

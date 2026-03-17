@@ -212,16 +212,22 @@ function doPost(e) {
         const fileName = "Meta_Deauthorize_Log";
         const files = DriveApp.getFilesByName(fileName);
         let sheet;
+        const now = new Date();
+        
         if (files.hasNext()) {
             sheet = SpreadsheetApp.open(files.next()).getActiveSheet();
         } else {
             const newSS = SpreadsheetApp.create(fileName);
             sheet = newSS.getActiveSheet();
-            sheet.appendRow(["event_type", "user_id", "issued_at", "status", "is_valid_signature", "timestamp"]);
-            sheet.getRange("A1:F1").setFontWeight("bold");
+            // id | event_type | user_id | issued_at | status | createdAt | updatedAt | isValid
+            sheet.appendRow(["id", "event_type", "user_id", "issued_at", "status", "createdAt", "updatedAt", "is_valid_signature"]);
+            sheet.getRange("A1:H1").setFontWeight("bold");
         }
         
-        sheet.appendRow(["deauthorize", data.user_id, data.issued_at, "RECEIVED", data.isValid, new Date()]);
+        const lastRow = sheet.getLastRow();
+        const nextId = lastRow === 1 ? 1 : parseInt(sheet.getRange(lastRow, 1).getValue()) + 1;
+        
+        sheet.appendRow([nextId, "deauthorize", data.user_id, data.issued_at, "RECEIVED", now, now, data.isValid]);
         
         const subject = data.isValid ? "Solicitud de eliminación de datos entrante 🚫" : "Solicitud de eliminación de datos fallida";
         const emailBody = "Se recibió una solicitud para desautorización en la app.\n\nuser_id: " + data.user_id + "\nissued at: " + data.issued_at + "\nis_valid_signature: " + data.isValid;
@@ -232,20 +238,24 @@ function doPost(e) {
     }
     
     else if (data.action === 'logDataDeletion') {
-        const fileName = "Meta_Deauthorize_Log"; // Aprovechamos la misma hoja o creamos una si no existe
+        const fileName = "Meta_Deauthorize_Log";
         const files = DriveApp.getFilesByName(fileName);
         let sheet;
+        const now = new Date();
+        
         if (files.hasNext()) {
             sheet = SpreadsheetApp.open(files.next()).getActiveSheet();
         } else {
             const newSS = SpreadsheetApp.create(fileName);
             sheet = newSS.getActiveSheet();
-            sheet.appendRow(["event_type", "user_id", "issued_at", "status", "is_valid_signature", "timestamp"]);
-            sheet.getRange("A1:F1").setFontWeight("bold");
+            sheet.appendRow(["id", "event_type", "user_id", "issued_at", "status", "createdAt", "updatedAt", "is_valid_signature"]);
+            sheet.getRange("A1:H1").setFontWeight("bold");
         }
         
-        // El status lo ponemos como RECEIVED en la base de datos (según n8n)
-        sheet.appendRow(["data-deletion", data.user_id, data.issued_at, "RECEIVED", data.isValid, new Date()]);
+        const lastRow = sheet.getLastRow();
+        const nextId = lastRow === 1 ? 1 : parseInt(sheet.getRange(lastRow, 1).getValue()) + 1;
+        
+        sheet.appendRow([nextId, "data-deletion", data.user_id, data.issued_at, "RECEIVED", now, now, data.isValid]);
 
         const subject = data.isValid ? "Solicitud de eliminación de datos entrante 🚫" : "Solicitud de eliminación de datos fallida";
         const emailBody = "Se recibió una solicitud para eliminación de datos en la app Senior Robot.\n\nuser_id: " + data.user_id + "\nissued at: " + data.issued_at + "\ncódigo_generado: " + data.code;
