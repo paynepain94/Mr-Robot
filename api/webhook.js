@@ -165,7 +165,7 @@ export default async function handler(req, res) {
                             
                             if (isConfirmation && !global.stateCache[from].thanked) {
                                 global.stateCache[from].thanked = true; // prevent unlimited spamming
-                                const responseMsg = "¡Gracias por su preferencia! Te esperamos pronto en Peluquería Carlos Escobar. Obten un 50% de descuento al mostrarnos en tu primer corte que nos sigues en Instagram <Cuenta>.";
+                                const responseMsg = "¡Gracias por su preferencia! Te esperamos pronto en Senior Robot. Obten un 50% de descuento al mostrarnos en tu primer corte que nos sigues en Instagram @senior.robot.";
                                 await sendMessage(phone_number_id, from, responseMsg);
                                 
                                 // Also show the help menu after gratitude to be helpful
@@ -371,7 +371,7 @@ export default async function handler(req, res) {
                                         { type: "reply", reply: { id: "btn_action_reagendar", title: "Re-agendar" } },
                                         { type: "reply", reply: { id: "btn_action_ubicacion", title: "Ubicación" } }
                                     ];
-                                    await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Bienvenido a Peluquería Carlos Escobar. ¿En qué podemos ayudarte hoy?\n\n👆 *Toque la opción deseada*", "https://lh3.googleusercontent.com/d/1pSxGMedHKUtxdOvhK9ZkbaDlNsO9nTmD", btns);
+                                    await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Bienvenido a Senior Robot 🤖. ¿En qué podemos ayudarte hoy?\n\n👆 *Toque la opción deseada*", "https://www.senior-robot.com/barber-header.jpg", btns);
                                 } else if (parts[2] === 'human') {
                                     await sendMessage(phone_number_id, from, "En un momento uno de nuestros asesores te atenderá personalmente.");
                                 } else if (parts[2] === 'agendar') {
@@ -632,7 +632,7 @@ export default async function handler(req, res) {
                                     { type: "reply", reply: { id: "btn_action_reagendar", title: "Re-agendar" } },
                                     { type: "reply", reply: { id: "btn_action_ubicacion", title: "Ubicación" } }
                                 ];
-                                await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Qué gusto saludarte. Bienvenido a Peluquería Carlos Escobar 💈. Nos encantaría atenderte, ¿en qué podemos ayudarte el día de hoy?\n\n👆 *Por favor, toca la opción deseada*", "https://lh3.googleusercontent.com/d/1pSxGMedHKUtxdOvhK9ZkbaDlNsO9nTmD", btns);
+                                await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Qué gusto saludarte. Bienvenido a Senior Robot 💈🤖. Nos encantaría atenderte, ¿en qué podemos ayudarte el día de hoy?\n\n👆 *Por favor, toca la opción deseada*", "https://www.senior-robot.com/barber-header.jpg", btns);
                             }
                         }
                     } catch (error) {
@@ -738,7 +738,7 @@ export default async function handler(req, res) {
                                 { type: "reply", reply: { id: "btn_contact_human", title: "Llamar Ahora 📞" } },
                                 { type: "reply", reply: { id: "btn_main_menu", title: "Menú Principal ⬅️" } }
                             ];
-                            await sendHeaderImageMessage(phone_number_id, from, fallbackText, "https://lh3.googleusercontent.com/d/1pSxGMedHKUtxdOvhK9ZkbaDlNsO9nTmD", fallbackButtons);
+                            await sendHeaderImageMessage(phone_number_id, from, fallbackText, "https://www.senior-robot.com/barber-header.jpg", fallbackButtons);
                         }
                     } catch (error) {
                         console.error('Error sending fallback flow:', error);
@@ -835,7 +835,7 @@ async function sendWelcomeAndNeeds(phoneNumberId, to) {
         { type: "reply", reply: { id: "btn_need_org", title: "Organizar Citas 📅" } },
         { type: "reply", reply: { id: "btn_need_ai", title: "Implementar IA 🧠" } }
     ];
-    await sendHeaderImageMessage(phoneNumberId, to, welcomeText, "https://lh3.googleusercontent.com/d/1pSxGMedHKUtxdOvhK9ZkbaDlNsO9nTmD", buttons);
+    await sendHeaderImageMessage(phoneNumberId, to, welcomeText, "https://www.senior-robot.com/barber-header.jpg", buttons);
 }
 
 // Generic Helper to send Button Messages
