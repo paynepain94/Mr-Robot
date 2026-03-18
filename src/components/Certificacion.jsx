@@ -38,7 +38,7 @@ const Certificacion = () => {
             });
         };
 
-        const handleMessage = async (event) => {
+        const handleMessage = (event) => {
             if (!event.origin.endsWith("facebook.com")) return;
             const client = getClientParam();
 
@@ -46,22 +46,18 @@ const Certificacion = () => {
             try {
                 data = JSON.parse(event.data);
             } catch (err) {
-                console.log('message event parse error: ', event.data);
                 return;
             }
 
             if (data.type === "WA_EMBEDDED_SIGNUP") {
-                console.log('Mensaje WA_EMBEDDED_SIGNUP recibido:', data);
-
                 if (data.event === "CANCEL") {
-                    // El usuario cerró a la mitad o hubo un error
-                    console.log("Proceso abandonado o fallido:", data.data);
+                    console.log("Proceso abandonado:", data.data);
                 } else {
-                    // Flujo terminado con éxito (e.g., event === 'FINISH' o similar)
-                    console.log("Onboarding exitoso. IDs recibidos:", data.data);
+                    console.log("Onboarding exitoso:", data.data);
                 }
 
-                await postToApi(API_ONBOARDING_URL, {
+                // Ejecutar el post de forma asíncrona pero sin marcar la función principal como async
+                postToApi(API_ONBOARDING_URL, {
                     client,
                     embedded_event: data,
                     received_at: new Date().toISOString()
@@ -95,19 +91,19 @@ const Certificacion = () => {
         }
     };
 
-    const fbLoginCallback = async (response) => {
+    const fbLoginCallback = (response) => {
         const client = getClientParam();
 
         if (response.authResponse) {
             const code = response.authResponse.code;
 
-            await postToApi(API_CODE_URL, {
+            postToApi(API_CODE_URL, {
                 client,
                 code,
                 received_at: new Date().toISOString()
             });
         } else {
-            await postToApi(API_CODE_URL, {
+            postToApi(API_CODE_URL, {
                 client,
                 error: response,
                 received_at: new Date().toISOString()
