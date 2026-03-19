@@ -37,9 +37,9 @@ export default async function handler(req, res) {
                 }
 
                 if (!isValid) {
-                    console.error('Signature verification failed (App Secret mismatch). Bypassing temporarily.');
-                    // TEMPORAL: Desactivado para que puedas probar el bot.
-                    // return res.status(403).send('Forbidden: Invalid Signature');
+                    console.error('Signature verification failed (App Secret mismatch). Rejecting request.');
+                    // SEGURIDAD ACTIVADA: Se rechazan peticiones sin firma válida
+                    return res.status(403).send('Forbidden: Invalid Signature');
                 }
             }
         }
