@@ -5,7 +5,7 @@ import Header from './components/Header';
 import Benefits from './components/Benefits';
 import HowItWorks from './components/HowItWorks';
 import Conoceme from './components/Conoceme';
-import Testimonials from './components/Testimonials';
+// import Testimonials from './components/Testimonials';
 import FAQ from './components/FAQ';
 import Footer from './components/Footer';
 import WhatsappButton from './components/WhatsappButton';
@@ -50,7 +50,7 @@ function App() {
                                 <Benefits />
                                 <HowItWorks />
                                 <Conoceme />
-                                <Testimonials />
+                        {/* <Testimonials /> */}
                                 <FAQ />
                             </main>
                         </>

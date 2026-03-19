@@ -52,7 +52,7 @@ const Header = () => {
           </a>
 
           {/* Trust Signal (Users + Rating) */}
-          <div className="flex items-center gap-3">
+          {/* <div className="flex items-center gap-3">
             <div className="flex -space-x-3">
               {[10, 12, 11, 8].map((imgId, i) => (
                 <div key={i} className={`w-10 h-10 rounded-full border-2 border-black bg-gray-700 overflow-hidden relative z-[${10 - i}]`}>
@@ -66,7 +66,7 @@ const Header = () => {
               </div>
               <p className="text-gray-400 text-xs font-medium">4.9/5 de valoración promedio.</p>
             </div>
-          </div>
+          </div> */}
 
         </div>
 
