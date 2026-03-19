@@ -329,8 +329,9 @@ export default async function handler(req, res) {
                                             
                                             let dateStr = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
                                             let dayName = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"][d.getDay()];
+                                            let ext = `_R_${oldName.replace(/_/g, ' ').substring(0, 30)}`;
                                             sections[0].rows.push({
-                                                id: `btn_day_${dateStr}_${brb}_${srv}`, 
+                                                id: `btn_day_${dateStr}_${brb}_${srv}${ext}`, 
                                                 title: `${dayName} ${d.getDate()}`
                                             });
                                             validDays++;
@@ -371,7 +372,7 @@ export default async function handler(req, res) {
                                         { type: "reply", reply: { id: "btn_action_reagendar", title: "Re-agendar" } },
                                         { type: "reply", reply: { id: "btn_action_ubicacion", title: "Ubicación" } }
                                     ];
-                                    await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Bienvenido a Senior Robot 🤖. ¿En qué podemos ayudarte hoy?\n\n👆 *Toque la opción deseada*", "https://www.senior-robot.com/barber-header.jpg", btns);
+                                    await sendHeaderImageMessage(phone_number_id, from, "Bienvenido a la Barbería Carlos Escobar, te atiende Sr. Robot, en que te puedo ayudar?\n\nToca/Selecciona 1 de las 3 opciones:  ", "https://www.senior-robot.com/barber-header.jpg", btns);
                                 } else if (parts[2] === 'human') {
                                     await sendMessage(phone_number_id, from, "En un momento uno de nuestros asesores te atenderá personalmente.");
                                 } else if (parts[2] === 'agendar') {
@@ -393,6 +394,7 @@ export default async function handler(req, res) {
                             else if (parts[1] === 'brb') {
                                 const brb = parts[2];
                                 const srv = parts[3];
+                                const extR = parts.length > 4 && parts[4] === 'R' ? `_R_${parts[5]}` : '';
                                 const sections = [{
                                     title: "Días Disponibles",
                                     rows: []
@@ -409,7 +411,7 @@ export default async function handler(req, res) {
                                     let dateStr = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
                                     let dayName = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"][d.getDay()];
                                     sections[0].rows.push({
-                                        id: `btn_day_${dateStr}_${brb}_${srv}`, 
+                                        id: `btn_day_${dateStr}_${brb}_${srv}${extR}`, 
                                         title: `${dayName} ${d.getDate()}`
                                     });
                                     validDays++;
@@ -425,14 +427,15 @@ export default async function handler(req, res) {
                                 const dateStr = parts[2];
                                 const brb = parts[3];
                                 const srv = parts[4];
+                                const extR = parts.length > 5 && parts[5] === 'R' ? `_R_${parts[6]}` : '';
                                 const btns = [
-                                    { type: "reply", reply: { id: `btn_bloque_manana_${dateStr}_${brb}_${srv}`, title: "Mañana (hasta 1pm)" } },
-                                    { type: "reply", reply: { id: `btn_bloque_tarde_${dateStr}_${brb}_${srv}`, title: "Tarde (1pm - 6pm)" } }
+                                    { type: "reply", reply: { id: `btn_bloque_manana_${dateStr}_${brb}_${srv}${extR}`, title: "Mañana (hasta 1pm)" } },
+                                    { type: "reply", reply: { id: `btn_bloque_tarde_${dateStr}_${brb}_${srv}${extR}`, title: "Tarde (1pm - 6pm)" } }
                                 ];
                                 
                                 let targetDateObj = new Date(parseInt(dateStr.substr(0,4)), parseInt(dateStr.substr(4,2))-1, parseInt(dateStr.substr(6,2)));
                                 if (targetDateObj.getDay() !== 0) { // No Noche on Sundays
-                                    btns.push({ type: "reply", reply: { id: `btn_bloque_noche_${dateStr}_${brb}_${srv}`, title: "Noche (6pm a cierre)" } });
+                                    btns.push({ type: "reply", reply: { id: `btn_bloque_noche_${dateStr}_${brb}_${srv}${extR}`, title: "Noche (6pm a cierre)" } });
                                 }
                                 
                                 await sendCustomButtonMessage(phone_number_id, from, "Para ver todos los horarios, ¿en qué turno te gustaría agendar?", btns);
@@ -442,6 +445,7 @@ export default async function handler(req, res) {
                                 const dateStr = parts[3];
                                 const brb = parts[4];
                                 const srv = parts[5];
+                                const extR = parts.length > 6 && parts[6] === 'R' ? `_R_${parts[7]}` : '';
 
                                 await sendMessage(phone_number_id, from, "⏳ Consultando disponibilidad en la barbería...");
 
@@ -471,7 +475,7 @@ export default async function handler(req, res) {
                                             title: `Horarios (${bloque})`,
                                             rows: slots.map(slot => {
                                                 const safeTime = slot.replace(/ /g, '').replace(/:/g, ''); 
-                                                return { id: `btn_time_${safeTime}_${dateStr}_${brb}_${srv}`, title: slot };
+                                                return { id: `btn_time_${safeTime}_${dateStr}_${brb}_${srv}${extR}`, title: slot };
                                             })
                                         }];
                                         await sendListMessage(phone_number_id, from, `Estos son los turnos disponibles:`, "Ver horarios", sections);
@@ -484,14 +488,14 @@ export default async function handler(req, res) {
                                         if ((dayW === 0 || dayW === 6) && bloque === 'noche') isOffHours = true;
 
                                         const btns = [
-                                            { type: "reply", reply: { id: `btn_day_${dateStr}_${brb}_${srv}`, title: "Ver otro horario" } },
+                                            { type: "reply", reply: { id: `btn_brb_${brb}_${srv}${extR}`, title: "Elegir otro día" } },
                                             { type: "reply", reply: { id: `btn_conf_main`, title: "Menú Principal" } }
                                         ];
 
                                         if (isOffHours) {
-                                            await sendCustomButtonMessage(phone_number_id, from, "Lo sentimos, ese horario se encuentra fuera de nuestra jornada laboral. 📅 ¿Te gustaría consultar nuestras horas disponibles?", btns);
+                                            await sendCustomButtonMessage(phone_number_id, from, "Lo sentimos, este turno se encuentra fuera de nuestra jornada laboral para ese día. 📅 ¿Te gustaría consultar otro día u otro horario?", btns);
                                         } else {
-                                            await sendCustomButtonMessage(phone_number_id, from, "Agenda llena a esa hora. ¡Intenta con un horario libre! 📅", btns);
+                                            await sendCustomButtonMessage(phone_number_id, from, "Agenda llena en este turno. ¡Por favor elige otro día para buscar un espacio libre! 📅", btns);
                                         }
                                     }
                                 } else {
@@ -542,7 +546,11 @@ export default async function handler(req, res) {
                                 
                                 let isReagendar = false;
                                 let oldName = null;
-                                if (global.bookingCache && global.bookingCache[from] && global.bookingCache[from].isReagendar) {
+                                
+                                if (parts.length > 6 && parts[6] === 'R') {
+                                    isReagendar = true;
+                                    oldName = parts[7];
+                                } else if (global.bookingCache && global.bookingCache[from] && global.bookingCache[from].isReagendar) {
                                     isReagendar = true;
                                     oldName = global.bookingCache[from].oldName;
                                 }
@@ -632,7 +640,7 @@ export default async function handler(req, res) {
                                     { type: "reply", reply: { id: "btn_action_reagendar", title: "Re-agendar" } },
                                     { type: "reply", reply: { id: "btn_action_ubicacion", title: "Ubicación" } }
                                 ];
-                                await sendHeaderImageMessage(phone_number_id, from, "¡Hola! Qué gusto saludarte. Bienvenido a Senior Robot 💈🤖. Nos encantaría atenderte, ¿en qué podemos ayudarte el día de hoy?\n\n👆 *Por favor, toca la opción deseada*", "https://www.senior-robot.com/barber-header.jpg", btns);
+                                await sendHeaderImageMessage(phone_number_id, from, "Bienvenido a la Barbería Carlos Escobar, te atiende Sr. Robot, en que te puedo ayudar?\n\nToca/Selecciona 1 de las 3 opciones:  ", "https://www.senior-robot.com/barber-header.jpg", btns);
                             }
                         }
                     } catch (error) {
