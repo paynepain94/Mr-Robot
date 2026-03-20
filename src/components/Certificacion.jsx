@@ -122,20 +122,9 @@ const Certificacion = () => {
             response_type: "code",
             override_default_response_type: true,
             extras: {
-                "version": "v3",
-                "sessionInfoVersion": "3",
-                "setup": {
-                    "business": {
-                        "id": null,
-                        "phone": {},
-                        "address": {},
-                        "timezone": null
-                    },
-                    "phone": {
-                        "category": null,
-                        "description": ""
-                    }
-                }
+                setup: {},
+                featureType: "whatsapp_business_app_onboarding",
+                sessionInfoVersion: "3"
             }
         });
     };
