@@ -1,6 +1,22 @@
 import crypto from 'crypto';
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 export default async function handler(req, res) {
+    // -------------------------------------------------------------------------
+    // Leer el raw body para Vercel
+    // -------------------------------------------------------------------------
+    let rawBody = '';
+    if (req.method === 'POST') {
+        for await (const chunk of req) {
+            rawBody += chunk;
+        }
+    }
+
     // -------------------------------------------------------------------------
     // SECURITY: Signature Verification
     // -------------------------------------------------------------------------
@@ -26,18 +42,21 @@ export default async function handler(req, res) {
 
                 // Intentar con el Secret 1 (Senior Robot)
                 if (APP_SECRET_1) {
-                    const expectedHash1 = crypto.createHmac('sha256', APP_SECRET_1).update(JSON.stringify(req.body)).digest('hex');
+                    const expectedHash1 = crypto.createHmac('sha256', APP_SECRET_1).update(rawBody).digest('hex');
                     if (signatureHash === expectedHash1) isValid = true;
+                    if (!isValid) console.log(`DEBUG: hash1=${expectedHash1} no match`);
                 }
 
                 // Si falla, intentar con el Secret 2 (Calendar Demo)
                 if (!isValid && APP_SECRET_2) {
-                    const expectedHash2 = crypto.createHmac('sha256', APP_SECRET_2).update(JSON.stringify(req.body)).digest('hex');
+                    const expectedHash2 = crypto.createHmac('sha256', APP_SECRET_2).update(rawBody).digest('hex');
                     if (signatureHash === expectedHash2) isValid = true;
+                    if (!isValid) console.log(`DEBUG: hash2=${expectedHash2} no match`);
                 }
 
                 if (!isValid) {
-                    console.error('Signature verification failed (App Secret mismatch). Rejecting request.');
+                    console.error(`Signature verification failed (App Secret mismatch). Expected hash1 or hash2, got: ${signatureHash}`);
+                    console.error(`Using APP_SECRET_1: ${APP_SECRET_1 ? 'Present' : 'Missing'}, APP_SECRET_2: ${APP_SECRET_2 ? 'Present' : 'Missing'}`);
                     // SEGURIDAD ACTIVADA: Se rechazan peticiones sin firma válida
                     return res.status(403).send('Forbidden: Invalid Signature');
                 }
@@ -63,7 +82,13 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-        const body = req.body;
+        let body;
+        try {
+            body = JSON.parse(rawBody);
+        } catch (e) {
+            console.error("Invalid JSON:", e);
+            return res.status(400).send("Invalid JSON");
+        }
         console.log('Incoming webhook:', JSON.stringify(body, null, 2));
 
         if (body.object) {

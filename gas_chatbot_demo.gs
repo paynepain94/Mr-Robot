@@ -302,20 +302,26 @@ function doPost(e) {
         // Asume que la hoja existe si logOnboarding corrió primero
         if (files.hasNext()) {
             sheet = SpreadsheetApp.open(files.next()).getActiveSheet();
+            // Asegurar que la columna access_token existe (traducido del sistema n8n)
+            const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+            if (headers.indexOf("access_token") === -1) {
+                // Agregarla si no estaba
+                sheet.getRange(1, sheet.getLastColumn() + 1).setValue("access_token");
+            }
         } else {
             const newSS = SpreadsheetApp.create(fileName);
             sheet = newSS.getActiveSheet();
-            sheet.appendRow(["id", "event_type", "client", "auth_code", "error_message", "status", "timestamp"]);
-            sheet.getRange("A1:G1").setFontWeight("bold");
+            sheet.appendRow(["id", "event_type", "client", "auth_code", "error_message", "status", "timestamp", "access_token"]);
+            sheet.getRange("A1:H1").setFontWeight("bold");
         }
         
         const lastRow = sheet.getLastRow();
         const nextId = lastRow === 1 ? 1 : parseInt(sheet.getRange(lastRow, 1).getValue()) + 1;
         
-        sheet.appendRow([nextId, "auth_code_received", data.client, data.auth_code || "", data.error || "", data.status, now]);
+        sheet.appendRow([nextId, "auth_code_received", data.client, data.auth_code || "", data.error || "", data.status, now, data.access_token || ""]);
 
-        const subject = data.status === "SUCCESS" ? "🔑 Código de Auth Recibido" : "❌ Error Obteniendo Auth Code";
-        const emailBody = "Evento: Recepción de Auth Code OAuth\nCliente: " + data.client + "\nEstado: " + data.status + "\n\nCódigo Recibido:\n" + (data.auth_code || "N/A") + "\n\nError (si lo hubo):\n" + (data.error || "Ninguno");
+        const subject = data.status === "SUCCESS" ? "🔑 Código de Auth y Token Recibido" : "❌ Error Obteniendo Auth Code";
+        const emailBody = "Evento: Recepción de Auth Code / Token OAuth\nCliente: " + data.client + "\nEstado: " + data.status + "\n\nCódigo Recibido:\n" + (data.auth_code || "N/A") + "\n\nAccess Token:\n" + (data.access_token || "No generado") + "\n\nError (si lo hubo):\n" + (data.error || "Ninguno");
         
         MailApp.sendEmail("mrodani94@gmail.com", subject, emailBody);
         

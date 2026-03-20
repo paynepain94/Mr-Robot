@@ -4,16 +4,16 @@ import DynamicBackground from './DynamicBackground';
 const Certificacion = () => {
     // ======== CONFIGURACIÓN ========
     const APP_ID = import.meta.env.VITE_FB_APP_ID || "1587527345706764";
-    const GRAPH_VERSION = import.meta.env.VITE_FB_GRAPH_VERSION || "v22.0";
-    const CONFIG_ID = import.meta.env.VITE_FB_CONFIG_ID || "1153020273511065";
+    const GRAPH_VERSION = import.meta.env.VITE_FB_GRAPH_VERSION || "v24.0";
+    const CONFIG_ID = import.meta.env.VITE_FB_CONFIG_ID || "971734715527532";
 
-    // URLs de los webhooks de Vercel
+    // URLs de los webhooks internos (Vercel)
     const API_ONBOARDING_URL = import.meta.env.VITE_API_ONBOARDING_URL || "/api/onboarding";
     const API_CODE_URL = import.meta.env.VITE_API_CODE_URL || "/api/auth-code";
 
-    // Header Auth para seguridad (opcional)
-    const API_HEADER_NAME = import.meta.env.VITE_API_HEADER_NAME || "authorization";
-    const API_HEADER_VALUE = import.meta.env.VITE_API_HEADER_VALUE || `Bearer ${import.meta.env.VITE_INTERNAL_AUTH_TOKEN || "SECRETO_INTERNO"}`;
+    // Header Auth interno para Vercel
+    const WEBHOOK_HEADER_NAME = "authorization";
+    const WEBHOOK_HEADER_VALUE = `Bearer ${import.meta.env.VITE_INTERNAL_AUTH_TOKEN || "SECRETO_INTERNO"}`;
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -56,8 +56,7 @@ const Certificacion = () => {
                     console.log("Onboarding exitoso:", data.data);
                 }
 
-                // Ejecutar el post de forma asíncrona pero sin marcar la función principal como async
-                postToApi(API_ONBOARDING_URL, {
+                postToN8n(API_ONBOARDING_URL, {
                     client,
                     embedded_event: data,
                     received_at: new Date().toISOString()
@@ -76,18 +75,18 @@ const Certificacion = () => {
         return new URLSearchParams(window.location.search).get("client");
     };
 
-    const postToApi = async (url, payload) => {
+    const postToN8n = async (url, payload) => {
         try {
             await fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    [API_HEADER_NAME]: API_HEADER_VALUE
+                    [WEBHOOK_HEADER_NAME]: WEBHOOK_HEADER_VALUE
                 },
                 body: JSON.stringify(payload)
             });
         } catch (err) {
-            console.error("Error enviando datos a la API en Vercel:", err);
+            console.error("Error enviando datos a n8n:", err);
         }
     };
 
@@ -97,13 +96,13 @@ const Certificacion = () => {
         if (response.authResponse) {
             const code = response.authResponse.code;
 
-            postToApi(API_CODE_URL, {
+            postToN8n(API_CODE_URL, {
                 client,
                 code,
                 received_at: new Date().toISOString()
             });
         } else {
-            postToApi(API_CODE_URL, {
+            postToN8n(API_CODE_URL, {
                 client,
                 error: response,
                 received_at: new Date().toISOString()
@@ -121,12 +120,13 @@ const Certificacion = () => {
         window.FB.login(fbLoginCallback, {
             config_id: CONFIG_ID,
             response_type: "code",
-            override_default_response_type: true,
-            extras: {
-                setup: {},
-                featureType: "whatsapp_business_app_onboarding",
-                sessionInfoVersion: "3"
-            }
+            override_default_response_type: true
+            // Descomenta lo siguiente cuando Meta apruebe tu revisión como Tech Provider (Coexistencia)
+            // extras: {
+            //     setup: {},
+            //     featureType: "whatsapp_business_app_onboarding",
+            //     sessionInfoVersion: "3"
+            // }
         });
     };
 
