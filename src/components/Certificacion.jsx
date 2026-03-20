@@ -123,6 +123,7 @@ const Certificacion = () => {
             override_default_response_type: true,
             extras: {
                 "version": "v3",
+                "sessionInfoVersion": "3",
                 "setup": {
                     "business": {
                         "id": null,
