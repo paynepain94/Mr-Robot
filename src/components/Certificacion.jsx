@@ -120,13 +120,22 @@ const Certificacion = () => {
         window.FB.login(fbLoginCallback, {
             config_id: CONFIG_ID,
             response_type: "code",
-            override_default_response_type: true
-            // Descomenta lo siguiente cuando Meta apruebe tu revisión como Tech Provider (Coexistencia)
-            // extras: {
-            //     setup: {},
-            //     featureType: "whatsapp_business_app_onboarding",
-            //     sessionInfoVersion: "3"
-            // }
+            override_default_response_type: true,
+            extras: {
+                "version": "v3",
+                "setup": {
+                    "business": {
+                        "id": null,
+                        "phone": {},
+                        "address": {},
+                        "timezone": null
+                    },
+                    "phone": {
+                        "category": null,
+                        "description": ""
+                    }
+                }
+            }
         });
     };
 
